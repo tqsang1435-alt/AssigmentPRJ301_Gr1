@@ -26,3 +26,4 @@ replay_pid*
 # --- [5] Other (Có thể giữ hoặc xóa tùy nhu cầu) ---
 *.ctxt
 .mtj.tmp/
+.gitignore
