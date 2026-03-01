@@ -26,4 +26,5 @@ replay_pid*
 *.ctxt
 .mtj.tmp/
 MANIFEST.MF
-.gitignore
+# Của Huan 
+Summary.json
