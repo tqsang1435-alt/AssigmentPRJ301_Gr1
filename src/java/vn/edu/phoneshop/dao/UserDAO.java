@@ -50,8 +50,7 @@ public class UserDAO {
                         rs.getString("Address"),
                         rs.getString("Password"),
                         rs.getString("Role"),
-                        new java.util.Date(rs.getTimestamp("CreateDate").getTime())
-                );
+                        new java.util.Date(rs.getTimestamp("CreateDate").getTime()));
             }
             rs.close();
         } catch (SQLException e) {
@@ -75,8 +74,7 @@ public class UserDAO {
                         rs.getString("Address"),
                         rs.getString("Password"),
                         rs.getString("Role"),
-                        new java.util.Date(rs.getTimestamp("CreateDate").getTime())
-                );
+                        new java.util.Date(rs.getTimestamp("CreateDate").getTime()));
                 userList.add(user);
             }
             rs.close();
@@ -112,8 +110,7 @@ public class UserDAO {
     }
 
     public boolean updateUser(User user) {
-        String sql = "UPDATE Users SET FullName = ?, Email = ?, PhoneNumber = ?, Address = ?, Password = ?, Role = ? "
-                + "WHERE UserID = ?";
+        String sql = "UPDATE Users SET FullName = ?, Email = ?, PhoneNumber = ?, Address = ?, Password = ?, Role = ? "+ "WHERE UserID = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
