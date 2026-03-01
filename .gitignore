@@ -1,6 +1,5 @@
 # --- [1] Compiled & Build Output (BẮT BUỘC) ---
 *.class
-build/
 dist/
 nbbuild/
 nblib/
@@ -27,3 +26,6 @@ replay_pid*
 *.ctxt
 .mtj.tmp/
 .gitignore
+
+# Thêm 
+MANIFEST.MF
