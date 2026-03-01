@@ -86,8 +86,7 @@ public class UserDAO {
     }
 
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO Users (FullName, Email, PhoneNumber, Address, Password, Role, CreateDate) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (FullName, Email, PhoneNumber, Address, Password, Role, CreateDate) " + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -110,7 +109,7 @@ public class UserDAO {
     }
 
     public boolean updateUser(User user) {
-        String sql = "UPDATE Users SET FullName = ?, Email = ?, PhoneNumber = ?, Address = ?, Password = ?, Role = ? "+ "WHERE UserID = ?";
+        String sql = "UPDATE Users SET FullName = ?, Email = ?, PhoneNumber = ?, Address = ?, Password = ?, Role = ? " + "WHERE UserID = ?";
 
         try (Connection conn = dbContext.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -206,7 +205,6 @@ public class UserDAO {
             e.printStackTrace();
             System.out.println("Lỗi kiểm tra email: " + e.getMessage());
         }
-
         return false;
     }
 }
