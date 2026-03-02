@@ -10,7 +10,6 @@ nbdist/
 nbproject/private/
 
 # --- [3] Archive & Package Files ---
-*.jar
 *.war
 *.ear
 *.zip
