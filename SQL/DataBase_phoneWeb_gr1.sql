@@ -150,10 +150,59 @@ VALUES
 ALTER TABLE Suppliers
 ADD [status] BIT NOT NULL DEFAULT 1;
 
+
+-- NEW
+
+
 -- Thêm cột vào bảng Users
 ALTER TABLE Users
 ADD RewardPoints INT DEFAULT 0;
 -- Điểm thưởng của khách hàng
 
 ALTER TABLE Users
-ADD CustomerType VARCHAR(50) DEFAULT 'Regular'; -- Loại khách hàng: Regular, VIP, Premium, etc. 
+ADD CustomerType VARCHAR(50) DEFAULT 'Regular';
+-- Loại khách hàng: Regular, VIP, Premium, etc.
+GO
+
+-- =============================================
+-- THỐNG KÊ DOANH THU
+-- =============================================
+-- HƯỚNG DẪN: Chỉ chạy các câu SELECT dưới đây AFTER hoàn thành toàn bộ script trên
+-- Step 1: Chạy toàn bộ script từ dòng 1 để tạo database và bảng
+-- Step 2: Sau đó chạy riêng các SELECT queries dưới đây để xem thống kê
+GO
+
+-- Thống kê doanh thu theo NGÀY
+SELECT
+    CAST(OrderDate AS DATE) AS [Ngày],
+    COUNT(OrderID) AS [Số lượng đơn],
+    SUM(TotalMoney) AS [Tổng doanh thu]
+FROM Orders
+WHERE Status != 0
+GROUP BY CAST(OrderDate AS DATE)
+ORDER BY CAST(OrderDate AS DATE) DESC;
+
+-- Thống kê doanh thu theo THÁNG
+SELECT
+    YEAR(OrderDate) AS [Năm],
+    MONTH(OrderDate) AS [Tháng],
+    COUNT(OrderID) AS [Số lượng đơn],
+    SUM(TotalMoney) AS [Tổng doanh thu]
+FROM Orders
+WHERE Status != 0
+GROUP BY YEAR(OrderDate), MONTH(OrderDate)
+ORDER BY YEAR(OrderDate) DESC, MONTH(OrderDate) DESC;
+
+-- Thống kê doanh thu theo sản phẩm
+SELECT
+    p.ProductID AS [Mã sản phẩm],
+    p.ProductName AS [Tên sản phẩm],
+    COUNT(DISTINCT o.OrderID) AS [Số lượng đơn],
+    SUM(od.Quantity) AS [Tổng số sản phẩm],
+    SUM(od.Quantity * od.Price) AS [Tổng doanh thu]
+FROM Products p
+    INNER JOIN OrderDetails od ON p.ProductID = od.ProductID
+    INNER JOIN Orders o ON od.OrderID = o.OrderID
+WHERE o.Status != 0
+GROUP BY p.ProductID, p.ProductName
+ORDER BY SUM(od.Quantity * od.Price) DESC;
