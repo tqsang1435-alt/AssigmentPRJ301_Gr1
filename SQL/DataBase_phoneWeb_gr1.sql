@@ -150,9 +150,9 @@ VALUES
 ALTER TABLE Suppliers
 ADD [status] BIT NOT NULL DEFAULT 1;
 
-
+-- =============================================
 -- NEW
-
+-- =============================================
 
 -- Thêm cột vào bảng Users
 ALTER TABLE Users
@@ -164,12 +164,8 @@ ADD CustomerType VARCHAR(50) DEFAULT 'Regular';
 -- Loại khách hàng: Regular, VIP, Premium, etc.
 GO
 
--- =============================================
 -- THỐNG KÊ DOANH THU
--- =============================================
--- HƯỚNG DẪN: Chỉ chạy các câu SELECT dưới đây AFTER hoàn thành toàn bộ script trên
--- Step 1: Chạy toàn bộ script từ dòng 1 để tạo database và bảng
--- Step 2: Sau đó chạy riêng các SELECT queries dưới đây để xem thống kê
+
 GO
 
 -- Thống kê doanh thu theo NGÀY
