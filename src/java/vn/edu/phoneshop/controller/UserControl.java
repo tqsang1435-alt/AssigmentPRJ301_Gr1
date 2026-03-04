@@ -35,7 +35,7 @@ public class UserControl extends HttpServlet {
                 case "/user-logout":
                     HttpSession session = request.getSession();
                     session.invalidate(); // Xóa session
-                    response.sendRedirect("home"); // Quay về trang chủ (giả sử có servlet home)
+                    response.sendRedirect("/PhoneShop_Management/"); // Quay về trang chủ (giả sử có servlet home)
                     break;
                 default:
                     response.sendRedirect("Login.jsp");
