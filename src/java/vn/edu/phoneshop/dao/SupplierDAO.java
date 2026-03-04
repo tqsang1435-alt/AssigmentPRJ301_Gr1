@@ -12,10 +12,6 @@ import java.util.List;
 import vn.edu.phoneshop.model.Supplier;
 import vn.edu.phoneshop.utils.DBContext;
 
-/**
- *
- * @author tqsan
- */
 public class SupplierDAO {
 
     Connection conn = null;
@@ -26,7 +22,7 @@ public class SupplierDAO {
     public List<Supplier> getAllSuppliers() {
         List<Supplier> list = new ArrayList<>();
         // SỬA: Thêm điều kiện WHERE status = 1
-        String query = "SELECT * FROM Suppliers WHERE status = 1"; 
+        String query = "SELECT * FROM Suppliers WHERE status = 1";
         try {
             conn = new DBContext().getConnection();
             ps = conn.prepareStatement(query);
