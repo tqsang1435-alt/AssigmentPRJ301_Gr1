@@ -3,7 +3,27 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/PhoneShop_Management/src/java/vn/edu/phoneshop/utils/DBContext.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/utils/DBContext.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/model/Supplier.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/dao/SupplierDAO.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/UpdateSupplierControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/LoadSupplierControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/DeleteSupplierControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/AddSupplierControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/SupplierControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/web/AddSupplier.jsp</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/web/EditSupplier.jsp</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/web/ManagerSupplier.jsp</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/model/Product.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/dao/ProductDAO.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/ProductControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/web/ManagerProduct.jsp</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/AddProductControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/web/AddProduct.jsp</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/DeleteProductControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/LoadProductControl.java</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/web/EditProduct.jsp</file>
+            <file>file:/D:/Cac_mon_chuyen_nganh/ki4/PRJ301/Ass/du_an_nhom/AssigmentPRJ301_Gr1/src/java/vn/edu/phoneshop/controller/UpdateProductControl.java</file>
         </group>
     </open-files>
 </project-private>
