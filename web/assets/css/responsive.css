@@ -3,6 +3,14 @@
     .hide-on-mobile-tablet {
         display: none;
     }
+
+    .hero__heading {
+        line-height: 5rem;
+    }
+
+    .hero__desc {
+        line-height: 2.4rem;
+    }
 }
 
 /* Tablet */
@@ -17,5 +25,10 @@
 @media (max-width: 739px) {
     .hide-on-mobile {
         display: none;
+    }
+
+    .features__row {
+        display: flex;
+        gap: 2rem;
     }
 }
