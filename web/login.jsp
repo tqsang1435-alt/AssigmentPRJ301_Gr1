@@ -18,7 +18,7 @@
         <div class="login-container">
             <div class="login-box">
                 <a href="${pageContext.request.contextPath}/" class="login-logo">
-                    <i class="ti-mobile"></i> <label>PhoneShop</label>
+                    <i class="ti-mobile"></i> <span>PhoneShop</span>
                 </a>
 
                 <form action="MainController" method="POST">
