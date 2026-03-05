@@ -95,17 +95,23 @@ public class UserControl extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
         String action = request.getServletPath();
+        HttpSession session = request.getSession(false);
 
         try {
             switch (action) {
                 case "/user-login":
-                    request.getRequestDispatcher("login.jsp").forward(request, response);
+                    if (session != null && session.getAttribute("ACC") != null) {
+                        // Nếu đã đăng nhập, chuyển hướng đến trang profile
+                        response.sendRedirect("user-profile");
+                    } else {
+                        // Nếu chưa đăng nhập, hiển thị trang login
+                        request.getRequestDispatcher("login.jsp").forward(request, response);
+                    }
                     break;
                 case "/user-register":
                     request.getRequestDispatcher("register.jsp").forward(request, response);
                     break;
                 case "/user-profile":
-                    HttpSession session = request.getSession(false);
                     if (session != null && session.getAttribute("ACC") != null) {
                         request.getRequestDispatcher("profile.jsp").forward(request, response);
                     } else {
@@ -113,8 +119,9 @@ public class UserControl extends HttpServlet {
                     }
                     break;
                 case "/user-logout":
-                    HttpSession logoutSession = request.getSession();
-                    logoutSession.invalidate();
+                    if (session != null) {
+                        session.invalidate();
+                    }
                     response.sendRedirect("index.html");
                     break;
                 default:

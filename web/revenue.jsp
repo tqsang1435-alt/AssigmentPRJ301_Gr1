@@ -20,7 +20,7 @@
             <div class="grid wide">
                 <div class="header__navbar">
                     <a href="${pageContext.request.contextPath}/" class="header__logo"><i class="ti-bar-chart"></i>
-                        <label>PhoneShop Thống Kê</label></a>
+                        <label>PhoneShop Admin</label></a>
                     <ul class="header__nav-list">
                         <li class="header__nav-item">
                             <a href="#" class="header__nav-link"><i class="ti-angle-left"></i> <label>Về
