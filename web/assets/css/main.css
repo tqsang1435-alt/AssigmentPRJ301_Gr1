@@ -278,3 +278,26 @@
      font-weight: bold;
      margin-top: 10px;
  }
+
+ .register-box {
+     max-width: 550px;
+ }
+
+ .auth-switch {
+     margin-top: 20px;
+     font-size: 1.4rem;
+     color: var(--text-color);
+ }
+
+ .auth-switch__link {
+     color: var(--primary-color);
+     text-decoration: none;
+     font-weight: 600;
+     margin-left: 5px;
+     transition: opacity 0.2s;
+ }
+
+ .auth-switch__link:hover {
+     opacity: 0.8;
+     text-decoration: underline;
+ }

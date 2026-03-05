@@ -156,11 +156,11 @@ ADD [status] BIT NOT NULL DEFAULT 1;
 
 -- Thêm cột vào bảng Users
 ALTER TABLE Users
-ADD RewardPoints INT DEFAULT 0;
+ADD RewardPoints INT NOT NULL DEFAULT 0;
 -- Điểm thưởng của khách hàng
 
 ALTER TABLE Users
-ADD CustomerType VARCHAR(50) DEFAULT 'Regular';
+ADD CustomerType VARCHAR(50) NOT NULL DEFAULT 'Regular';
 -- Loại khách hàng: Regular, VIP, Premium, etc.
 GO
 

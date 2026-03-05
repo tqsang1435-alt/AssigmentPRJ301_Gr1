@@ -162,4 +162,31 @@ public class UserDAO {
         }
         return null;
     }
+
+    // Hàm kiểm tra email tồn tại
+    public User checkUserExist(String email) {
+        String query = "SELECT * FROM Users WHERE Email = ?";
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("UserID"),
+                        rs.getString("FullName"),
+                        rs.getString("Email"),
+                        rs.getString("PhoneNumber"),
+                        rs.getString("Address"),
+                        rs.getString("Password"),
+                        rs.getString("Role"),
+                        rs.getDate("CreateDate"),
+                        rs.getInt("RewardPoints"),
+                        rs.getString("CustomerType"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

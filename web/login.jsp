@@ -21,24 +21,29 @@
                     <i class="ti-mobile"></i> <span>PhoneShop</span>
                 </a>
 
-                <form action="MainController" method="POST">
+                <form action="user-login" method="POST">
 
-                    <div class="error-message">${requestScope.ERROR}</div>
+                    <div class="error-message">${requestScope.mess}</div>
 
                     <div class="form-group">
-                        <label class="form-label">Tài khoản</label>
-                        <input type="text" name="txtUsername" class="form-control" placeholder="Nhập tên đăng nhập"
-                            value="${param.txtUsername}" required>
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Nhập email"
+                            value="${param.email}" required>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Mật khẩu</label>
-                        <input type="password" name="txtPassword" class="form-control" placeholder="Nhập mật khẩu"
+                        <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu"
                             required>
                     </div>
 
-                    <button type="submit" name="action" value="Login" class="btn btn--primary btn-login">Đăng
-                        Nhập</button>
+                    <button type="submit" class="btn btn--primary btn-login">Đăng Nhập</button>
+
+                    <div class="auth-switch">
+                        <span>Chưa có tài khoản?</span>
+                        <a href="${pageContext.request.contextPath}/register.jsp" class="auth-switch__link">Đăng ký
+                            ngay</a>
+                    </div>
                 </form>
             </div>
         </div>
