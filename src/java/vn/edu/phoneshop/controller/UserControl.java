@@ -83,7 +83,7 @@ public class UserControl extends HttpServlet {
             session.setAttribute("ACC", acc);
 
             request.setAttribute("mess", "Cập nhật thông tin thành công!");
-            request.getRequestDispatcher("UserProfile.jsp").forward(request, response);
+            request.getRequestDispatcher("profile.jsp").forward(request, response);
         } else {
             response.sendRedirect("login.jsp");
         }
@@ -107,7 +107,7 @@ public class UserControl extends HttpServlet {
                 case "/user-profile":
                     HttpSession session = request.getSession(false);
                     if (session != null && session.getAttribute("ACC") != null) {
-                        request.getRequestDispatcher("UserProfile.jsp").forward(request, response);
+                        request.getRequestDispatcher("profile.jsp").forward(request, response);
                     } else {
                         response.sendRedirect("login.jsp");
                     }
