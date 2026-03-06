@@ -511,3 +511,40 @@
      color: #333;
      font-weight: 500;
  }
+
+ .profile-header__name {
+     margin: 0;
+     font-size: 2.4rem;
+ }
+
+ .profile-header__role {
+     margin: 5px 0 0;
+     opacity: 0.9;
+     font-size: 1.4rem;
+ }
+
+ .profile-actions {
+     text-align: center;
+     margin-top: 35px;
+     display: flex;
+     justify-content: center;
+     gap: 15px;
+ }
+
+ .btn--outline-danger {
+     color: #dc3545;
+     border: 1px solid #dc3545;
+     background: transparent;
+     text-decoration: none;
+     display: inline-flex;
+     align-items: center;
+ }
+
+ .btn--outline-danger:hover {
+     background-color: #dc3545;
+     color: #fff;
+ }
+
+ .btn i {
+     margin-right: 6px;
+ }
