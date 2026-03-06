@@ -43,14 +43,16 @@
                                 </li>
                                 <c:if test="${not empty sessionScope.ACC}">
                                     <li class="header__nav-item">
-                                        <a href="${pageContext.request.contextPath}/profile" class="header__nav-link">
+                                        <a href="${pageContext.request.contextPath}/user-profile"
+                                            class="header__nav-link">
                                             <i class="ti-user"></i> <label class="hide-on-mobile">Tài khoản</label>
                                         </a>
                                     </li>
                                 </c:if>
                                 <c:if test="${empty sessionScope.ACC}">
                                     <li class="header__nav-item">
-                                        <a href="${pageContext.request.contextPath}/login.jsp" class="header__nav-link">
+                                        <a href="${pageContext.request.contextPath}/user-login"
+                                            class="header__nav-link">
                                             <i class="ti-user"></i> <label class="hide-on-mobile">Đăng nhập</label>
                                         </a>
                                     </li>
