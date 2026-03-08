@@ -7,27 +7,24 @@
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <web-module-libraries>
                 <library dirs="200">
-<<<<<<< HEAD
+                    <file>${file.reference.jakarta.activation-2.0.1.jar-1}</file>
                     <file>${file.reference.jstl-1.2.jar}</file>
-=======
-                    <file>${file.reference.mssql-jdbc-12.6.1.jre11.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.servlet.jsp.jstl-api-3.0.0.jar}</file>
+                    <file>${file.reference.jakarta.mail-2.0.1.jar-1}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.servlet.jsp.jstl-3.0.0.jar}</file>
+                    <file>${file.reference.jakarta.servlet.jsp.jstl-3.0.0.jar-1}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.mail-2.0.1.jar}</file>
+                    <file>${file.reference.jakarta.servlet.jsp.jstl-api-3.0.0.jar-1}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.activation-2.0.1.jar}</file>
->>>>>>> e7b45a906d28bff2867a45721aa3c05ab0f4cc4d
+                    <file>${file.reference.mssql-jdbc-13.2.1.jre11.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>

@@ -10,7 +10,6 @@ public class Product {
     private int categoryID;
     private int supplierID;
     private boolean status;
-
     private String ram;
     private String rom;
     private String color;
