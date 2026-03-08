@@ -36,6 +36,7 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h3 class="card-title">Danh sách Khách hàng</h3>
+                                    <a href="add-customer" class="btn btn-primary">Thêm mới</a>
                                 </div>
                                 <div class="card-body">
                                     <table class="table">
@@ -48,6 +49,7 @@
                                                 <th>Địa chỉ</th>
                                                 <th>Điểm thưởng</th>
                                                 <th>Loại khách</th>
+                                                <th>Hành động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -61,6 +63,10 @@
                                                     <td style="text-align: center;">${c.rewardPoints}</td>
                                                     <td>
                                                         <span class="badge badge--normal">${c.customerType}</span>
+                                                    </td>
+                                                    <td>
+                                                        <a href="edit-customer?id=${c.userID}" class="btn-action btn-action--edit">Sửa</a>
+                                                        <a href="delete-customer?id=${c.userID}" onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này không?');" class="btn-action btn-action--delete">Xóa</a>
                                                     </td>
                                                 </tr>
                                             </c:forEach>
