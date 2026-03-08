@@ -12,7 +12,6 @@ import vn.edu.phoneshop.utils.DBContext;
 public class ProductDAO {
 
     // Hàm phụ trợ: Map dữ liệu từ ResultSet sang Object Product
-    // Giúp code gọn hơn, không phải lặp lại đoạn lấy dữ liệu nhiều lần
     private Product mapResultSetToProduct(ResultSet rs) throws Exception {
         return new Product(
                 rs.getInt("ProductID"),
@@ -23,7 +22,7 @@ public class ProductDAO {
                 rs.getString("ImageURL"),
                 rs.getInt("CategoryID"),
                 rs.getInt("SupplierID"),
-                rs.getBoolean("Status"), // Cột Status trong SQL là bit -> getBoolean
+                rs.getBoolean("Status"),
                 rs.getString("RAM"),
                 rs.getString("ROM"),
                 rs.getString("Color"));
@@ -47,18 +46,34 @@ public class ProductDAO {
         return list;
     }
 
-    // 2. HÀM LỌC SẢN PHẨM THEO RAM VÀ ROM (Chức năng quan trọng)
+    // 2. Hàm lấy sản phẩm theo Category
+    public List<Product> getProductsByCategoryId(int cid) {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM Products WHERE CategoryID = ? AND Status = 1";
+
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, cid);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToProduct(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // 3. Hàm lọc sản phẩm theo RAM và ROM
     public List<Product> filterProducts(String ram, String rom) {
         List<Product> list = new ArrayList<>();
-
-        // Khởi tạo câu lệnh SQL gốc
         String sql = "SELECT * FROM Products WHERE Status = 1";
 
-        // Nếu người dùng có chọn RAM thì nối thêm điều kiện lọc RAM
         if (ram != null && !ram.trim().isEmpty()) {
             sql += " AND RAM = ?";
         }
-        // Nếu người dùng có chọn ROM thì nối thêm điều kiện lọc ROM
         if (rom != null && !rom.trim().isEmpty()) {
             sql += " AND ROM = ?";
         }
@@ -66,7 +81,6 @@ public class ProductDAO {
         try (Connection conn = DBContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // Truyền giá trị vào các dấu '?' tương ứng
             int paramIndex = 1;
             if (ram != null && !ram.trim().isEmpty()) {
                 ps.setString(paramIndex++, ram);
@@ -86,7 +100,25 @@ public class ProductDAO {
         return list;
     }
 
-    // 3. Hàm Thêm mới Sản phẩm
+    // 4. Hàm Lấy 1 Sản phẩm theo ID
+    public Product getProductByID(int id) {
+        String sql = "SELECT * FROM Products WHERE ProductID = ?";
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToProduct(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 5. Hàm Thêm mới Sản phẩm
     public void insertProduct(String name, double price, int quantity, String desc, String img, int cateID, int suppID,
             String ram, String rom, String color) {
         String sql = "INSERT INTO Products (ProductName, Price, StockQuantity, Description, ImageURL, CategoryID, SupplierID, Status, RAM, ROM, Color) "
@@ -110,25 +142,7 @@ public class ProductDAO {
         }
     }
 
-    // 4. Hàm Lấy 1 Sản phẩm theo ID (Dùng để Sửa)
-    public Product getProductByID(String id) {
-        String sql = "SELECT * FROM Products WHERE ProductID = ?";
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToProduct(rs);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // 5. Hàm Xóa mềm (Update Status = 0)
+    // 6. Hàm Xóa mềm (Update Status = 0)
     public void deleteProduct(int id) {
         String sql = "UPDATE Products SET Status = 0 WHERE ProductID = ?";
         try (Connection conn = DBContext.getConnection();
@@ -141,8 +155,8 @@ public class ProductDAO {
         }
     }
 
-    // 6. Hàm Cập nhật Sản phẩm
-    public void updateProduct(String id, String name, double price, int quantity, String desc, String img, int cateID,
+    // 7. Hàm Cập nhật Sản phẩm
+    public void updateProduct(int id, String name, double price, int quantity, String desc, String img, int cateID,
             int suppID, String ram, String rom, String color) {
         String sql = "UPDATE Products SET ProductName = ?, Price = ?, StockQuantity = ?, Description = ?, ImageURL = ?, CategoryID = ?, SupplierID = ?, RAM = ?, ROM = ?, Color = ? WHERE ProductID = ?";
         try (Connection conn = DBContext.getConnection();
@@ -158,7 +172,7 @@ public class ProductDAO {
             ps.setString(8, ram);
             ps.setString(9, rom);
             ps.setString(10, color);
-            ps.setString(11, id); // Đẩy ID vào vị trí dấu ? cuối cùng
+            ps.setInt(11, id);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
