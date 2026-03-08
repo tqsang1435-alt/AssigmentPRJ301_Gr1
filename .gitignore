@@ -4,6 +4,10 @@ dist/
 nbbuild/
 nblib/
 nbdist/
+<<<<<<< HEAD
+=======
+build/
+>>>>>>> e7b45a906d28bff2867a45721aa3c05ab0f4cc4d
 
 # --- [2] NetBeans Private Data (BẮT BUỘC) ---
 # Đây là phần quan trọng nhất để làm việc nhóm không bị lỗi
@@ -26,4 +30,11 @@ replay_pid*
 *.ctxt
 .mtj.tmp/
 MANIFEST.MF
+<<<<<<< HEAD
+=======
+*.md
+
+# Của Sơn
+DANH_SACH_FILE.txt
+>>>>>>> e7b45a906d28bff2867a45721aa3c05ab0f4cc4d
 
