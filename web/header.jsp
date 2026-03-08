@@ -5,7 +5,7 @@
             <div class="grid wide">
                 <div class="header__navbar">
                     <!-- Logo -->
-                    <a href="${pageContext.request.contextPath}/" class="header__logo">
+                    <a href="${pageContext.request.contextPath}/home" class="header__logo">
                         <i class="ti-mobile"></i> <label>PhoneShop</label>
                     </a>
 
@@ -28,7 +28,7 @@
                             <c:when test="${not empty sessionScope.ACC}">
                                 <li class="header__nav-item">
                                     <a href="${pageContext.request.contextPath}/user-profile" class="header__nav-link">
-                                        <i class="ti-user"></i> <label class="hide-on-mobile">Chào,
+                                        <i class="ti-user"></i> <label class="hide-on-mobile">
                                             ${sessionScope.ACC.fullName}</label>
                                     </a>
                                 </li>
