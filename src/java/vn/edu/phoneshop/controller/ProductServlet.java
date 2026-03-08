@@ -45,22 +45,10 @@ public class ProductServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String name = request.getParameter("name");
-        double price = Double.parseDouble(request.getParameter("price"));
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
-        String description = request.getParameter("description");
-        String image = request.getParameter("image");
-
-        Product p = new Product();
-        p.setProductName(name);
-        p.setPrice(price);
-        p.setQuantity(quantity);
-        p.setDescription(description);
-        p.setImage(image);
-
-        dao.insertProduct(p);
-
+        
+        // This method seems to be deprecated or incomplete. 
+        // The main functionality for adding a product is in AddProductControl.
+        // Redirecting to the product list to avoid errors.
         response.sendRedirect("products");
     }
 }

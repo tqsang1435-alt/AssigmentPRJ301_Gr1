@@ -16,19 +16,21 @@ import vn.edu.phoneshop.dao.SupplierDAO;
  *
  * @author tqsan
  */
-@WebServlet(name = "DeleteSupplierControl", urlPatterns = {"/delete-supplier"})
+@WebServlet(name = "DeleteSupplierControl", urlPatterns = { "/delete-supplier" })
 public class DeleteSupplierControl extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String id = request.getParameter("pid");
-        
-        // Thêm dòng này để debug
-        System.out.println("Đang xóa ID: " + id);
-        
-        SupplierDAO dao = new SupplierDAO();
-        dao.deleteSupplier(id);
+
+        try {
+            int pid = Integer.parseInt(id);
+            SupplierDAO dao = new SupplierDAO();
+            dao.deleteSupplier(pid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         response.sendRedirect("supplier-list");
     }
 }
