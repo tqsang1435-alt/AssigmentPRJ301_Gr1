@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package vn.edu.phoneshop.dao;
 
 import java.sql.Connection;
@@ -9,19 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
 import vn.edu.phoneshop.model.Product;
 import vn.edu.phoneshop.utils.DBContext;
-/**
- *
- * @author tqsan
- */
+
 public class ProductDAO {
 
-    Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-
-    // Hàm phụ trợ: Giúp code gọn hơn, không phải lặp lại đoạn lấy dữ liệu nhiều lần
+    // Hàm phụ trợ: Map dữ liệu từ ResultSet sang Object Product
+    // Giúp code gọn hơn, không phải lặp lại đoạn lấy dữ liệu nhiều lần
     private Product mapResultSetToProduct(ResultSet rs) throws Exception {
         return new Product(
                 rs.getInt("ProductID"),
@@ -35,18 +26,18 @@ public class ProductDAO {
                 rs.getBoolean("Status"), // Cột Status trong SQL là bit -> getBoolean
                 rs.getString("RAM"),
                 rs.getString("ROM"),
-                rs.getString("Color")
-        );
+                rs.getString("Color"));
     }
 
     // 1. Hàm lấy tất cả sản phẩm đang kinh doanh (Status = 1)
     public List<Product> getAllProducts() {
         List<Product> list = new ArrayList<>();
-        String query = "SELECT * FROM Products WHERE Status = 1";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(query);
-            rs = ps.executeQuery();
+        String sql = "SELECT * FROM Products WHERE Status = 1";
+
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 list.add(mapResultSetToProduct(rs));
             }
@@ -59,23 +50,22 @@ public class ProductDAO {
     // 2. HÀM LỌC SẢN PHẨM THEO RAM VÀ ROM (Chức năng quan trọng)
     public List<Product> filterProducts(String ram, String rom) {
         List<Product> list = new ArrayList<>();
-        
+
         // Khởi tạo câu lệnh SQL gốc
-        String query = "SELECT * FROM Products WHERE Status = 1";
-        
+        String sql = "SELECT * FROM Products WHERE Status = 1";
+
         // Nếu người dùng có chọn RAM thì nối thêm điều kiện lọc RAM
         if (ram != null && !ram.trim().isEmpty()) {
-            query += " AND RAM = ?";
+            sql += " AND RAM = ?";
         }
         // Nếu người dùng có chọn ROM thì nối thêm điều kiện lọc ROM
         if (rom != null && !rom.trim().isEmpty()) {
-            query += " AND ROM = ?";
+            sql += " AND ROM = ?";
         }
 
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(query);
-            
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             // Truyền giá trị vào các dấu '?' tương ứng
             int paramIndex = 1;
             if (ram != null && !ram.trim().isEmpty()) {
@@ -85,9 +75,10 @@ public class ProductDAO {
                 ps.setString(paramIndex++, rom);
             }
 
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToProduct(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToProduct(rs));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,12 +87,13 @@ public class ProductDAO {
     }
 
     // 3. Hàm Thêm mới Sản phẩm
-    public void insertProduct(String name, double price, int quantity, String desc, String img, int cateID, int suppID, String ram, String rom, String color) {
-        String query = "INSERT INTO Products (ProductName, Price, StockQuantity, Description, ImageURL, CategoryID, SupplierID, Status, RAM, ROM, Color) "
-                     + "VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(query);
+    public void insertProduct(String name, double price, int quantity, String desc, String img, int cateID, int suppID,
+            String ram, String rom, String color) {
+        String sql = "INSERT INTO Products (ProductName, Price, StockQuantity, Description, ImageURL, CategoryID, SupplierID, Status, RAM, ROM, Color) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)";
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, name);
             ps.setDouble(2, price);
             ps.setInt(3, quantity);
@@ -120,14 +112,15 @@ public class ProductDAO {
 
     // 4. Hàm Lấy 1 Sản phẩm theo ID (Dùng để Sửa)
     public Product getProductByID(String id) {
-        String query = "SELECT * FROM Products WHERE ProductID = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(query);
+        String sql = "SELECT * FROM Products WHERE ProductID = ?";
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, id);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                return mapResultSetToProduct(rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToProduct(rs);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,10 +130,10 @@ public class ProductDAO {
 
     // 5. Hàm Xóa mềm (Update Status = 0)
     public void deleteProduct(String id) {
-        String query = "UPDATE Products SET Status = 0 WHERE ProductID = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(query);
+        String sql = "UPDATE Products SET Status = 0 WHERE ProductID = ?";
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, id);
             ps.executeUpdate();
         } catch (Exception e) {
@@ -149,11 +142,12 @@ public class ProductDAO {
     }
 
     // 6. Hàm Cập nhật Sản phẩm
-    public void updateProduct(String id, String name, double price, int quantity, String desc, String img, int cateID, int suppID, String ram, String rom, String color) {
-        String query = "UPDATE Products SET ProductName = ?, Price = ?, StockQuantity = ?, Description = ?, ImageURL = ?, CategoryID = ?, SupplierID = ?, RAM = ?, ROM = ?, Color = ? WHERE ProductID = ?";
-        try {
-            conn = new DBContext().getConnection();
-            ps = conn.prepareStatement(query);
+    public void updateProduct(String id, String name, double price, int quantity, String desc, String img, int cateID,
+            int suppID, String ram, String rom, String color) {
+        String sql = "UPDATE Products SET ProductName = ?, Price = ?, StockQuantity = ?, Description = ?, ImageURL = ?, CategoryID = ?, SupplierID = ?, RAM = ?, ROM = ?, Color = ? WHERE ProductID = ?";
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, name);
             ps.setDouble(2, price);
             ps.setInt(3, quantity);

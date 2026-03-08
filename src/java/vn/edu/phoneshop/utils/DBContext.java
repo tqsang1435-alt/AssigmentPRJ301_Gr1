@@ -1,11 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package vn.edu.phoneshop.utils;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 /**
  *
  * @author tqsan
@@ -17,7 +15,7 @@ public class DBContext {
     private static final String PORT = "1433";
     private static final String DB_NAME = "PhoneShopDB";
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             String connectionUrl = "jdbc:sqlserver://" + SERVER + ":" + PORT + ";databaseName=" + DB_NAME + ";encrypt=false;trustServerCertificate=true;";
@@ -28,7 +26,8 @@ public class DBContext {
         }
         return null;
     }
-public static void main(String[] args) {
+
+    public static void main(String[] args) {
         System.out.println("Đang kiểm tra kết nối...");
         if (new DBContext().getConnection() != null) {
             System.out.println("Kết nối thành công!");

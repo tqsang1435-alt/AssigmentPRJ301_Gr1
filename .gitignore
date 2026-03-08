@@ -27,4 +27,7 @@ replay_pid*
 *.ctxt
 .mtj.tmp/
 MANIFEST.MF
+*.md
 
+# Của Sơn
+DANH_SACH_FILE.txt

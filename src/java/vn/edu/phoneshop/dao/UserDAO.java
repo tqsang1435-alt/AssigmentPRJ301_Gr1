@@ -102,8 +102,6 @@ public class UserDAO {
                 newType = "Premium";
             } else if (newTotalPoints >= 500) {
                 newType = "VIP";
-            } else {
-                newType = "Regular";
             }
 
             // Cập nhật vào DB
