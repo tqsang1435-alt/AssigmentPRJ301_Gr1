@@ -206,4 +206,18 @@ public class UserDAO {
         }
         return false;
     }
+
+    public boolean updateUserProfile(int userID, String fullName, String phone, String address) {
+        String sql = "UPDATE Users SET FullName = ?, PhoneNumber = ?, Address = ? WHERE UserID = ?";
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, phone);
+            ps.setString(3, address);
+            ps.setInt(4, userID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
