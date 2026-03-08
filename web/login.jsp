@@ -1,113 +1,87 @@
-<%-- 
-    Document   : login
-    Created on : Mar 2, 2026, 9:14:14 PM
-    Author     : Lenovo
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html>
+<html lang="vi">
+
 <head>
-    <title>PhoneShop Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - PhoneShop</title>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cssreset.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css?v=999">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+
     <style>
-        body{
-            font-family: Arial;
-            background: linear-gradient(135deg,#667eea,#764ba2);
-            height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
+        #toast-success {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745; /* Đổi sang màu xanh chuẩn Bootstrap cho đẹp */
+            color: white;
+            padding: 14px 24px;
+            border-radius: 4px; /* Bo góc nhẹ cho hợp với base.css */
+            font-size: 1.4rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            animation: fadeInOut 4s forwards;
+            display: flex;
+            align-items: center;
         }
-        .login-box{
-            background:white;
-            padding:30px;
-            width:350px;
-            border-radius:10px;
-            box-shadow:0 10px 25px rgba(0,0,0,0.2);
+
+        #toast-success i {
+            margin-right: 8px;
+            font-size: 1.8rem;
         }
-        h2{
-            text-align:center;
-            margin-bottom:20px;
-        }
-        input{
-            width:100%;
-            padding:10px;
-            margin:8px 0;
-            border:1px solid #ccc;
-            border-radius:5px;
-        }
-        button{
-            width:100%;
-            padding:10px;
-            background:#667eea;
-            color:white;
-            border:none;
-            border-radius:5px;
-            font-size:16px;
-            cursor:pointer;
-        }
-        button:hover{
-            background:#5a67d8;
-        }
-        .error{
-            background:#ffe5e5;
-            color:#cc0000;
-            padding:8px;
-            border-radius:5px;
-            margin-bottom:10px;
-            text-align:center;
-            font-weight:bold;
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
         }
     </style>
 </head>
-<% if("success".equals(request.getParameter("register"))){ %>
-<div id="toast-success">
-    Bạn đã đăng ký thành công
-</div>
 
-<style>
-#toast-success{
-    position:fixed;
-    top:20px;
-    right:20px;
-    background:#4CAF50;
-    color:white;
-    padding:14px 20px;
-    border-radius:8px;
-    font-weight:600;
-    box-shadow:0 8px 20px rgba(0,0,0,0.2);
-    z-index:9999;
-    animation:fadeInOut 4s forwards;
-}
-
-@keyframes fadeInOut{
-    0%{opacity:0; transform:translateY(-10px);}
-    10%{opacity:1;}
-    90%{opacity:1;}
-    100%{opacity:0; transform:translateY(-10px);}
-}
-</style>
-<% } %>
 <body>
-
-<div class="login-box">
-    <h2>Phone Shop</h2>
-
-    <% if(request.getAttribute("error") != null){ %>
-        <div class="error">
-            <%= request.getAttribute("error") %>
+    <c:if test="${param.register == 'success'}">
+        <div id="toast-success">
+            <i class="ti-check-box"></i> Đăng ký tài khoản thành công!
         </div>
-    <% } %>
+    </c:if>
 
-    <form action="login" method="post">
-        <input type="text" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-        <div style="text-align:center;margin-top:10px">
-    Don't have account? <a href="register.jsp">Register</a>
-</div>
-    </form>
-</div>
+    <div class="login-container">
+        <div class="login-box">
+            <a href="${pageContext.request.contextPath}/" class="login-logo">
+                <i class="ti-mobile"></i> <label>PhoneShop</label>
+            </a>
 
+            <form action="user-login" method="POST">
+
+                <div class="error-message">${requestScope.mess}</div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="Nhập email" value="${param.email}" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mật khẩu</label>
+                    <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                </div>
+
+                <button type="submit" class="btn btn--primary btn-login">Đăng Nhập</button>
+
+                <div class="auth-switch">
+                    <span>Chưa có tài khoản?</span>
+                    <a href="${pageContext.request.contextPath}/register.jsp" class="auth-switch__link">Đăng ký ngay</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
+
 </html>

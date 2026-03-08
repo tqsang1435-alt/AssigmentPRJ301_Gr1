@@ -1,15 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package vn.edu.phoneshop.model;
 
-/**
- *
- * @author Lenovo
- */
-
-import java.util.Date;
+import java.sql.Date;
 
 public class Order {
     private int orderID;
@@ -20,11 +11,11 @@ public class Order {
     private String note;
     private int status;
 
-    public Order() {}
+    public Order() {
+    }
 
-    public Order(int orderID, int userID, Date orderDate,
-                 double totalMoney, String shippingAddress,
-                 String note, int status) {
+    public Order(int orderID, int userID, Date orderDate, double totalMoney, String shippingAddress, String note,
+            int status) {
         this.orderID = orderID;
         this.userID = userID;
         this.orderDate = orderDate;
@@ -34,24 +25,59 @@ public class Order {
         this.status = status;
     }
 
-    public int getOrderID() { return orderID; }
-    public void setOrderID(int orderID) { this.orderID = orderID; }
+    public int getOrderID() {
+        return orderID;
+    }
 
-    public int getUserID() { return userID; }
-    public void setUserID(int userID) { this.userID = userID; }
+    public void setOrderID(int orderID) {
+        this.orderID = orderID;
+    }
 
-    public Date getOrderDate() { return orderDate; }
-    public void setOrderDate(Date orderDate) { this.orderDate = orderDate; }
+    public int getUserID() {
+        return userID;
+    }
 
-    public double getTotalMoney() { return totalMoney; }
-    public void setTotalMoney(double totalMoney) { this.totalMoney = totalMoney; }
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
 
-    public String getShippingAddress() { return shippingAddress; }
-    public void setShippingAddress(String shippingAddress) { this.shippingAddress = shippingAddress; }
+    public Date getOrderDate() {
+        return orderDate;
+    }
 
-    public String getNote() { return note; }
-    public void setNote(String note) { this.note = note; }
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
 
-    public int getStatus() { return status; }
-    public void setStatus(int status) { this.status = status; }
+    public double getTotalMoney() {
+        return totalMoney;
+    }
+
+    public void setTotalMoney(double totalMoney) {
+        this.totalMoney = totalMoney;
+    }
+
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 }

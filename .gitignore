@@ -4,12 +4,14 @@ dist/
 nbbuild/
 nblib/
 nbdist/
+build/
 
 # --- [2] NetBeans Private Data (BẮT BUỘC) ---
 # Đây là phần quan trọng nhất để làm việc nhóm không bị lỗi
 nbproject/private/
 
 # --- [3] Archive & Package Files ---
+*.jar
 *.war
 *.ear
 *.zip
@@ -25,4 +27,7 @@ replay_pid*
 *.ctxt
 .mtj.tmp/
 MANIFEST.MF
+*.md
 
+# Của Sơn
+DANH_SACH_FILE.txt
