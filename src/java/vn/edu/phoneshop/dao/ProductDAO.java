@@ -13,6 +13,20 @@ public class ProductDAO {
 
     // Hàm phụ trợ: Map dữ liệu từ ResultSet sang Object Product
     private Product mapResultSetToProduct(ResultSet rs) throws Exception {
+        String ram = null, rom = null, color = null;
+        try {
+            ram = rs.getString("RAM");
+        } catch (Exception e) {
+        }
+        try {
+            rom = rs.getString("ROM");
+        } catch (Exception e) {
+        }
+        try {
+            color = rs.getString("Color");
+        } catch (Exception e) {
+        }
+
         return new Product(
                 rs.getInt("ProductID"),
                 rs.getString("ProductName"),
@@ -23,9 +37,9 @@ public class ProductDAO {
                 rs.getInt("CategoryID"),
                 rs.getInt("SupplierID"),
                 rs.getBoolean("Status"),
-                rs.getString("RAM"),
-                rs.getString("ROM"),
-                rs.getString("Color"));
+                ram,
+                rom,
+                color);
     }
 
     public List<Product> getAllActiveProducts() {
@@ -206,5 +220,60 @@ public class ProductDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // Lấy TỔNG SỐ SẢN PHẨM (Có hỗ trợ lọc theo Category nếu khách đang chọn danh
+    // mục)
+    public int getTotalProducts(String cidRaw) {
+        String sql = "SELECT COUNT(*) FROM Products WHERE Status = 1";
+        if (cidRaw != null && !cidRaw.isEmpty()) {
+            sql += " AND CategoryID = ?";
+        }
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            if (cidRaw != null && !cidRaw.isEmpty()) {
+                ps.setInt(1, Integer.parseInt(cidRaw));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // Lấy SẢN PHẨM THEO TRANG
+    public List<Product> getProductsWithPagination(String cidRaw, int page, int pageSize) {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM Products WHERE Status = 1";
+
+        if (cidRaw != null && !cidRaw.isEmpty()) {
+            sql += " AND CategoryID = ?";
+        }
+        // Công thức bỏ qua dữ liệu cũ và lấy đúng pageSize của trang hiện tại
+        sql += " ORDER BY ProductID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+            if (cidRaw != null && !cidRaw.isEmpty()) {
+                ps.setInt(paramIndex++, Integer.parseInt(cidRaw));
+            }
+            ps.setInt(paramIndex++, (page - 1) * pageSize);
+            ps.setInt(paramIndex, pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToProduct(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

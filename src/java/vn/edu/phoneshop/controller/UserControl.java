@@ -30,7 +30,7 @@ public class UserControl extends HttpServlet {
             if ("Admin".equalsIgnoreCase(user.getRole())) {
                 response.sendRedirect("admin-dashboard");
             } else {
-                response.sendRedirect("index.html");
+                response.sendRedirect("home");
             }
         } else {
             request.setAttribute("mess", "Sai email hoặc mật khẩu!");
@@ -122,10 +122,10 @@ public class UserControl extends HttpServlet {
                     if (session != null) {
                         session.invalidate();
                     }
-                    response.sendRedirect("index.html");
+                    response.sendRedirect("home");
                     break;
                 default:
-                    response.sendRedirect("index.html");
+                    response.sendRedirect("home");
                     break;
             }
         } catch (Exception e) {
@@ -153,7 +153,7 @@ public class UserControl extends HttpServlet {
                     handleUpdateProfile(request, response, dao);
                     break;
                 default:
-                    response.sendRedirect("index.html");
+                    response.sendRedirect("home");
                     break;
             }
         } catch (Exception e) {
