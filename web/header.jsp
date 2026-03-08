@@ -5,7 +5,7 @@
             <div class="grid wide">
                 <div class="header__navbar">
                     <!-- Logo -->
-                    <a href="${pageContext.request.contextPath}/home" class="header__logo">
+                    <a href="${pageContext.request.contextPath}/" class="header__logo">
                         <i class="ti-mobile"></i> <label>PhoneShop</label>
                     </a>
 
