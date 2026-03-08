@@ -13,12 +13,11 @@ import java.io.IOException;
 import vn.edu.phoneshop.dao.UserDAO;
 import vn.edu.phoneshop.model.User;
 
-
 /**
  *
  * @author Lenovo
  */
-@WebServlet(name = "UpdateProfileController", urlPatterns = {"/update-profile", "/edit-profile"})
+@WebServlet(name = "UpdateProfileController", urlPatterns = { "/update-profile", "/edit-profile" })
 public class UpdateProfileController extends HttpServlet {
 
     // Hàm này dùng để MỞ trang edit-profile.jsp khi bạn nhấn nút Sửa
@@ -38,19 +37,20 @@ public class UpdateProfileController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8"); 
-        
+        request.setCharacterEncoding("UTF-8");
+
         String fullName = request.getParameter("fullName");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
-        
+
         User user = (User) request.getSession().getAttribute("user");
-        
+
         if (user != null) {
             UserDAO dao = new UserDAO();
             // Gọi hàm từ UserDAO mà bạn đã định nghĩa
-            boolean success = dao.updateUserProfile(user.getUserID(), fullName, phone, address);
-            
+            boolean success = dao.updateUserProfileDat(user.getUserID(), fullName, phone,
+                    address);
+
             if (success) {
                 // Cập nhật lại Session để giao diện thay đổi ngay lập tức
                 user.setFullName(fullName);

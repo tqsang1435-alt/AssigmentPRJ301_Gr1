@@ -28,6 +28,35 @@ public class ProductDAO {
                 rs.getString("Color"));
     }
 
+    public List<Product> getAllActiveProducts() {
+        List<Product> list = new ArrayList<>();
+        String sql = "SELECT * FROM Products WHERE Status = 1";
+
+        try (Connection con = new DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Product p = new Product();
+                p.setProductID(rs.getInt("ProductID"));
+                p.setProductName(rs.getString("ProductName"));
+                p.setPrice(rs.getDouble("Price"));
+                p.setStockQuantity(rs.getInt("StockQuantity"));
+                p.setDescription(rs.getString("Description"));
+                p.setImageURL(rs.getString("ImageURL"));
+                p.setCategoryID(rs.getInt("CategoryID"));
+                p.setSupplierID(rs.getInt("SupplierID"));
+                p.setStatus(rs.getBoolean("Status"));
+
+                list.add(p);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     // 1. Hàm lấy tất cả sản phẩm đang kinh doanh (Status = 1)
     public List<Product> getAllProducts() {
         List<Product> list = new ArrayList<>();

@@ -31,16 +31,16 @@ public class LoginDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return new User(
-                        rs.getInt("UserID"),
-                        rs.getString("FullName"),
-                        rs.getString("Email"),
-                        rs.getString("PhoneNumber"),
-                        rs.getString("Address"),
-                        rs.getString("Password"),
-                        rs.getString("Role"),
-                        rs.getDate("CreateDate")
-                );
+                // return new User(
+                // rs.getInt("UserID"),
+                // rs.getString("FullName"),
+                // rs.getString("Email"),
+                // rs.getString("PhoneNumber"),
+                // rs.getString("Address"),
+                // rs.getString("Password"),
+                // rs.getString("Role"),
+                // rs.getDate("CreateDate")
+                // );
             }
 
         } catch (Exception e) {

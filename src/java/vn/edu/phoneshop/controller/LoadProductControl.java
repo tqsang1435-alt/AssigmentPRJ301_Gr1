@@ -17,7 +17,7 @@ import vn.edu.phoneshop.model.Product;
  *
  * @author tqsan
  */
-@WebServlet(name = "LoadProductControl", urlPatterns = {"/load-product"})
+@WebServlet(name = "LoadProductControl", urlPatterns = { "/load-product" })
 public class LoadProductControl extends HttpServlet {
 
     @Override
@@ -25,8 +25,8 @@ public class LoadProductControl extends HttpServlet {
             throws ServletException, IOException {
         String id = request.getParameter("pid");
         ProductDAO dao = new ProductDAO();
-        Product p = dao.getProductByID(id);
-        
+        Product p = dao.getProductByID(Integer.parseInt(id));
+
         request.setAttribute("detail", p);
         request.getRequestDispatcher("EditProduct.jsp").forward(request, response);
     }

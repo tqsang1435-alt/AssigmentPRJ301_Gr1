@@ -27,7 +27,7 @@ public class DeleteSupplierControl extends HttpServlet {
         try {
             int pid = Integer.parseInt(id);
             SupplierDAO dao = new SupplierDAO();
-            dao.deleteSupplier(pid);
+            dao.deleteSupplier(String.valueOf(pid));
         } catch (Exception e) {
             e.printStackTrace();
         }

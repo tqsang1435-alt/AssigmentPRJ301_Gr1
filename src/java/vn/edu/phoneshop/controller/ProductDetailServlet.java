@@ -8,7 +8,6 @@ package vn.edu.phoneshop.controller;
  *
  * @author Lenovo
  */
-
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,7 +20,7 @@ public class ProductDetailServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+            HttpServletResponse response)
             throws ServletException, IOException {
 
         String idRaw = request.getParameter("id");
@@ -41,7 +40,7 @@ public class ProductDetailServlet extends HttpServlet {
         }
 
         ProductDAO dao = new ProductDAO();
-        Product p = dao.getProductById(id);
+        Product p = dao.getProductByID(id);
 
         // không có sản phẩm
         if (p == null) {
@@ -53,6 +52,6 @@ public class ProductDetailServlet extends HttpServlet {
 
         // JSP đúng của bạn
         request.getRequestDispatcher("detail.jsp")
-               .forward(request, response);
+                .forward(request, response);
     }
 }

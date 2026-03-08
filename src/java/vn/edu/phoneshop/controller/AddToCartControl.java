@@ -11,10 +11,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "AddToCartControl", urlPatterns = {"/add-to-cart"})
+@WebServlet(name = "AddToCartControl", urlPatterns = { "/add-to-cart" })
 public class AddToCartControl extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             String productIDStr = request.getParameter("productID");
             String quantityStr = request.getParameter("quantity");
@@ -31,7 +32,7 @@ public class AddToCartControl extends HttpServlet {
                 quantity = 1;
             }
             ProductDAO productDAO = new ProductDAO();
-            Product product = productDAO.getProductByID(String.valueOf(productID));
+            Product product = productDAO.getProductByID(productID);
             if (product != null) {
                 HttpSession session = request.getSession();
                 Cart cart = (Cart) session.getAttribute("cart");

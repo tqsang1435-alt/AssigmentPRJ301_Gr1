@@ -16,7 +16,7 @@ import vn.edu.phoneshop.dao.ProductDAO;
  *
  * @author tqsan
  */
-@WebServlet(name = "DeleteProductControl", urlPatterns = {"/delete-product"})
+@WebServlet(name = "DeleteProductControl", urlPatterns = { "/delete-product" })
 public class DeleteProductControl extends HttpServlet {
 
     @Override
@@ -24,7 +24,7 @@ public class DeleteProductControl extends HttpServlet {
             throws ServletException, IOException {
         String id = request.getParameter("pid");
         ProductDAO dao = new ProductDAO();
-        dao.deleteProduct(id);
+        dao.deleteProduct(Integer.parseInt(id));
         response.sendRedirect("product-list");
     }
 }

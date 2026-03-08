@@ -10,7 +10,7 @@ import vn.edu.phoneshop.dao.OrderDAO;
 import vn.edu.phoneshop.dao.UserDAO;
 import vn.edu.phoneshop.model.Order;
 
-@WebServlet(name = "OrderControl", urlPatterns = { "/update-order-status" })
+@WebServlet(name = "OrderControl", urlPatterns = {"/update-order-status"})
 public class OrderControl extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)

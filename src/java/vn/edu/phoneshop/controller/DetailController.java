@@ -28,12 +28,12 @@ public class DetailController extends HttpServlet {
                 response.sendRedirect("home");
                 return;
             }
-            
+
             int id = Integer.parseInt(idRaw);
-            Product p = dao.getProductById(id);
+            Product p = dao.getProductByID(id);
 
             if (p != null) {
-                request.setAttribute("product", p); 
+                request.setAttribute("product", p);
                 request.getRequestDispatcher("detail.jsp").forward(request, response);
             } else {
                 response.sendRedirect("home");

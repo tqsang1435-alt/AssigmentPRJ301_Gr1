@@ -188,9 +188,10 @@ public class UserDAO {
         return null;
     }
 
-    public boolean updateUserProfile(int userID, String fullName, String phone, String address) {
+    public boolean updateUserProfileDat(int userID, String fullName, String phone, String address) {
         String sql = "UPDATE Users SET FullName = ?, PhoneNumber = ?, Address = ? WHERE UserID = ?";
-        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, fullName);
             ps.setString(2, phone);
             ps.setString(3, address);

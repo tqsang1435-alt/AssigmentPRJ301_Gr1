@@ -18,17 +18,17 @@ import vn.edu.phoneshop.dao.ProductDAO;
  */
 @WebServlet(name = "UpdateProductControl", urlPatterns = {"/update-product"})
 public class UpdateProductControl extends HttpServlet {
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
         request.setCharacterEncoding("UTF-8");
-
+        
         try {
             // Lấy id (bắt buộc phải có để biết update dòng nào)
             String id = request.getParameter("id");
-            
+
             // Lấy các dữ liệu khác
             String name = request.getParameter("name");
             String priceStr = request.getParameter("price");
@@ -49,10 +49,10 @@ public class UpdateProductControl extends HttpServlet {
 
             // Gọi DAO update
             ProductDAO dao = new ProductDAO();
-            dao.updateProduct(id, name, price, quantity, desc, img, cateId, suppId, ram, rom, color);
-
+            dao.updateProduct(Integer.parseInt(id), name, price, quantity, desc, img, cateId, suppId, ram, rom, color);
+            
             response.sendRedirect("product-list");
-
+            
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -14,11 +14,14 @@ import vn.edu.phoneshop.model.Order;
 import vn.edu.phoneshop.model.OrderDetail;
 import vn.edu.phoneshop.utils.DBContext;
 
+import java.sql.Date;
+
 public class OrderDAO {
 
     public int createOrder(int userID, double totalMoney, int status) {
         String sql = "INSERT INTO Orders (UserID, OrderDate, TotalMoney, Status) VALUES (?, GETDATE(), ?, ?)";
-        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, userID);
             ps.setDouble(2, totalMoney);
@@ -37,7 +40,8 @@ public class OrderDAO {
 
     public void updateOrderStatus(int orderId, int status) {
         String sql = "UPDATE Orders SET Status = ? WHERE OrderID = ?";
-        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, status);
             ps.setInt(2, orderId);
             ps.executeUpdate();
@@ -47,31 +51,32 @@ public class OrderDAO {
     }
 
     public void updateOrderStatusAndAddress(int orderID, int status, String address) {
-    // Ép trạng thái thành 4 (Hoàn thành) và lưu địa chỉ từ User vào bảng Orders
-    String sql = "UPDATE Orders SET Status = ?, Address = ? WHERE OrderID = ?";
-    try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        ps.setInt(1, status);    // Sẽ truyền vào số 4
-        ps.setString(2, address); // Địa chỉ lấy từ User
-        ps.setInt(3, orderID);
-        ps.executeUpdate();
-    } catch (Exception e) {
-        e.printStackTrace();
+        // Ép trạng thái thành 4 (Hoàn thành) và lưu địa chỉ từ User vào bảng Orders
+        String sql = "UPDATE Orders SET Status = ?, Address = ? WHERE OrderID = ?";
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, status); // Sẽ truyền vào số 4
+            ps.setString(2, address); // Địa chỉ lấy từ User
+            ps.setInt(3, orderID);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
 
     public List<Order> getOrdersByUserId(int userId) {
         List<Order> list = new ArrayList<>();
         String sql = "SELECT * FROM Orders WHERE UserID = ? ORDER BY OrderDate DESC";
-        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Order o = new Order();
                 o.setOrderID(rs.getInt("OrderID"));
                 o.setUserID(rs.getInt("UserID"));
-                o.setOrderDate(rs.getTimestamp("OrderDate"));
-                o.setTotalMoney(rs.getDouble("TotalMoney")); // Đảm bảo lấy được cột này
+                o.setOrderDate(rs.getDate("OrderDate"));
+                o.setTotalMoney(rs.getDouble("TotalMoney"));
                 o.setShippingAddress(rs.getString("ShippingAddress"));
                 o.setNote(rs.getString("Note"));
                 o.setStatus(rs.getInt("Status"));
@@ -118,7 +123,8 @@ public class OrderDAO {
         String sql = "SELECT od.*, p.ProductName FROM OrderDetails od "
                 + "JOIN Products p ON od.ProductID = p.ProductID "
                 + "WHERE od.OrderID = ?";
-        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, orderID);
             ResultSet rs = ps.executeQuery();
@@ -142,7 +148,8 @@ public class OrderDAO {
         Map<Integer, String> map = new HashMap<>();
         String sql = "SELECT p.ProductID, p.ProductName FROM OrderDetails od "
                 + "JOIN Products p ON od.ProductID = p.ProductID WHERE od.OrderID = ?";
-        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, orderID);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -152,6 +159,30 @@ public class OrderDAO {
             e.printStackTrace();
         }
         return map;
+    }
+
+    // Lấy thông tin đơn hàng để biết UserID và Tổng tiền
+    public Order getOrderById(int orderId) {
+        String query = "SELECT * FROM Orders WHERE OrderID = ?";
+        try {
+            // conn = new DBContext().getConnection();
+            // ps = conn.prepareStatement(query);
+            // ps.setInt(1, orderId);
+            // rs = ps.executeQuery();
+            // if (rs.next()) {
+            // return new Order(
+            // rs.getInt("OrderID"),
+            // rs.getInt("UserID"),
+            // rs.getDate("OrderDate"),
+            // rs.getDouble("TotalMoney"),
+            // rs.getString("ShippingAddress"),
+            // rs.getString("Note"),
+            // rs.getInt("Status"));
+            // }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

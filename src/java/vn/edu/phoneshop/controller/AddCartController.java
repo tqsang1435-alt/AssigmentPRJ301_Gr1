@@ -27,7 +27,7 @@ public class AddCartController extends HttpServlet {
         String action = request.getParameter("action");
         HttpSession session = request.getSession();
         ProductDAO dao = new ProductDAO();
-        OrderDAO oDao = new OrderDAO(); 
+        OrderDAO oDao = new OrderDAO();
 
         vn.edu.phoneshop.model.User user = (vn.edu.phoneshop.model.User) session.getAttribute("user");
         if (user == null) {
@@ -35,41 +35,43 @@ public class AddCartController extends HttpServlet {
             return;
         }
         if ("buynow".equals(action)) {
-    double totalAmount = 0;
+            double totalAmount = 0;
 
-    if (productIdStr != null) {
-        int id = Integer.parseInt(productIdStr);
-        Product p = dao.getProductById(id);
-        if (p != null) totalAmount = p.getPrice();
-    } else {
-        Object totalMoneyObj = session.getAttribute("totalMoney");
-        if (totalMoneyObj != null) {
-            totalAmount = (Double) totalMoneyObj;
-        }
-    }
-    int orderId = oDao.createOrder(user.getUserID(), totalAmount, 1);
-    session.setAttribute("currentOrderId", orderId);
-
-    if (productIdStr != null) {
-        int id = Integer.parseInt(productIdStr);
-        Product p = dao.getProductById(id);
-        oDao.insertOrderDetail(orderId, id, 1, p.getPrice());
-        
-        request.setAttribute("quickProduct", p);
-        request.setAttribute("payMode", "single");
-    } else {
-        Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
-        if (cart != null) {
-            for (Integer pId : cart.keySet()) {
-                Product p = dao.getProductById(pId);
-                oDao.insertOrderDetail(orderId, pId, cart.get(pId), p.getPrice());
+            if (productIdStr != null) {
+                int id = Integer.parseInt(productIdStr);
+                Product p = dao.getProductByID(id);
+                if (p != null) {
+                    totalAmount = p.getPrice();
+                }
+            } else {
+                Object totalMoneyObj = session.getAttribute("totalMoney");
+                if (totalMoneyObj != null) {
+                    totalAmount = (Double) totalMoneyObj;
+                }
             }
+            int orderId = oDao.createOrder(user.getUserID(), totalAmount, 1);
+            session.setAttribute("currentOrderId", orderId);
+
+            if (productIdStr != null) {
+                int id = Integer.parseInt(productIdStr);
+                Product p = dao.getProductByID(id);
+                oDao.insertOrderDetail(orderId, id, 1, p.getPrice());
+
+                request.setAttribute("quickProduct", p);
+                request.setAttribute("payMode", "single");
+            } else {
+                Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart");
+                if (cart != null) {
+                    for (Integer pId : cart.keySet()) {
+                        Product p = dao.getProductByID(pId);
+                        oDao.insertOrderDetail(orderId, pId, cart.get(pId), p.getPrice());
+                    }
+                }
+                request.setAttribute("payMode", "cart");
+            }
+            request.getRequestDispatcher("quick-pay.jsp").forward(request, response);
+            return;
         }
-        request.setAttribute("payMode", "cart");
-    }
-    request.getRequestDispatcher("quick-pay.jsp").forward(request, response);
-    return;
-}
         try {
             if (productIdStr != null) {
                 int id = Integer.parseInt(productIdStr);
@@ -113,7 +115,7 @@ public class AddCartController extends HttpServlet {
         double totalMoney = 0;
 
         for (Map.Entry<Integer, Integer> entry : cart.entrySet()) {
-            Product p = dao.getProductById(entry.getKey());
+            Product p = dao.getProductByID(entry.getKey());
             if (p != null) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("product", p);
