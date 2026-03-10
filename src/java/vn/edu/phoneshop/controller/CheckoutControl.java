@@ -107,15 +107,15 @@ public class CheckoutControl extends HttpServlet {
             user.setRewardPoints(user.getRewardPoints() + pointsEarned);
             int newPoints = user.getRewardPoints();
             if (newPoints >= 2000)
-                user.setCustomerType("Kim Cương");
+                user.setCustomerType("Diamond");
             else if (newPoints >= 1000)
-                user.setCustomerType("Vàng");
+                user.setCustomerType("Gold");
             else if (newPoints >= 500)
-                user.setCustomerType("Bạc");
+                user.setCustomerType("Silver");
             else if (newPoints >= 100)
-                user.setCustomerType("Đồng");
+                user.setCustomerType("Bronze");
             else
-                user.setCustomerType("Thành viên mới");
+                user.setCustomerType("New Member");
 
             session.setAttribute("ACC", user);
 

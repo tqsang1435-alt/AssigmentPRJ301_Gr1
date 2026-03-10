@@ -12,7 +12,7 @@
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cssreset.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/grid.css">
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css?v=1004">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css?v=1006">
                 <link rel="stylesheet"
                     href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
             </head>
@@ -35,19 +35,19 @@
                             <c:set var="iconClass" value="ti-user" />
 
                             <c:choose>
-                                <c:when test="${fn:contains(rank, 'Kim Cương')}">
+                                <c:when test="${fn:contains(rank, 'Diamond')}">
                                     <c:set var="rankClass" value="rank-diamond" />
                                     <c:set var="iconClass" value="ti-diamond" />
                                 </c:when>
-                                <c:when test="${fn:contains(rank, 'Vàng')}">
+                                <c:when test="${fn:contains(rank, 'Gold')}">
                                     <c:set var="rankClass" value="rank-gold" />
                                     <c:set var="iconClass" value="ti-star" />
                                 </c:when>
-                                <c:when test="${fn:contains(rank, 'Bạc')}">
+                                <c:when test="${fn:contains(rank, 'Silver')}">
                                     <c:set var="rankClass" value="rank-silver" />
                                     <c:set var="iconClass" value="ti-medall" />
                                 </c:when>
-                                <c:when test="${fn:contains(rank, 'Đồng')}">
+                                <c:when test="${fn:contains(rank, 'Bronze')}">
                                     <c:set var="rankClass" value="rank-bronze" />
                                     <c:set var="iconClass" value="ti-medall-alt" />
                                 </c:when>
@@ -80,8 +80,8 @@
                                                     </div>
 
                                                     <div class="info-group">
-                                                        <div class="info-label"><i class="ti-email"></i> Liên kết tài
-                                                            khoản</div>
+                                                        <div class="info-label"><i class="ti-email"></i> Account Email
+                                                        </div>
                                                         <div class="info-value">${sessionScope.ACC.email}</div>
                                                     </div>
 
@@ -104,7 +104,7 @@
                                                     </div>
 
                                                     <div class="info-group">
-                                                        <div class="info-label"><i class="ti-location-pin"></i> Khu vực
+                                                        <div class="info-label"><i class="ti-location-pin"></i> Address
                                                         </div>
                                                         <div class="info-value">
                                                             <c:choose>
@@ -121,7 +121,7 @@
                                                     </div>
 
                                                     <div class="info-group">
-                                                        <div class="info-label"><i class="ti-bolt"></i> Rank</div>
+                                                        <div class="info-label"><i class="ti-bolt"></i> Points</div>
                                                         <div class="exp-points">
                                                             ${sessionScope.ACC.rewardPoints} Point
                                                         </div>
@@ -129,12 +129,13 @@
 
                                                     <div class="info-group"
                                                         style="text-align: center; border-bottom: none; margin-top: 40px;">
-                                                        <div class="info-label" style="margin-bottom: 20px;"><i
-                                                                class="ti-target"></i> Mức Xếp Hạng Hiện Tại</div>
+                                                        <div class="info-label" style="margin-bottom: 20px;">
+                                                            <i class="ti-target"></i> Current Rank
+                                                        </div>
 
                                                         <div class="membership-rank-badge">
-                                                            <i class="${iconClass}"></i> ${rank != null ? rank : 'Tân
-                                                            Binh'}
+                                                            <i class="${iconClass}"></i> ${rank != null ? rank : 'New
+                                                            Member'}
                                                         </div>
                                                     </div>
 
@@ -146,8 +147,8 @@
                                                         </a>
                                                         <a href="user-logout" class="btn btn--outline-danger"
                                                             style="line-height: 40px; height: 44px; border-radius: 4px; padding: 0 25px; border: 2px solid #ff4757; color: #ff4757;">
-                                                            <i class="ti-power-off" style="margin-right: 8px;"></i> Đăng
-                                                            Xuất
+                                                            <i class="ti-power-off" style="margin-right: 8px;"></i>
+                                                            Logout
                                                         </a>
                                                     </div>
                                                 </div>

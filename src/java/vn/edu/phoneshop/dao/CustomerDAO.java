@@ -49,7 +49,7 @@ public class CustomerDAO extends DBContext {
     }
 
     public void addCustomer(String fullName, String email, String password, String phone, String address) {
-        String sql = "INSERT INTO Users (FullName, Email, Password, PhoneNumber, Address, Role, RewardPoints, CustomerType) VALUES (?, ?, ?, ?, ?, 'Customer', 0, 'Regular')";
+        String sql = "INSERT INTO Users (FullName, Email, Password, PhoneNumber, Address, Role, RewardPoints, CustomerType) VALUES (?, ?, ?, ?, ?, 'Customer', 0, 'New Member')";
         try {
             Connection connection = getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -92,7 +92,21 @@ public class CustomerDAO extends DBContext {
 
     public void updateCustomer(User user) {
         try {
-            StringBuilder sql = new StringBuilder("UPDATE Users SET FullName = ?, Email = ?, PhoneNumber = ?, Address = ?, RewardPoints = ?, CustomerType = ?");
+            int points = user.getRewardPoints();
+            String newType = "New Member";
+            if (points >= 2000) {
+                newType = "Diamond";
+            } else if (points >= 1000) {
+                newType = "Gold";
+            } else if (points >= 500) {
+                newType = "Silver";
+            } else if (points >= 100) {
+                newType = "Bronze";
+            }
+            user.setCustomerType(newType);
+
+            StringBuilder sql = new StringBuilder(
+                    "UPDATE Users SET FullName = ?, Email = ?, PhoneNumber = ?, Address = ?, RewardPoints = ?, CustomerType = ?");
             boolean passwordChanged = user.getPassword() != null && !user.getPassword().isEmpty();
             if (passwordChanged) {
                 sql.append(", Password = ?");
@@ -101,21 +115,21 @@ public class CustomerDAO extends DBContext {
 
             Connection connection = getConnection();
             PreparedStatement ps = connection.prepareStatement(sql.toString());
-            
+
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPhoneNumber());
             ps.setString(4, user.getAddress());
             ps.setInt(5, user.getRewardPoints());
             ps.setString(6, user.getCustomerType());
-            
+
             if (passwordChanged) {
                 ps.setString(7, user.getPassword());
                 ps.setInt(8, user.getUserID());
             } else {
                 ps.setInt(7, user.getUserID());
             }
-            
+
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

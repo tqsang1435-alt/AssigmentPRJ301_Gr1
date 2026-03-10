@@ -43,7 +43,7 @@ public class UserDAO {
 
     // 2. CREATE: Thêm khách hàng mới (Đăng ký)
     public void registerUser(String fullName, String email, String phone, String address, String password) {
-        String query = "INSERT INTO Users (FullName, Email, PhoneNumber, Address, Password, Role, RewardPoints, CustomerType) VALUES (?, ?, ?, ?, ?, 'Customer', 0, N'Thành viên mới')";
+        String query = "INSERT INTO Users (FullName, Email, PhoneNumber, Address, Password, Role, RewardPoints, CustomerType) VALUES (?, ?, ?, ?, ?, 'Customer', 0, 'New Member')";
         try {
             conn = new DBContext().getConnection();
             ps = conn.prepareStatement(query);
@@ -81,9 +81,9 @@ public class UserDAO {
         String updateSql = "UPDATE Users SET RewardPoints = ?, CustomerType = ? WHERE UserID = ?";
 
         try (Connection conn = new DBContext().getConnection();
-             PreparedStatement psGet = conn.prepareStatement(getPointSql);
-             PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
-            
+                PreparedStatement psGet = conn.prepareStatement(getPointSql);
+                PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+
             // Quy tắc: 100,000 VNĐ = 1 điểm
             int pointsEarned = (int) (totalOrderMoney / 100000);
 
@@ -98,15 +98,15 @@ public class UserDAO {
                 int newTotalPoints = currentPoints + pointsEarned;
 
                 // Logic Phân loại khách hàng
-                String newType = "Thành viên mới";
+                String newType = "New Member";
                 if (newTotalPoints >= 2000) {
-                    newType = "Kim Cương";
+                    newType = "Diamond";
                 } else if (newTotalPoints >= 1000) {
-                    newType = "Vàng";
+                    newType = "Gold";
                 } else if (newTotalPoints >= 500) {
-                    newType = "Bạc";
+                    newType = "Silver";
                 } else if (newTotalPoints >= 100) {
-                    newType = "Đồng";
+                    newType = "Bronze";
                 }
 
                 // Cập nhật vào DB
@@ -115,7 +115,8 @@ public class UserDAO {
                 psUpdate.setInt(3, userId);
                 psUpdate.executeUpdate();
 
-                System.out.println("User " + userId + " tích lũy thêm " + pointsEarned + " điểm. Hạng hiện tại: " + newType);
+                System.out.println(
+                        "User " + userId + " tích lũy thêm " + pointsEarned + " điểm. Hạng hiện tại: " + newType);
             }
         } catch (Exception e) {
             e.printStackTrace();
