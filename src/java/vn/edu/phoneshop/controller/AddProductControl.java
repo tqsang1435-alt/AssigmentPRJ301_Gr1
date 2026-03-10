@@ -9,20 +9,28 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import vn.edu.phoneshop.dao.ProductDAO;
+import vn.edu.phoneshop.model.User;
 
 /**
  *
  * @author tqsan
  */
-@WebServlet(name = "AddProductControl", urlPatterns = {"/add-product"})
+@WebServlet(name = "AddProductControl", urlPatterns = { "/add-product" })
 public class AddProductControl extends HttpServlet {
 
     // Hiển thị form thêm sản phẩm
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("ACC");
+        if (user == null || !"Admin".equalsIgnoreCase(user.getRole())) {
+            response.sendRedirect("user-login");
+            return;
+        }
         request.getRequestDispatcher("AddProduct.jsp").forward(request, response);
     }
 
@@ -32,6 +40,13 @@ public class AddProductControl extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8"); // Xử lý tiếng Việt
+
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("ACC");
+        if (user == null || !"Admin".equalsIgnoreCase(user.getRole())) {
+            response.sendRedirect("user-login");
+            return;
+        }
 
         try {
             // 1. Lấy dữ liệu dạng chuỗi từ form

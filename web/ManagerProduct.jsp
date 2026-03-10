@@ -1,85 +1,106 @@
-<%-- 
-    Document   : ManagerProduct
-    Created on : Mar 4, 2026, 5:44:40 PM
-    Author     : tqsan
---%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+        <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+            <c:if test="${sessionScope.ACC == null || sessionScope.ACC.role != 'Admin'}">
+                <c:redirect url="home" />
+            </c:if>
+            <!DOCTYPE html>
+            <html lang="vi">
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Quản lý Sản phẩm</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container-fluid mt-4">
-            <h1 class="text-center mb-4">Quản lý Sản phẩm PhoneShop</h1>
+            <head>
+                <meta charset="UTF-8">
+                <title>Quản lý Sản phẩm - PhoneShop Admin</title>
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cssreset.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/grid.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
+                <link rel="stylesheet"
+                    href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+            </head>
 
-            <div class="d-flex justify-content-between mb-3">
-                <a href="add-product" class="btn btn-success">Thêm Sản phẩm mới</a>
-                
-                <form action="product-list" method="get" class="form-inline">
-                    <label class="mr-2 font-weight-bold">Lọc theo:</label>
-                    
-                    <select name="ramFilter" class="form-control mr-2">
-                        <option value="">-- Tất cả RAM --</option>
-                        <option value="4GB" ${selectedRam == '4GB' ? 'selected' : ''}>4GB</option>
-                        <option value="8GB" ${selectedRam == '8GB' ? 'selected' : ''}>8GB</option>
-                        <option value="12GB" ${selectedRam == '12GB' ? 'selected' : ''}>12GB</option>
-                    </select>
-                    
-                    <select name="romFilter" class="form-control mr-2">
-                        <option value="">-- Tất cả ROM --</option>
-                        <option value="64GB" ${selectedRom == '64GB' ? 'selected' : ''}>64GB</option>
-                        <option value="128GB" ${selectedRom == '128GB' ? 'selected' : ''}>128GB</option>
-                        <option value="256GB" ${selectedRom == '256GB' ? 'selected' : ''}>256GB</option>
-                        <option value="512GB" ${selectedRom == '512GB' ? 'selected' : ''}>512GB</option>
-                    </select>
-                    
-                    <button type="submit" class="btn btn-primary">Lọc</button>
-                    <a href="product-list" class="btn btn-secondary ml-1">Xóa lọc</a>
-                </form>
-            </div>
+            <body>
+                <div class="admin-container">
+                    <%-- SIDEBAR --%>
+                        <jsp:include page="admin-sidebar.jsp"></jsp:include>
 
-            <table class="table table-bordered table-striped table-hover">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>ID</th>
-                        <th>Tên Sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>RAM</th>
-                        <th>ROM</th>
-                        <th>Màu sắc</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach items="${listP}" var="p">
-                        <tr>
-                            <td>${p.productID}</td>
-                            <td>${p.productName}</td>
-                            <td>${p.price}</td>
-                            <td>${p.stockQuantity}</td>
-                            <td><span class="badge badge-info">${p.ram}</span></td>
-                            <td><span class="badge badge-secondary">${p.rom}</span></td>
-                            <td>${p.color}</td>
-                            <td>
-                                <a href="load-product?pid=${p.productID}" class="btn btn-warning btn-sm">Sửa</a>
-                                <a href="delete-product?pid=${p.productID}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này không?')">Xóa</a>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                    
-                    <c:if test="${empty listP}">
-                        <tr>
-                            <td colspan="8" class="text-center text-danger font-weight-bold">Không tìm thấy sản phẩm nào phù hợp với cấu hình bạn chọn!</td>
-                        </tr>
-                    </c:if>
-                </tbody>
-            </table>
-        </div>
-    </body>
-</html>
+                        <div class="admin-main">
+                            <div class="admin-header">
+                                <h3>Quản lý Sản phẩm</h3>
+                                <div class="admin-user-info">Xin chào, <strong>${sessionScope.ACC.fullName}</strong>
+                                </div>
+                            </div>
+
+                            <div class="admin-content">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Danh sách sản phẩm</h3>
+                                        <a href="add-product" class="btn btn--primary"><i class="ti-plus"></i> Thêm
+                                            mới</a>
+                                    </div>
+
+                                    <%-- Filter Form --%>
+                                        <form action="product-list" method="get"
+                                            style="margin-bottom: 20px; display: flex; gap: 10px;">
+                                            <select name="ramFilter" class="form-control" style="width: 150px;">
+                                                <option value="">-- Chọn RAM --</option>
+                                                <option value="8GB" ${selectedRam=='8GB' ? 'selected' : '' }>8GB
+                                                </option>
+                                                <option value="16GB" ${selectedRam=='16GB' ? 'selected' : '' }>16GB
+                                                </option>
+                                            </select>
+                                            <select name="romFilter" class="form-control" style="width: 150px;">
+                                                <option value="">-- Chọn ROM --</option>
+                                                <option value="128GB" ${selectedRom=='128GB' ? 'selected' : '' }>128GB
+                                                </option>
+                                                <option value="256GB" ${selectedRom=='256GB' ? 'selected' : '' }>256GB
+                                                </option>
+                                            </select>
+                                            <button type="submit" class="btn btn--primary">Lọc</button>
+                                        </form>
+
+                                        <div class="card-body">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Hình ảnh</th>
+                                                        <th>Tên sản phẩm</th>
+                                                        <th>Giá</th>
+                                                        <th>Kho</th>
+                                                        <th>Hành động</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <c:forEach items="${listP}" var="p">
+                                                        <tr>
+                                                            <td>#${p.productID}</td>
+                                                            <td><img src="${p.imageURL}" alt=""
+                                                                    style="width: 50px; height: 50px; object-fit: contain;">
+                                                            </td>
+                                                            <td>${p.productName}</td>
+                                                            <td style="color: var(--primary-color); font-weight: bold;">
+                                                                <fmt:formatNumber value="${p.price}" type="currency"
+                                                                    currencySymbol="₫" />
+                                                            </td>
+                                                            <td>${p.stockQuantity}</td>
+                                                            <td>
+                                                                <a href="loadProduct?pid=${p.productID}"
+                                                                    class="action-btn" title="Sửa"><i
+                                                                        class="ti-pencil"></i></a>
+                                                                <a href="delete?pid=${p.productID}"
+                                                                    class="action-btn action-btn--delete" title="Xóa"
+                                                                    onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')"><i
+                                                                        class="ti-trash"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </body>
+
+            </html>

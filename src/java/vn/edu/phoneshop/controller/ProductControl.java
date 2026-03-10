@@ -9,27 +9,36 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import vn.edu.phoneshop.dao.ProductDAO;
 import vn.edu.phoneshop.model.Product;
+import vn.edu.phoneshop.model.User;
 
 /**
  *
  * @author tqsan
  */
-@WebServlet(name = "ProductControl", urlPatterns = {"/product-list"})
+@WebServlet(name = "ProductControl", urlPatterns = { "/product-list" })
 public class ProductControl extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("ACC");
+        if (user == null || !"Admin".equalsIgnoreCase(user.getRole())) {
+            response.sendRedirect("user-login");
+            return;
+        }
+
         try {
             // 1. Lấy thông tin người dùng chọn từ thanh Lọc (nếu có)
             String ram = request.getParameter("ramFilter");
             String rom = request.getParameter("romFilter");
-            
+
             ProductDAO dao = new ProductDAO();
             List<Product> list;
 
@@ -46,9 +55,9 @@ public class ProductControl extends HttpServlet {
             request.setAttribute("listP", list);
             request.setAttribute("selectedRam", ram);
             request.setAttribute("selectedRom", rom);
-            
+
             request.getRequestDispatcher("ManagerProduct.jsp").forward(request, response);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
