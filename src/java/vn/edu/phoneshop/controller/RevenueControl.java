@@ -7,35 +7,27 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 import vn.edu.phoneshop.dao.StatisticDAO;
+import vn.edu.phoneshop.model.RevenueStat;
 import vn.edu.phoneshop.model.User;
 
-@WebServlet(name = "AdminDashboardControl", urlPatterns = { "/admin-dashboard", "/admin", "/dashboard", "/admin-home" })
-public class AdminDashboardControl extends HttpServlet {
-
+@WebServlet(name = "RevenueControl", urlPatterns = { "/revenue-stats" })
+public class RevenueControl extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("ACC");
-
-        // Kiểm tra quyền Admin
         if (user == null || !"Admin".equalsIgnoreCase(user.getRole())) {
             response.sendRedirect("user-login");
             return;
         }
 
-        // Lấy dữ liệu thống kê cho dashboard
         StatisticDAO dao = new StatisticDAO();
-        int totalCustomers = dao.getTotalCustomers();
-        int totalProducts = dao.getTotalProducts();
-        int newOrders = dao.getNewOrders();
-        double monthRevenue = dao.getCurrentMonthRevenue();
+        List<RevenueStat> monthlyRevenue = dao.getMonthlyRevenue();
+        request.setAttribute("monthlyRevenue", monthlyRevenue);
 
-        request.setAttribute("totalCustomers", totalCustomers);
-        request.setAttribute("totalProducts", totalProducts);
-        request.setAttribute("newOrders", newOrders);
-        request.setAttribute("monthRevenue", monthRevenue);
-        request.getRequestDispatcher("admin-dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("revenue.jsp").forward(request, response);
     }
 }

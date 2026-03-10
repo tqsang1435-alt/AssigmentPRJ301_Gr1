@@ -26,6 +26,13 @@
                 </a>
             </li>
             <li class="admin-menu__item">
+                <a href="revenue-stats"
+                    class="admin-menu__link ${pageContext.request.servletPath.contains('revenue') ? 'admin-menu__link--active' : ''}">
+                    <i class="ti-bar-chart admin-menu__icon"></i>
+                    <span>Thống kê Doanh thu</span>
+                </a>
+            </li>
+            <li class="admin-menu__item">
                 <a href="admin-orders.jsp"
                     class="admin-menu__link ${pageContext.request.servletPath.contains('order') ? 'admin-menu__link--active' : ''}">
                     <i class="ti-shopping-cart admin-menu__icon"></i>
