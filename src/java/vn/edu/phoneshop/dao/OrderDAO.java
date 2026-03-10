@@ -52,7 +52,7 @@ public class OrderDAO {
 
     public void updateOrderStatusAndAddress(int orderID, int status, String address) {
         // Ép trạng thái thành 4 (Hoàn thành) và lưu địa chỉ từ User vào bảng Orders
-        String sql = "UPDATE Orders SET Status = ?, Address = ? WHERE OrderID = ?";
+        String sql = "UPDATE Orders SET Status = ?, ShippingAddress = ? WHERE OrderID = ?";
         try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, status); // Sẽ truyền vào số 4
@@ -164,21 +164,21 @@ public class OrderDAO {
     // Lấy thông tin đơn hàng để biết UserID và Tổng tiền
     public Order getOrderById(int orderId) {
         String query = "SELECT * FROM Orders WHERE OrderID = ?";
-        try {
-            // conn = new DBContext().getConnection();
-            // ps = conn.prepareStatement(query);
-            // ps.setInt(1, orderId);
-            // rs = ps.executeQuery();
-            // if (rs.next()) {
-            // return new Order(
-            // rs.getInt("OrderID"),
-            // rs.getInt("UserID"),
-            // rs.getDate("OrderDate"),
-            // rs.getDouble("TotalMoney"),
-            // rs.getString("ShippingAddress"),
-            // rs.getString("Note"),
-            // rs.getInt("Status"));
-            // }
+        try (Connection con = new vn.edu.phoneshop.utils.DBContext().getConnection();
+                PreparedStatement ps = con.prepareStatement(query)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Order o = new Order();
+                o.setOrderID(rs.getInt("OrderID"));
+                o.setUserID(rs.getInt("UserID"));
+                o.setOrderDate(rs.getDate("OrderDate"));
+                o.setTotalMoney(rs.getDouble("TotalMoney"));
+                o.setShippingAddress(rs.getString("ShippingAddress"));
+                o.setNote(rs.getString("Note"));
+                o.setStatus(rs.getInt("Status"));
+                return o;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

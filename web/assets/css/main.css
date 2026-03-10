@@ -545,10 +545,6 @@
      color: #fff;
  }
 
- .btn i {
-     margin-right: 6px;
- }
-
  /* CART */
 
  .cart_body {
@@ -902,4 +898,456 @@
      background-color: var(--primary-color);
      color: var(--white-color);
      opacity: 0.9;
+ }
+
+ /* PRODUCT DETAIL */
+ .product-detail-container {
+     background-color: #fff;
+     padding: 40px;
+     border-radius: 4px;
+     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+ }
+
+ .product-img-box {
+     width: 100%;
+     padding-top: 100%;
+     background-size: contain;
+     background-repeat: no-repeat;
+     background-position: center;
+     border: 1px solid #f0f0f0;
+     border-radius: 4px;
+ }
+
+ .product-info {
+     padding-left: 20px;
+ }
+
+ .product-name {
+     font-size: 2.4rem;
+     font-weight: 500;
+     color: var(--text-color);
+     margin-bottom: 15px;
+     line-height: 1.2;
+ }
+
+ .product-price {
+     font-size: 2.8rem;
+     color: var(--primary-color);
+     font-weight: bold;
+     margin-bottom: 20px;
+     background-color: #fafafa;
+     padding: 15px;
+     border-radius: 4px;
+ }
+
+ .product-meta {
+     font-size: 1.5rem;
+     color: #555;
+     margin-bottom: 12px;
+     display: flex;
+     align-items: center;
+ }
+
+ .product-meta i {
+     width: 25px;
+     color: #888;
+ }
+
+ .product-meta span {
+     font-weight: 500;
+     color: #333;
+     margin-left: 5px;
+ }
+
+ .product-desc-box {
+     margin-top: 30px;
+     padding-top: 30px;
+     border-top: 1px solid #eee;
+ }
+
+ .product-desc-title {
+     font-size: 1.8rem;
+     font-weight: 600;
+     margin-bottom: 15px;
+     color: var(--text-color);
+     text-transform: uppercase;
+ }
+
+ .product-desc-content {
+     font-size: 1.5rem;
+     line-height: 1.8;
+     color: #444;
+     text-align: justify;
+ }
+
+ .action-buttons {
+     display: flex;
+     gap: 15px;
+     margin-top: 30px;
+ }
+
+ .btn-action {
+     flex: 1;
+     height: 48px;
+     font-size: 1.6rem;
+     font-weight: 600;
+     border-radius: 4px;
+     cursor: pointer;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     text-decoration: none;
+     transition: opacity 0.2s;
+ }
+
+ .btn-add-cart {
+     background-color: rgba(255, 193, 7, 0.1);
+     color: var(--primary-color);
+     border: 1px solid var(--primary-color);
+ }
+
+ .btn-add-cart:hover {
+     background-color: rgba(255, 193, 7, 0.2);
+ }
+
+ .btn-buy-now {
+     background-color: var(--primary-color);
+     color: #fff;
+     border: none;
+ }
+
+ .btn-buy-now:hover {
+     opacity: 0.9;
+ }
+
+ /* Responsive Product Detail */
+ @media (max-width: 739px) {
+     .product-info {
+         padding-left: 0;
+         margin-top: 20px;
+     }
+
+     .product-detail-container {
+         padding: 20px;
+     }
+ }
+
+ /* Profile */
+ .profile-header__name {
+     margin: 0;
+     font-size: 2.4rem;
+ }
+
+ .profile-header__role {
+     margin: 5px 0 0;
+     opacity: 0.9;
+     font-size: 1.4rem;
+ }
+
+ .profile-actions {
+     text-align: center;
+     margin-top: 35px;
+     display: flex;
+     justify-content: center;
+     gap: 15px;
+ }
+
+ .btn--outline-danger {
+     color: #dc3545;
+     border: 1px solid #dc3545;
+     background: transparent;
+     text-decoration: none;
+     display: inline-flex;
+     align-items: center;
+ }
+
+ .btn--outline-danger:hover {
+     background-color: #dc3545;
+     color: #fff;
+ }
+
+ .btn i {
+     margin-right: 6px;
+ }
+
+ /* CSS cho Thông báo thành công */
+ #toast-success {
+     position: fixed;
+     top: 20px;
+     right: 20px;
+     background: #28a745;
+     color: white;
+     padding: 14px 24px;
+     border-radius: 4px;
+     font-size: 1.4rem;
+     font-weight: 500;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+     z-index: 9999;
+     animation: fadeInOut 4s forwards;
+     display: flex;
+     align-items: center;
+ }
+
+ #toast-success i {
+     margin-right: 8px;
+     font-size: 1.8rem;
+ }
+
+ @keyframes fadeInOut {
+     0% {
+         opacity: 0;
+         transform: translateY(-20px);
+     }
+
+     10% {
+         opacity: 1;
+         transform: translateY(0);
+     }
+
+     80% {
+         opacity: 1;
+         transform: translateY(0);
+     }
+
+     100% {
+         opacity: 0;
+         transform: translateY(-20px);
+     }
+ }
+
+ .rank-diamond {
+     --r-color-1: #00f2fe;
+     --r-color-2: #4facfe;
+     --r-color-3: #005be3;
+     --r-color-4: #ffffff;
+     --r-border: linear-gradient(60deg, #00f2fe, #ffffff, #005be3, #4facfe, #00f2fe);
+     --r-glow: rgba(0, 242, 254, 0.6);
+     --r-text: drop-shadow(0 0 8px rgba(0, 242, 254, 0.8));
+ }
+
+ .rank-gold {
+     --r-color-1: #bf953f;
+     --r-color-2: #fcf6ba;
+     --r-color-3: #b38728;
+     --r-color-4: #fbf5b7;
+     --r-border: linear-gradient(60deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #bf953f);
+     --r-glow: rgba(252, 246, 186, 0.6);
+     --r-text: drop-shadow(0 0 8px rgba(252, 246, 186, 0.8));
+ }
+
+ .rank-silver {
+     --r-color-1: #757f9a;
+     --r-color-2: #d7dde8;
+     --r-color-3: #9ba8b8;
+     --r-color-4: #ffffff;
+     --r-border: linear-gradient(60deg, #757f9a, #ffffff, #9ba8b8, #d7dde8, #757f9a);
+     --r-glow: rgba(215, 221, 232, 0.6);
+     --r-text: drop-shadow(0 0 5px rgba(215, 221, 232, 0.8));
+ }
+
+ .rank-bronze {
+     --r-color-1: #804a00;
+     --r-color-2: #e0a96d;
+     --r-color-3: #5a3200;
+     --r-color-4: #ffc98c;
+     --r-border: linear-gradient(60deg, #804a00, #ffc98c, #5a3200, #e0a96d, #804a00);
+     --r-glow: rgba(224, 169, 109, 0.6);
+     --r-text: drop-shadow(0 0 5px rgba(224, 169, 109, 0.5));
+ }
+
+ .rank-new {
+     --r-color-1: #4ca1af;
+     --r-color-2: #c4e0e5;
+     --r-color-3: #2c3e50;
+     --r-color-4: #ffffff;
+     --r-border: linear-gradient(60deg, #4ca1af, #ffffff, #2c3e50, #c4e0e5, #4ca1af);
+     --r-glow: rgba(76, 161, 175, 0.4);
+     --r-text: none;
+ }
+
+ /* --- ANIMATION XOAY VÒNG CHO KHUNG --- */
+ @keyframes border-spin {
+     0% {
+         background-position: 0% 50%;
+     }
+
+     50% {
+         background-position: 100% 50%;
+     }
+
+     100% {
+         background-position: 0% 50%;
+     }
+ }
+
+ @keyframes pulse-energy {
+     0% {
+         transform: scale(1);
+         filter: brightness(1);
+     }
+
+     100% {
+         transform: scale(1.03);
+         filter: brightness(1.2);
+     }
+ }
+
+ /* --- KHUNG THẺ CHÍNH (FRAME) --- */
+ .membership-card-wrapper {
+     position: relative;
+     padding: 5px;
+     /* Độ dày của khung viền */
+     border-radius: 12px;
+     background: var(--r-border);
+     background-size: 300% 300%;
+     animation: border-spin 4s linear infinite;
+     box-shadow: 0 0 25px var(--r-glow);
+     margin-top: 30px;
+ }
+
+ .membership-card-inner {
+     background: #1a1c23;
+     /* Nền tối đậm chất game */
+     border-radius: 8px;
+     overflow: hidden;
+     color: #e0e0e0;
+ }
+
+ /* --- HEADER BẢNG TÊN --- */
+ .profile-header {
+     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent), var(--r-border);
+     background-size: 200% 200%;
+     animation: border-spin 6s ease infinite;
+     padding: 50px 20px 30px;
+     text-align: center;
+     border-bottom: 2px solid var(--r-color-2);
+     position: relative;
+ }
+
+ .profile-header__name {
+     margin: 15px 0 5px;
+     font-size: 2.8rem;
+     font-weight: 900;
+     text-transform: uppercase;
+     letter-spacing: 2px;
+     color: #fff;
+     filter: var(--r-text);
+ }
+
+ .profile-header__role {
+     font-size: 1.4rem;
+     color: var(--r-color-4);
+     text-transform: uppercase;
+     letter-spacing: 3px;
+ }
+
+ .avatar-hexagon-wrap {
+     position: relative;
+     width: 110px;
+     height: 110px;
+     margin: 0 auto;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+
+ .avatar-hexagon-border {
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background: var(--r-border);
+     background-size: 300% 300%;
+     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+     animation: border-spin 2s linear infinite;
+     z-index: 1;
+ }
+
+ .avatar-hexagon-inner {
+     position: absolute;
+     top: 4px;
+     left: 4px;
+     right: 4px;
+     bottom: 4px;
+     background: #1a1c23;
+     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     font-size: 4.5rem;
+     color: var(--r-color-2);
+     z-index: 2;
+     filter: var(--r-text);
+ }
+
+ .profile-body {
+     padding: 40px;
+ }
+
+ .info-group {
+     margin-bottom: 25px;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+     padding-bottom: 15px;
+ }
+
+ .info-label {
+     font-size: 1.2rem;
+     color: #8a93a2;
+     margin-bottom: 8px;
+     text-transform: uppercase;
+     letter-spacing: 1px;
+     font-weight: bold;
+ }
+
+ .info-value {
+     font-size: 1.8rem;
+     color: #fff;
+     font-weight: 500;
+ }
+
+ .membership-rank-badge {
+     display: inline-flex;
+     align-items: center;
+     padding: 10px 40px;
+     font-size: 1.6rem;
+     font-weight: 900;
+     color: #111;
+     text-transform: uppercase;
+     letter-spacing: 2px;
+     background: var(--r-border);
+     background-size: 200% 200%;
+     /* Cắt góc tạo hình viên pha lê/ruy băng */
+     clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%);
+     box-shadow: 0 0 15px var(--r-glow);
+     animation: pulse-energy 1.5s infinite alternate, border-spin 3s linear infinite;
+     gap: 8px;
+ }
+
+ .membership-rank-badge i {
+     font-size: 2rem;
+ }
+
+ .exp-points {
+     font-size: 2.2rem;
+     font-weight: 900;
+     color: var(--r-color-2);
+     text-shadow: 0 0 10px var(--r-glow);
+     font-family: 'Courier New', Courier, monospace;
+     letter-spacing: -1px;
+ }
+
+ .btn-rank-action {
+     background: var(--r-border);
+     background-size: 200% 200%;
+     color: #111;
+     font-weight: bold;
+     border: none;
+     transition: all 0.3s;
+ }
+
+ .btn-rank-action:hover {
+     animation: border-spin 1s linear infinite;
+     transform: translateY(-2px) scale(1.05);
+     box-shadow: 0 5px 15px var(--r-glow);
  }

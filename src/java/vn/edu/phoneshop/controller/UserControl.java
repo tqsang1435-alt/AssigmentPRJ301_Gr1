@@ -23,10 +23,9 @@ public class UserControl extends HttpServlet {
 
         if (user != null) {
             HttpSession session = request.getSession();
-            session.setAttribute("ACC", user); // Lưu user vào session
-            session.setAttribute("ROLE", user.getRole()); // Lưu quyền
-
-            // Nếu là Admin thì vào trang quản lý, khách thì về trang chủ
+            session.setAttribute("ACC", user);
+            session.setAttribute("ROLE", user.getRole());
+            session.setMaxInactiveInterval(24 * 60 * 60);
             if ("Admin".equalsIgnoreCase(user.getRole())) {
                 response.sendRedirect("admin-dashboard");
             } else {

@@ -13,6 +13,7 @@ public class Product {
     private String ram;
     private String rom;
     private String color;
+    private int quantity;
 
     public Product() {
     }
@@ -105,19 +106,19 @@ public class Product {
         this.status = status;
     }
 
-    public String getRam() {
+    public String getRAM() {
         return ram;
     }
 
-    public void setRam(String ram) {
+    public void setRAM(String ram) {
         this.ram = ram;
     }
 
-    public String getRom() {
+    public String getROM() {
         return rom;
     }
 
-    public void setRom(String rom) {
+    public void setROM(String rom) {
         this.rom = rom;
     }
 
@@ -128,4 +129,13 @@ public class Product {
     public void setColor(String color) {
         this.color = color;
     }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
 }

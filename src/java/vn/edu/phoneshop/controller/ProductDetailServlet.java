@@ -48,7 +48,7 @@ public class ProductDetailServlet extends HttpServlet {
             return;
         }
 
-        request.setAttribute("p", p);
+        request.setAttribute("product", p);
 
         // JSP đúng của bạn
         request.getRequestDispatcher("detail.jsp")

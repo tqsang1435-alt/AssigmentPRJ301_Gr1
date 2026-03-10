@@ -19,10 +19,14 @@ public class AddToCartControl extends HttpServlet {
         try {
             String productIDStr = request.getParameter("productID");
             String quantityStr = request.getParameter("quantity");
+            if (productIDStr == null) {
+                productIDStr = request.getParameter("pid");
+            }
             if (productIDStr == null || productIDStr.isEmpty()) {
                 response.sendRedirect(request.getContextPath() + "/index.jsp");
                 return;
             }
+            System.out.println("Input PID: " + productIDStr + ", Quantity: " + quantityStr);
             int productID = Integer.parseInt(productIDStr);
             int quantity = 1;
             if (quantityStr != null && !quantityStr.isEmpty()) {
@@ -34,20 +38,33 @@ public class AddToCartControl extends HttpServlet {
             ProductDAO productDAO = new ProductDAO();
             Product product = productDAO.getProductByID(productID);
             if (product != null) {
+                System.out.println("Product Found: " + product.getProductName());
                 HttpSession session = request.getSession();
-                Cart cart = (Cart) session.getAttribute("cart");
-                if (cart == null) {
+                Object cartObj = session.getAttribute("cart");
+                Cart cart = null;
+                if (cartObj != null && cartObj instanceof Cart) {
+                    cart = (Cart) cartObj;
+                } else {
                     cart = new Cart();
                 }
                 cart.addProduct(product, quantity);
                 session.setAttribute("cart", cart);
+                session.setAttribute("cartCount", cart.getTotalQuantity());
+                System.out.println("Added to cart. Current Total Quantity: " + cart.getTotalQuantity());
+            } else {
+                System.out.println("ERROR: Product is NULL for ID = " + productID);
             }
+
             String returnURL = request.getParameter("returnURL");
             if (returnURL == null || returnURL.isEmpty()) {
-                returnURL = request.getContextPath() + "/product-list";
+                String referer = request.getHeader("Referer");
+                returnURL = (referer != null && !referer.isEmpty()) ? referer
+                        : request.getContextPath() + "/product-list";
             }
             response.sendRedirect(returnURL);
+            System.out.println("--- DEBUG: AddToCartControl END ---");
         } catch (NumberFormatException e) {
+            System.out.println("ERROR: NumberFormatException " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/index.jsp");
         }
     }

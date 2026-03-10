@@ -43,7 +43,7 @@ public class UserDAO {
 
     // 2. CREATE: Thêm khách hàng mới (Đăng ký)
     public void registerUser(String fullName, String email, String phone, String address, String password) {
-        String query = "INSERT INTO Users (FullName, Email, PhoneNumber, Address, Password, Role, RewardPoints, CustomerType) VALUES (?, ?, ?, ?, ?, 'Customer', 0, 'Regular')";
+        String query = "INSERT INTO Users (FullName, Email, PhoneNumber, Address, Password, Role, RewardPoints, CustomerType) VALUES (?, ?, ?, ?, ?, 'Customer', 0, N'Thành viên mới')";
         try {
             conn = new DBContext().getConnection();
             ps = conn.prepareStatement(query);
@@ -77,44 +77,46 @@ public class UserDAO {
     // 4. LOGIC TÍCH ĐIỂM & PHÂN LOẠI KHÁCH HÀNG
     // Hàm này sẽ được gọi sau khi đơn hàng (Order) hoàn tất (Status = 4)
     public void updateRewardPoints(int userId, double totalOrderMoney) {
-        try {
-            conn = new DBContext().getConnection();
+        String getPointSql = "SELECT RewardPoints FROM Users WHERE UserID = ?";
+        String updateSql = "UPDATE Users SET RewardPoints = ?, CustomerType = ? WHERE UserID = ?";
 
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement psGet = conn.prepareStatement(getPointSql);
+             PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+            
             // Quy tắc: 100,000 VNĐ = 1 điểm
             int pointsEarned = (int) (totalOrderMoney / 100000);
 
             // Lấy điểm hiện tại
-            String getPointSql = "SELECT RewardPoints FROM Users WHERE UserID = ?";
-            ps = conn.prepareStatement(getPointSql);
-            ps.setInt(1, userId);
-            rs = ps.executeQuery();
+            psGet.setInt(1, userId);
+            try (ResultSet rs = psGet.executeQuery()) {
+                int currentPoints = 0;
+                if (rs.next()) {
+                    currentPoints = rs.getInt("RewardPoints");
+                }
 
-            int currentPoints = 0;
-            if (rs.next()) {
-                currentPoints = rs.getInt("RewardPoints");
+                int newTotalPoints = currentPoints + pointsEarned;
+
+                // Logic Phân loại khách hàng
+                String newType = "Thành viên mới";
+                if (newTotalPoints >= 2000) {
+                    newType = "Kim Cương";
+                } else if (newTotalPoints >= 1000) {
+                    newType = "Vàng";
+                } else if (newTotalPoints >= 500) {
+                    newType = "Bạc";
+                } else if (newTotalPoints >= 100) {
+                    newType = "Đồng";
+                }
+
+                // Cập nhật vào DB
+                psUpdate.setInt(1, newTotalPoints);
+                psUpdate.setString(2, newType);
+                psUpdate.setInt(3, userId);
+                psUpdate.executeUpdate();
+
+                System.out.println("User " + userId + " tích lũy thêm " + pointsEarned + " điểm. Hạng hiện tại: " + newType);
             }
-
-            int newTotalPoints = currentPoints + pointsEarned;
-
-            // Logic Phân loại khách hàng
-            String newType = "Regular";
-            if (newTotalPoints >= 1000) {
-                newType = "Premium";
-            } else if (newTotalPoints >= 500) {
-                newType = "VIP";
-            }
-
-            // Cập nhật vào DB
-            String updateSql = "UPDATE Users SET RewardPoints = ?, CustomerType = ? WHERE UserID = ?";
-            ps = conn.prepareStatement(updateSql);
-            ps.setInt(1, newTotalPoints);
-            ps.setString(2, newType);
-            ps.setInt(3, userId);
-            ps.executeUpdate();
-
-            System.out
-                    .println("User " + userId + " tích lũy thêm " + pointsEarned + " điểm. Hạng hiện tại: " + newType);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -201,5 +203,32 @@ public class UserDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    // 7. Lấy User theo ID (Hỗ trợ refresh session)
+    public User getUserByID(int userId) {
+        String query = "SELECT * FROM Users WHERE UserID = ?";
+        try {
+            conn = new DBContext().getConnection();
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, userId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("UserID"),
+                        rs.getString("FullName"),
+                        rs.getString("Email"),
+                        rs.getString("PhoneNumber"),
+                        rs.getString("Address"),
+                        rs.getString("Password"),
+                        rs.getString("Role"),
+                        rs.getDate("CreateDate"),
+                        rs.getInt("RewardPoints"),
+                        rs.getString("CustomerType"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

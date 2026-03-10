@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+            <fmt:setLocale value="vi_VN" />
 
             <!DOCTYPE html>
             <html lang="vi">
@@ -84,7 +85,7 @@
                         <div class="row sm-gutter">
                             <c:forEach items="${listP}" var="p">
                                 <div class="col l-2-4 m-4 c-6" style="margin-bottom: 20px;">
-                                    <a href="detail?id=${p.productID}" class="home-product-item"
+                                    <a href="product-detail?id=${p.productID}" class="home-product-item"
                                         style="display: block; text-decoration: none; background-color: #fff; border-radius: 8px; box-shadow: 0 1px 5px rgba(0,0,0,0.1); padding-bottom: 15px; height: 100%; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s;"
                                         onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.12)';"
                                         onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 5px rgba(0,0,0,0.1)';">
@@ -99,8 +100,7 @@
                                         <div class="home-product-item__price" style="margin: 0 10px 10px;">
                                             <span class="home-product-item__price-current"
                                                 style="font-size: 1.6rem; color: var(--primary-color); font-weight: bold;">
-                                                <fmt:formatNumber value="${p.price}" type="currency" currencySymbol="₫"
-                                                    pattern="#,##0" />
+                                                <fmt:formatNumber value="${p.price}" pattern="#,##0" /> đ
                                             </span>
                                         </div>
 
@@ -109,7 +109,7 @@
                                             <button
                                                 onclick="event.preventDefault(); confirmAddCart('${p.productID}', '${p.productName}')"
                                                 class="btn btn--primary"
-                                                style="flex: 1; font-size: 1.2rem; padding: 0; height: 36px; border-radius: 4px; cursor: pointer;">
+                                                style="flex: 1; font-size: 1.6rem; padding: 0; height: 36px; border-radius: 4px; cursor: pointer;">
                                                 <i class="ti-shopping-cart"></i>
                                             </button>
                                             <button
@@ -171,13 +171,13 @@
                             text: "Bạn muốn thêm " + name + " vào giỏ hàng chứ?",
                             icon: 'question',
                             showCancelButton: true,
-                            confirmButtonColor: '#ffc107',
+                            confirmButtonColor: '#ee4b2b',
                             cancelButtonColor: '#6c757d',
                             confirmButtonText: 'Đúng, thêm ngay!',
                             cancelButtonText: 'Hủy'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = "add-cart?id=" + id + "&action=add";
+                                window.location.href = "add-to-cart?pid=" + id;
                             }
                         })
                     }
@@ -188,13 +188,13 @@
                             text: "Bạn sẽ được chuyển đến trang thanh toán cho " + name,
                             icon: 'info',
                             showCancelButton: true,
-                            confirmButtonColor: '#ffc107',
+                            confirmButtonColor: '#ee4b2b',
                             cancelButtonColor: '#6c757d',
                             confirmButtonText: 'Thanh toán ngay',
                             cancelButtonText: 'Để sau'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = "add-cart?id=" + id + "&action=buynow";
+                                window.location.href = "add-to-cart?pid=" + id + "&returnURL=view-cart";
                             }
                         })
                     }

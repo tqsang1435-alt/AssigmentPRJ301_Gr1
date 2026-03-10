@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import vn.edu.phoneshop.dao.ProductDAO;
 import vn.edu.phoneshop.model.Cart;
+import vn.edu.phoneshop.model.Product;
 
-@WebServlet(name = "UpdateCartControl", urlPatterns = {"/update-cart"})
+@WebServlet(name = "UpdateCartControl", urlPatterns = { "/update-cart" })
 public class UpdateCartControl extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -27,27 +29,28 @@ public class UpdateCartControl extends HttpServlet {
             int productID = Integer.parseInt(productIDStr);
             int quantity = Integer.parseInt(quantityStr);
 
-            // Kiểm tra quantity hợp lệ
             if (quantity < 1) {
-                // Nếu quantity < 1, xóa sản phẩm
                 response.sendRedirect(request.getContextPath() + "/remove-from-cart?productID=" + productID);
                 return;
             }
 
-            // Lấy session
             HttpSession session = request.getSession();
 
-            // Lấy cart từ session
             Cart cart = (Cart) session.getAttribute("cart");
             if (cart != null) {
-                // Cập nhật số lượng
-                cart.updateQuantity(productID, quantity);
+                ProductDAO dao = new ProductDAO();
+                Product p = dao.getProductByID(productID);
+                if (p != null) {
+                    if (quantity > p.getStockQuantity()) {
+                        quantity = p.getStockQuantity();
+                    }
+                }
 
-                // Lưu cart vào session
+                cart.updateQuantity(productID, quantity);
                 session.setAttribute("cart", cart);
+                session.setAttribute("cartCount", cart.getTotalQuantity());
             }
 
-            // Redirect về trang giỏ hàng
             response.sendRedirect(request.getContextPath() + "/view-cart");
 
         } catch (NumberFormatException e) {

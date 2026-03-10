@@ -29,7 +29,7 @@ public class AddCartController extends HttpServlet {
         ProductDAO dao = new ProductDAO();
         OrderDAO oDao = new OrderDAO();
 
-        vn.edu.phoneshop.model.User user = (vn.edu.phoneshop.model.User) session.getAttribute("user");
+        vn.edu.phoneshop.model.User user = (vn.edu.phoneshop.model.User) session.getAttribute("ACC");
         if (user == null) {
             response.sendRedirect("login.jsp");
             return;

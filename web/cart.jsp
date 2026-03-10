@@ -1,6 +1,7 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+            <fmt:setLocale value="vi_VN" />
             <!DOCTYPE html>
             <html lang="vi">
 
@@ -298,8 +299,8 @@
                                                 <div class="row no-gutters">
                                                     <div class="col l-5 m-5 c-12">
                                                         <div class="cart-item__product">
-                                                            <img src="${pageContext.request.contextPath}${item.product.imageURL}"
-                                                                alt="Ảnh" class="cart-item__img">
+                                                            <img src="${item.product.imageURL}" alt="Ảnh"
+                                                                class="cart-item__img">
                                                             <div class="cart-item__info">
                                                                 <h3 class="cart-item__name">${item.product.productName}
                                                                 </h3>
@@ -316,7 +317,7 @@
                                                     <div class="col l-2 m-2 c-0 hide-on-mobile">
                                                         <div class="cart-item__price">
                                                             <fmt:formatNumber value="${item.product.price}"
-                                                                type="currency" currencySymbol="₫" pattern="#,##0" />
+                                                                pattern="#,##0" /> đ
                                                         </div>
                                                     </div>
                                                     <div class="col l-3 m-3 c-12">
@@ -333,8 +334,8 @@
                                                     <div class="col l-2 m-2 c-12">
                                                         <div class="cart-item__subtotal"
                                                             style="justify-content: flex-end;">
-                                                            <fmt:formatNumber value="${item.subtotal}" type="currency"
-                                                                currencySymbol="₫" pattern="#,##0" />
+                                                            <fmt:formatNumber value="${item.subtotal}"
+                                                                pattern="#,##0" /> đ
                                                         </div>
                                                     </div>
                                                 </div>
@@ -360,8 +361,7 @@
                                         <div class="cart-summary__row">
                                             <span>Tạm tính (${cart.totalQuantity} SP):</span>
                                             <span style="font-weight: 500;">
-                                                <fmt:formatNumber value="${cart.totalPrice}" type="currency"
-                                                    currencySymbol="₫" pattern="#,##0" />
+                                                <fmt:formatNumber value="${cart.totalPrice}" pattern="#,##0" /> đ
                                             </span>
                                         </div>
                                         <div class="cart-summary__row">
@@ -371,8 +371,7 @@
                                         <div class="cart-summary__total">
                                             <span>Tổng cộng:</span>
                                             <span>
-                                                <fmt:formatNumber value="${cart.totalPrice}" type="currency"
-                                                    currencySymbol="₫" pattern="#,##0" />
+                                                <fmt:formatNumber value="${cart.totalPrice}" pattern="#,##0" /> đ
                                             </span>
                                         </div>
 

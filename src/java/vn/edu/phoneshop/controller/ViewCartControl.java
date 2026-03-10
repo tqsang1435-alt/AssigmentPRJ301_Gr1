@@ -9,24 +9,25 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.edu.phoneshop.model.Cart;
 
-@WebServlet(name = "ViewCartControl", urlPatterns = {"/view-cart"})
+@WebServlet(name = "ViewCartControl", urlPatterns = { "/view-cart", "/cart" })
 public class ViewCartControl extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Lấy session
         HttpSession session = request.getSession();
-
-        // Lấy cart từ session
-        Cart cart = (Cart) session.getAttribute("cart");
-        if (cart == null) {
+        Object cartObj = session.getAttribute("cart");
+        Cart cart = null;
+        if (cartObj != null && cartObj instanceof Cart) {
+            cart = (Cart) cartObj;
+            System.out.println("Cart found in session. Total items: " + cart.getTotalQuantity());
+        } else {
+            System.out.println("Cart NOT found in session (or invalid type). Creating new cart.");
             cart = new Cart();
+            session.setAttribute("cart", cart);
+            session.setAttribute("cartCount", 0);
         }
 
-        // Đặt cart vào request attributes để hiển thị trong JSP
         request.setAttribute("cart", cart);
-
-        // Forward đến trang giỏ hàng
         request.getRequestDispatcher("/cart.jsp").forward(request, response);
     }
 

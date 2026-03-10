@@ -24,7 +24,7 @@ public class UpdateProfileController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getSession().getAttribute("ACC");
         if (user == null) {
             response.sendRedirect("login");
             return;
@@ -43,7 +43,7 @@ public class UpdateProfileController extends HttpServlet {
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
 
-        User user = (User) request.getSession().getAttribute("user");
+        User user = (User) request.getSession().getAttribute("ACC");
 
         if (user != null) {
             UserDAO dao = new UserDAO();
@@ -56,7 +56,7 @@ public class UpdateProfileController extends HttpServlet {
                 user.setFullName(fullName);
                 user.setPhoneNumber(phone);
                 user.setAddress(address);
-                request.getSession().setAttribute("user", user);
+                request.getSession().setAttribute("ACC", user);
                 response.sendRedirect("profile?message=success");
             } else {
                 response.sendRedirect("edit-profile?error=fail");
