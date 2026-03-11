@@ -94,11 +94,19 @@ public class Product {
         return ram;
     }
 
+    public String getRam() {
+        return ram;
+    }
+
     public void setRam(String ram) {
         this.ram = ram;
     }
 
     public String getROM() {
+        return rom;
+    }
+
+    public String getRom() {
         return rom;
     }
 

@@ -37,10 +37,16 @@ public class CustomerDAO extends DBContext {
     }
 
     public void deleteCustomer(String id) {
-        String sql = "DELETE FROM Users WHERE UserID = ? AND Role = 'Customer'";
+        String sqlUpdateOrder = "UPDATE Orders SET UserID = NULL WHERE UserID = ?";
+        String sqlDeleteUser = "DELETE FROM Users WHERE UserID = ? AND Role = 'Customer'";
         try {
             Connection connection = getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
+
+            PreparedStatement psUpdate = connection.prepareStatement(sqlUpdateOrder);
+            psUpdate.setString(1, id);
+            psUpdate.executeUpdate();
+
+            PreparedStatement ps = connection.prepareStatement(sqlDeleteUser);
             ps.setString(1, id);
             ps.executeUpdate();
         } catch (Exception e) {

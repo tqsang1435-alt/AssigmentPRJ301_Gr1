@@ -59,9 +59,10 @@
                                                         <span class="badge badge--normal">${c.customerType}</span>
                                                     </td>
                                                     <td>
-                                                        <a href="#" class="action-btn" title="Chỉnh sửa"><i
-                                                                class="ti-pencil"></i></a>
-                                                        <a href="#" class="action-btn action-btn--delete" title="Xóa"><i
+                                                        <a href="edit-customer?id=${c.userID}" class="action-btn"
+                                                            title="Chỉnh sửa"><i class="ti-pencil"></i></a>
+                                                        <a href="delete-customer?id=${c.userID}"
+                                                            class="action-btn action-btn--delete" title="Xóa"><i
                                                                 class="ti-trash"></i></a>
                                                     </td>
                                                 </tr>

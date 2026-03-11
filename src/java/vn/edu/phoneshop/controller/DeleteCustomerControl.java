@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import vn.edu.phoneshop.dao.CustomerDAO;
 
-@WebServlet(name = "DeleteCustomerControl", urlPatterns = {"/delete-customer"})
+@WebServlet(name = "DeleteCustomerControl", urlPatterns = { "/delete-customer" })
 public class DeleteCustomerControl extends HttpServlet {
 
     @Override
