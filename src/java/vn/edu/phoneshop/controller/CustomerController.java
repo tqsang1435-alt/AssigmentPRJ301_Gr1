@@ -17,7 +17,7 @@ public class CustomerController extends HttpServlet {
         try {
             List<User> customerList = userDAO.getAllUsers();
             request.setAttribute("customerList", customerList);
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/ManagerSupplier.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/ManagerCustomer.jsp");
             dispatcher.forward(request, response);
 
         } catch (Exception e) {

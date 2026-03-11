@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "AddToCartControl", urlPatterns = { "/add-to-cart" })
+@WebServlet(name = "AddToCartControl", urlPatterns = {"/add-to-cart"})
 public class AddToCartControl extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -13,25 +13,9 @@ public class Product {
     private String ram;
     private String rom;
     private String color;
-    private int quantity;
+    private Category category;
 
     public Product() {
-    }
-
-    public Product(int productID, String productName, double price, int stockQuantity, String description,
-            String imageURL, int categoryID, int supplierID, boolean status, String ram, String rom, String color) {
-        this.productID = productID;
-        this.productName = productName;
-        this.price = price;
-        this.stockQuantity = stockQuantity;
-        this.description = description;
-        this.imageURL = imageURL;
-        this.categoryID = categoryID;
-        this.supplierID = supplierID;
-        this.status = status;
-        this.ram = ram;
-        this.rom = rom;
-        this.color = color;
     }
 
     public int getProductID() {
@@ -110,7 +94,7 @@ public class Product {
         return ram;
     }
 
-    public void setRAM(String ram) {
+    public void setRam(String ram) {
         this.ram = ram;
     }
 
@@ -118,7 +102,7 @@ public class Product {
         return rom;
     }
 
-    public void setROM(String rom) {
+    public void setRom(String rom) {
         this.rom = rom;
     }
 
@@ -130,12 +114,11 @@ public class Product {
         this.color = color;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public Category getCategory() {
+        return category;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setCategory(Category category) {
+        this.category = category;
     }
-
 }

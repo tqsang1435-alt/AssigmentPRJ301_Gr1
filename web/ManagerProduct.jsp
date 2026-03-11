@@ -1,9 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
-            <c:if test="${sessionScope.ACC == null || sessionScope.ACC.role != 'Admin'}">
-                <c:redirect url="home" />
-            </c:if>
             <!DOCTYPE html>
             <html lang="vi">
 
@@ -67,6 +64,9 @@
                                                         <th>Tên sản phẩm</th>
                                                         <th>Giá</th>
                                                         <th>Kho</th>
+                                                        <th>RAM</th>
+                                                        <th>ROM</th>
+                                                        <th>Màu</th>
                                                         <th>Hành động</th>
                                                     </tr>
                                                 </thead>
@@ -83,6 +83,9 @@
                                                                     currencySymbol="₫" />
                                                             </td>
                                                             <td>${p.stockQuantity}</td>
+                                                            <td>${p.ram}</td>
+                                                            <td>${p.rom}</td>
+                                                            <td>${p.color}</td>
                                                             <td>
                                                                 <a href="loadProduct?pid=${p.productID}"
                                                                     class="action-btn" title="Sửa"><i

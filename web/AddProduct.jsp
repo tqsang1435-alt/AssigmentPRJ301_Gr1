@@ -55,6 +55,29 @@
                                             <input type="text" name="image" class="form-control" required>
                                         </div>
                                         <div class="row">
+                                            <div class="col l-4 m-4 c-12">
+                                                <div class="form-group">
+                                                    <label class="form-label">RAM</label>
+                                                    <input type="text" name="ram" class="form-control"
+                                                        placeholder="VD: 8GB">
+                                                </div>
+                                            </div>
+                                            <div class="col l-4 m-4 c-12">
+                                                <div class="form-group">
+                                                    <label class="form-label">ROM (Bộ nhớ trong)</label>
+                                                    <input type="text" name="rom" class="form-control"
+                                                        placeholder="VD: 128GB">
+                                                </div>
+                                            </div>
+                                            <div class="col l-4 m-4 c-12">
+                                                <div class="form-group">
+                                                    <label class="form-label">Màu sắc</label>
+                                                    <input type="text" name="color" class="form-control"
+                                                        placeholder="VD: Xanh">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
                                             <div class="col l-6 m-6 c-12">
                                                 <div class="form-group">
                                                     <label class="form-label">Danh mục</label>

@@ -1,91 +1,125 @@
-<%-- 
-    Document   : EditProduct
-    Created on : Mar 4, 2026, 5:49:36 PM
-    Author     : tqsan
---%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+        <c:if test="${sessionScope.ACC == null || sessionScope.ACC.role != 'Admin'}">
+            <c:redirect url="home" />
+        </c:if>
+        <!DOCTYPE html>
+        <html lang="vi">
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Sửa Sản Phẩm</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="container mt-4">
-            <h2 class="text-center text-warning mb-4">Chỉnh Sửa Điện Thoại</h2>
-            
-            <form action="update-product" method="post" class="shadow p-4 bg-light rounded">
-                <input type="hidden" name="id" value="${detail.productID}">
+        <head>
+            <meta charset="UTF-8">
+            <title>Chỉnh sửa Sản phẩm - PhoneShop Admin</title>
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cssreset.css">
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/grid.css">
+            <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
+            <link rel="stylesheet"
+                href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+        </head>
 
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label class="font-weight-bold">Tên Sản Phẩm:</label>
-                        <input type="text" name="name" class="form-control" required value="${detail.productName}">
+        <body>
+            <div class="admin-container">
+                <jsp:include page="admin-sidebar.jsp"></jsp:include>
+
+                <div class="admin-main">
+                    <div class="admin-header">
+                        <h3>Chỉnh sửa Sản phẩm #${detail.productID}</h3>
+                        <div class="admin-user-info">Xin chào, <strong>${sessionScope.ACC.fullName}</strong></div>
                     </div>
-                    <div class="col-md-3 form-group">
-                        <label class="font-weight-bold">Giá tiền (VND):</label>
-                        <input type="number" name="price" class="form-control" required value="${detail.price}">
-                    </div>
-                    <div class="col-md-3 form-group">
-                        <label class="font-weight-bold">Số lượng kho:</label>
-                        <input type="number" name="quantity" class="form-control" required value="${detail.stockQuantity}">
+
+                    <div class="admin-content">
+                        <div class="card" style="max-width: 800px; margin: 0 auto;">
+                            <div class="card-body">
+                                <form action="update-product" method="post">
+                                    <input type="hidden" name="id" value="${detail.productID}">
+                                    <div class="form-group">
+                                        <label class="form-label">Tên sản phẩm</label>
+                                        <input type="text" name="name" class="form-control"
+                                            value="${detail.productName}" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col l-6 m-6 c-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Giá (VNĐ)</label>
+                                                <input type="number" name="price" class="form-control"
+                                                    value="${detail.price}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col l-6 m-6 c-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Số lượng kho</label>
+                                                <input type="number" name="quantity" class="form-control"
+                                                    value="${detail.stockQuantity}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Hình ảnh (URL)</label>
+                                        <input type="text" name="image" class="form-control" value="${detail.imageURL}"
+                                            required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col l-4 m-4 c-12">
+                                            <div class="form-group">
+                                                <label class="form-label">RAM</label>
+                                                <input type="text" name="ram" class="form-control" value="${detail.ram}"
+                                                    placeholder="VD: 8GB">
+                                            </div>
+                                        </div>
+                                        <div class="col l-4 m-4 c-12">
+                                            <div class="form-group">
+                                                <label class="form-label">ROM</label>
+                                                <input type="text" name="rom" class="form-control" value="${detail.rom}"
+                                                    placeholder="VD: 128GB">
+                                            </div>
+                                        </div>
+                                        <div class="col l-4 m-4 c-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Màu sắc</label>
+                                                <input type="text" name="color" class="form-control"
+                                                    value="${detail.color}" placeholder="VD: Xanh">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col l-6 m-6 c-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Danh mục</label>
+                                                <select name="category" class="form-control">
+                                                    <option value="1" ${detail.categoryID==1 ? 'selected' : '' }>Điện
+                                                        thoại</option>
+                                                    <option value="2" ${detail.categoryID==2 ? 'selected' : '' }>Phụ
+                                                        kiện</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col l-6 m-6 c-12">
+                                            <div class="form-group">
+                                                <label class="form-label">Nhà cung cấp</label>
+                                                <select name="supplier" class="form-control">
+                                                    <option value="1" ${detail.supplierID==1 ? 'selected' : '' }>Samsung
+                                                    </option>
+                                                    <option value="2" ${detail.supplierID==2 ? 'selected' : '' }>Apple
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Mô tả</label>
+                                        <textarea name="description" class="form-control"
+                                            style="height: 100px;">${detail.description}</textarea>
+                                    </div>
+                                    <div class="form-group" style="text-align: right;">
+                                        <a href="product-list" class="btn btn--normal">Hủy bỏ</a>
+                                        <button type="submit" class="btn btn--primary">Lưu thay đổi</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </body>
 
-                <div class="row">
-                    <div class="col-md-4 form-group">
-                        <label class="font-weight-bold">RAM:</label>
-                        <select name="ram" class="form-control">
-                            <option value="4GB" ${detail.ram == '4GB' ? 'selected' : ''}>4GB</option>
-                            <option value="8GB" ${detail.ram == '8GB' ? 'selected' : ''}>8GB</option>
-                            <option value="12GB" ${detail.ram == '12GB' ? 'selected' : ''}>12GB</option>
-                            <option value="16GB" ${detail.ram == '16GB' ? 'selected' : ''}>16GB</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label class="font-weight-bold">ROM (Bộ nhớ):</label>
-                        <select name="rom" class="form-control">
-                            <option value="64GB" ${detail.rom == '64GB' ? 'selected' : ''}>64GB</option>
-                            <option value="128GB" ${detail.rom == '128GB' ? 'selected' : ''}>128GB</option>
-                            <option value="256GB" ${detail.rom == '256GB' ? 'selected' : ''}>256GB</option>
-                            <option value="512GB" ${detail.rom == '512GB' ? 'selected' : ''}>512GB</option>
-                            <option value="1TB" ${detail.rom == '1TB' ? 'selected' : ''}>1TB</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 form-group">
-                        <label class="font-weight-bold">Màu sắc:</label>
-                        <input type="text" name="color" class="form-control" value="${detail.color}">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label class="font-weight-bold">ID Danh mục (Category):</label>
-                        <input type="number" name="category" class="form-control" required value="${detail.categoryID}">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label class="font-weight-bold">ID Nhà cung cấp (Supplier):</label>
-                        <input type="number" name="supplier" class="form-control" required value="${detail.supplierID}">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="font-weight-bold">Link Ảnh (URL):</label>
-                    <input type="text" name="image" class="form-control" value="${detail.imageURL}">
-                </div>
-
-                <div class="form-group">
-                    <label class="font-weight-bold">Mô tả chi tiết:</label>
-                    <textarea name="description" class="form-control" rows="3">${detail.description}</textarea>
-                </div>
-
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-warning px-5">Cập nhật</button>
-                    <a href="product-list" class="btn btn-secondary px-5 ml-2">Hủy bỏ</a>
-                </div>
-            </form>
-        </div>
-    </body>
-</html>
+        </html>
