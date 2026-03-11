@@ -1,12 +1,24 @@
 package vn.edu.phoneshop.model;
 
+import java.util.Date;
+
 public class RevenueStat {
     private int year;
     private int month;
+    private Date date;
+    private String productName;
+    private int quantity;
     private int orderCount;
     private double totalRevenue;
 
     public RevenueStat() {
+    }
+
+    public RevenueStat(int year, int month, int orderCount, double totalRevenue) {
+        this.year = year;
+        this.month = month;
+        this.orderCount = orderCount;
+        this.totalRevenue = totalRevenue;
     }
 
     public int getYear() {
@@ -39,5 +51,29 @@ public class RevenueStat {
 
     public void setTotalRevenue(double totalRevenue) {
         this.totalRevenue = totalRevenue;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

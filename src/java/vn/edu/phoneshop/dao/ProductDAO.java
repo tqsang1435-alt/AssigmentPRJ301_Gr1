@@ -180,7 +180,7 @@ public class ProductDAO extends DBContext {
     }
 
     public int getTotalProducts(String txtSearch) {
-        String sql = "SELECT count(*) FROM Products WHERE ProductName LIKE ?";
+        String sql = "SELECT count(*) FROM Products WHERE ProductName LIKE ? AND Status = 1";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -206,7 +206,7 @@ public class ProductDAO extends DBContext {
      */
     public List<Product> getProductsWithPagination(String txtSearch, int page, int pageSize) {
         List<Product> list = new ArrayList<>();
-        String sql = "SELECT p.*, c.CategoryName FROM Products p JOIN Categories c ON p.CategoryID = c.CategoryID WHERE p.ProductName LIKE ? ORDER BY p.ProductID OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        String sql = "SELECT p.*, c.CategoryName FROM Products p JOIN Categories c ON p.CategoryID = c.CategoryID WHERE p.ProductName LIKE ? AND p.Status = 1 ORDER BY p.ProductID DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 

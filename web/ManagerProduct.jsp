@@ -36,12 +36,16 @@
                                     </div>
 
                                     <%-- Filter Form --%>
-                                        <form action="product-list" method="get"
-                                            style="margin-bottom: 20px; display: flex; gap: 10px;">
+                                        <form action="manager-product" method="get"
+                                            style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+                                            <input type="text" name="searchName" class="form-control"
+                                                placeholder="Tìm theo tên..." value="${searchName}"
+                                                style="width: 200px;">
                                             <select name="ramFilter" class="form-control" style="width: 150px;">
                                                 <option value="">-- Chọn RAM --</option>
                                                 <c:forEach items="${listRAM}" var="ram">
-                                                    <option value="${ram}">${ram}</option>
+                                                    <option value="${ram}" ${selectedRam==ram ? 'selected' : '' }>${ram}
+                                                    </option>
                                                 </c:forEach>
                                             </select>
                                             <select name="romFilter" class="form-control" style="width: 150px;">
@@ -50,9 +54,9 @@
                                                     <option value="${rom}" ${selectedRom==rom ? 'selected' : '' }>${rom}
                                                     </option>
                                                 </c:forEach>
-                                                </option>
                                             </select>
                                             <button type="submit" class="btn btn--primary">Lọc</button>
+                                            <a href="manager-product" class="btn">Reset</a>
                                         </form>
 
                                         <div class="card-body">
