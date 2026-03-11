@@ -40,16 +40,16 @@
                                             style="margin-bottom: 20px; display: flex; gap: 10px;">
                                             <select name="ramFilter" class="form-control" style="width: 150px;">
                                                 <option value="">-- Chọn RAM --</option>
-                                                <option value="8GB" ${selectedRam=='8GB' ? 'selected' : '' }>8GB
-                                                </option>
-                                                <option value="16GB" ${selectedRam=='16GB' ? 'selected' : '' }>16GB
-                                                </option>
+                                                <c:forEach items="${listRAM}" var="ram">
+                                                    <option value="${ram}">${ram}</option>
+                                                </c:forEach>
                                             </select>
                                             <select name="romFilter" class="form-control" style="width: 150px;">
                                                 <option value="">-- Chọn ROM --</option>
-                                                <option value="128GB" ${selectedRom=='128GB' ? 'selected' : '' }>128GB
-                                                </option>
-                                                <option value="256GB" ${selectedRom=='256GB' ? 'selected' : '' }>256GB
+                                                <c:forEach items="${listROM}" var="rom">
+                                                    <option value="${rom}" ${selectedRom==rom ? 'selected' : '' }>${rom}
+                                                    </option>
+                                                </c:forEach>
                                                 </option>
                                             </select>
                                             <button type="submit" class="btn btn--primary">Lọc</button>

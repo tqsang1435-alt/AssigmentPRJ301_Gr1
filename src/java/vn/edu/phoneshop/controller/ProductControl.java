@@ -35,29 +35,20 @@ public class ProductControl extends HttpServlet {
         }
 
         try {
-            // 1. Lấy thông tin người dùng chọn từ thanh Lọc (nếu có)
+            ProductDAO dao = new ProductDAO();
+            List<String> listRAM = dao.getAllRAMs();
+            List<String> listROM = dao.getAllROMs();
+            request.setAttribute("listRAM", listRAM);
+            request.setAttribute("listROM", listROM);
+            String search = request.getParameter("txtSearch");
             String ram = request.getParameter("ramFilter");
             String rom = request.getParameter("romFilter");
-
-            ProductDAO dao = new ProductDAO();
-            List<Product> list;
-
-            // 2. Kiểm tra xem người dùng có chọn Lọc hay không
-            // Nếu cả 2 ô đều trống (hoặc null) -> Lấy tất cả
-            if ((ram == null || ram.isEmpty()) && (rom == null || rom.isEmpty())) {
-                list = dao.getAllProducts();
-            } else {
-                // Nếu có chọn ít nhất 1 ô -> Gọi hàm Lọc động
-                list = dao.filterProducts(ram, rom);
-            }
-
-            // 3. Đẩy dữ liệu sang JSP và giữ lại lựa chọn của người dùng trên thanh Filter
+            List<Product> list = dao.searchAndFilterProducts(search, ram, rom);
             request.setAttribute("listP", list);
+            request.setAttribute("txtSearch", search);
             request.setAttribute("selectedRam", ram);
             request.setAttribute("selectedRom", rom);
-
             request.getRequestDispatcher("ManagerProduct.jsp").forward(request, response);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

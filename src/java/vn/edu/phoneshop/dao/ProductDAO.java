@@ -224,4 +224,75 @@ public class ProductDAO extends DBContext {
         }
         return list;
     }
+
+    // Lấy danh sách các loại RAM (không trùng lặp) từ database
+    public List<String> getAllRAMs() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT RAM FROM Products WHERE RAM IS NOT NULL AND RAM <> '' ORDER BY RAM";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(rs.getString("RAM"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Lấy danh sách các loại ROM (không trùng lặp) từ database
+    public List<String> getAllROMs() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT ROM FROM Products WHERE ROM IS NOT NULL AND ROM <> '' ORDER BY ROM";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(rs.getString("ROM"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Tìm kiếm kết hợp lọc RAM, ROM
+    public List<Product> searchAndFilterProducts(String search, String ram, String rom) {
+        List<Product> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.*, c.CategoryName FROM Products p JOIN Categories c ON p.CategoryID = c.CategoryID WHERE 1=1");
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND p.ProductName LIKE ?");
+        }
+        if (ram != null && !ram.trim().isEmpty()) {
+            sql.append(" AND p.RAM = ?");
+        }
+        if (rom != null && !rom.trim().isEmpty()) {
+            sql.append(" AND p.ROM = ?");
+        }
+        sql.append(" ORDER BY p.ProductID DESC");
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int index = 1;
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(index++, "%" + search.trim() + "%");
+            }
+            if (ram != null && !ram.trim().isEmpty()) {
+                ps.setString(index++, ram);
+            }
+            if (rom != null && !rom.trim().isEmpty()) {
+                ps.setString(index++, rom);
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToProduct(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
