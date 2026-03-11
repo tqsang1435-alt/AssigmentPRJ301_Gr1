@@ -15,6 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
+import vn.edu.phoneshop.dao.ProductDAO;
+import vn.edu.phoneshop.model.Product;
 
 @WebServlet(name = "ChatBotServlet", urlPatterns = { "/chat-bot" })
 public class ChatBotServlet extends HttpServlet {
@@ -40,7 +43,7 @@ public class ChatBotServlet extends HttpServlet {
 
         String apiKey = "AIzaSyDbva3Jx9Q9w4BfTHGU_Ku3lNWuJiZ2e8U".trim();
 
-        String modelName = "gemini-1.5-flash";
+        String modelName = "gemini-2.5-flash";
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key="
                 + apiKey;
 
@@ -54,7 +57,11 @@ public class ChatBotServlet extends HttpServlet {
             conn.setReadTimeout(30000);
 
             conn.setDoOutput(true);
-            String escapedMessage = message.replace("\\", "\\\\")
+
+            // Lấy dữ liệu sản phẩm để cung cấp ngữ cảnh cho AI
+            String context = getProductContext();
+            String fullPrompt = context + "\n\nKhách hàng hỏi: " + message;
+            String escapedMessage = fullPrompt.replace("\\", "\\\\")
                     .replace("\"", "\\\"")
                     .replace("\n", "\\n")
                     .replace("\r", "");
@@ -94,6 +101,28 @@ public class ChatBotServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             return "Có lỗi xảy ra khi kết nối với AI: " + e.getMessage();
+        }
+    }
+
+    // Hàm lấy danh sách sản phẩm từ Database để "dạy" cho AI
+    private String getProductContext() {
+        try {
+            ProductDAO dao = new ProductDAO();
+            List<Product> list = dao.getAllActiveProducts();
+            StringBuilder sb = new StringBuilder();
+            sb.append(
+                    "Bạn là nhân viên tư vấn nhiệt tình của PhoneShop. Dưới đây là danh sách điện thoại đang bán (Tên, Giá, Cấu hình):\n");
+
+            for (Product p : list) {
+                sb.append(String.format("- %s: Giá %,.0f VNĐ. (RAM: %s, ROM: %s, Màu: %s)\n",
+                        p.getProductName(), p.getPrice(), p.getRam(), p.getRom(), p.getColor()));
+            }
+            sb.append(
+                    "\nHãy dùng thông tin trên để tư vấn. Nếu khách hỏi sản phẩm không có trong danh sách, hãy báo cửa hàng chưa kinh doanh dòng đó.");
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
     }
 
