@@ -163,7 +163,7 @@
                 </div>
 
                 <jsp:include page="footer.jsp" />
-
+                <jsp:include page="chat-widget.jsp"></jsp:include>
                 <script>
                     function confirmAddCart(id, name) {
                         Swal.fire({
