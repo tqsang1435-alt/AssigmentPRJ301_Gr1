@@ -184,7 +184,8 @@ public class ProductDAO extends DBContext {
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, "%" + txtSearch + "%");
+            String search = (txtSearch == null) ? "" : txtSearch;
+            ps.setString(1, "%" + search + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
