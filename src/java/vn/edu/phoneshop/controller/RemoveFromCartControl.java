@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.edu.phoneshop.model.Cart;
+import vn.edu.phoneshop.model.User;
 
 @WebServlet(name = "RemoveFromCartControl", urlPatterns = { "/remove-from-cart" })
 public class RemoveFromCartControl extends HttpServlet {
@@ -38,6 +39,12 @@ public class RemoveFromCartControl extends HttpServlet {
             if (cart != null) {
                 // Xóa sản phẩm khỏi giỏ hàng
                 cart.removeProduct(productID);
+
+                // Cập nhật lại giảm giá nếu user đang đăng nhập
+                User account = (User) session.getAttribute("ACC");
+                if (account != null) {
+                    cart.setDiscountPercent(CheckoutControl.getDiscountPercent(account.getCustomerType()));
+                }
 
                 // Lưu cart vào session
                 session.setAttribute("cart", cart);

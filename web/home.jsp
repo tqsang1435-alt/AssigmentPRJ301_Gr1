@@ -42,35 +42,6 @@
                     </div>
                 </div>
 
-                <!-- FEATURES -->
-                <div class="features">
-                    <div class="grid wide">
-                        <div class="row">
-                            <div class="col l-4 m-4 c-12">
-                                <div class="feature-box">
-                                    <div class="feature-icon"><i class="ti-truck"></i></div>
-                                    <h3 class="feature-title">Giao hàng miễn phí</h3>
-                                    <p class="feature-desc">Cho đơn hàng trên 5 triệu đồng</p>
-                                </div>
-                            </div>
-                            <div class="col l-4 m-4 c-12">
-                                <div class="feature-box">
-                                    <div class="feature-icon"><i class="ti-shield"></i></div>
-                                    <h3 class="feature-title">Bảo hành chính hãng</h3>
-                                    <p class="feature-desc">Cam kết 100% hàng chính hãng</p>
-                                </div>
-                            </div>
-                            <div class="col l-4 m-4 c-12">
-                                <div class="feature-box">
-                                    <div class="feature-icon"><i class="ti-headphone-alt"></i></div>
-                                    <h3 class="feature-title">Hỗ trợ 24/7</h3>
-                                    <p class="feature-desc">Luôn sẵn sàng giải đáp thắc mắc</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="container" id="product-section"
                     style="background-color: #f5f5f5; padding-top: 20px; padding-bottom: 50px;">
                     <div class="grid wide">
@@ -159,6 +130,35 @@
                             </ul>
                         </c:if>
 
+                    </div>
+                </div>
+
+                <!-- FEATURES -->
+                <div class="features">
+                    <div class="grid wide">
+                        <div class="row">
+                            <div class="col l-4 m-4 c-12">
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="ti-truck"></i></div>
+                                    <h3 class="feature-title">Giao hàng miễn phí</h3>
+                                    <p class="feature-desc">Cho đơn hàng trên 5 triệu đồng</p>
+                                </div>
+                            </div>
+                            <div class="col l-4 m-4 c-12">
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="ti-shield"></i></div>
+                                    <h3 class="feature-title">Bảo hành chính hãng</h3>
+                                    <p class="feature-desc">Cam kết 100% hàng chính hãng</p>
+                                </div>
+                            </div>
+                            <div class="col l-4 m-4 c-12">
+                                <div class="feature-box">
+                                    <div class="feature-icon"><i class="ti-headphone-alt"></i></div>
+                                    <h3 class="feature-title">Hỗ trợ 24/7</h3>
+                                    <p class="feature-desc">Luôn sẵn sàng giải đáp thắc mắc</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

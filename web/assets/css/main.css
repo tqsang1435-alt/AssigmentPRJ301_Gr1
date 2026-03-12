@@ -142,7 +142,7 @@
 
  /* FEATURES */
  .features {
-     padding: 60px 0;
+     padding: 0 0 60px 0;
      background-color: #f5f5f5;
  }
 
@@ -1064,10 +1064,6 @@
  .btn--outline-danger:hover {
      background-color: #dc3545;
      color: #fff;
- }
-
- .btn i {
-     margin-right: 6px;
  }
 
  #toast-success {

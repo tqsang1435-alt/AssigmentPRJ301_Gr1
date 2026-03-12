@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.edu.phoneshop.model.Cart;
+import vn.edu.phoneshop.model.User;
 
 @WebServlet(name = "ViewCartControl", urlPatterns = { "/view-cart", "/cart" })
 public class ViewCartControl extends HttpServlet {
@@ -25,6 +26,15 @@ public class ViewCartControl extends HttpServlet {
             cart = new Cart();
             session.setAttribute("cart", cart);
             session.setAttribute("cartCount", 0);
+        }
+
+        // Cập nhật % giảm giá theo hạng thành viên nếu đã đăng nhập
+        User account = (User) session.getAttribute("ACC");
+        if (account != null) {
+            double discount = CheckoutControl.getDiscountPercent(account.getCustomerType());
+            cart.setDiscountPercent(discount);
+        } else {
+            cart.setDiscountPercent(0);
         }
 
         request.setAttribute("cart", cart);

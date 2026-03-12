@@ -12,6 +12,8 @@
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/grid.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css?v=1001">
+                <link rel="stylesheet"
+                    href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
             </head>
 
             <body>
@@ -77,13 +79,37 @@
                                         </div>
                                     </c:forEach>
 
-                                    <div class="checkout-summary-total"
-                                        style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px solid #eee; font-size: 1.6rem; font-weight: bold;">
-                                        <span>Tổng cộng:</span>
-                                        <span style="color: var(--primary-color);">
-                                            <fmt:formatNumber value="${sessionScope.cart.totalPrice}" pattern="#,##0" />
-                                            đ
-                                        </span>
+                                    <div class="checkout-summary-rows"
+                                        style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                                        <div
+                                            style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.4rem;">
+                                            <span>Tạm tính:</span>
+                                            <span>
+                                                <fmt:formatNumber value="${sessionScope.cart.totalPrice}"
+                                                    pattern="#,##0" /> đ
+                                            </span>
+                                        </div>
+                                        <c:if test="${sessionScope.cart.discountAmount > 0}">
+                                            <div
+                                                style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.4rem; color: #28a745;">
+                                                <span>Giảm giá hạng thành viên (
+                                                    <fmt:formatNumber value="${sessionScope.cart.discountPercent}"
+                                                        pattern="#,##0.#" />%):
+                                                </span>
+                                                <span>-
+                                                    <fmt:formatNumber value="${sessionScope.cart.discountAmount}"
+                                                        pattern="#,##0" /> đ
+                                                </span>
+                                            </div>
+                                        </c:if>
+                                        <div
+                                            style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 2px solid #eee; font-size: 1.8rem; font-weight: bold;">
+                                            <span>Tổng thanh toán:</span>
+                                            <span style="color: var(--primary-color);">
+                                                <fmt:formatNumber value="${sessionScope.cart.finalTotalPrice}"
+                                                    pattern="#,##0" /> đ
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -41,7 +41,15 @@ public class ChatBotServlet extends HttpServlet {
             return "Bạn chưa nhập câu hỏi.";
         }
 
-        String apiKey = "AIzaSyDbva3Jx9Q9w4BfTHGU_Ku3lNWuJiZ2e8U".trim();
+        // Đọc API Key từ biến môi trường của hệ điều hành
+        String apiKey = System.getenv("GEMINI_API_KEY");
+        // Kiểm tra xem đã lấy được key chưa (chống lỗi sập web nếu quên cài biến)
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            System.err.println("LỖI: Chưa cấu hình biến môi trường GEMINI_API_KEY!");
+            return "Hệ thống đang bảo trì (Lỗi thiếu API Key).";
+        }
+
+        apiKey = apiKey.trim();
 
         String modelName = "gemini-2.5-flash";
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key="

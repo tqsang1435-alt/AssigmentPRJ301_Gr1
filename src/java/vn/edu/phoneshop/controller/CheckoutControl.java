@@ -16,10 +16,6 @@ import vn.edu.phoneshop.model.User;
 @WebServlet(name = "CheckoutControl", urlPatterns = { "/checkout" })
 public class CheckoutControl extends HttpServlet {
 
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     * This method is for displaying the checkout page.
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -40,15 +36,14 @@ public class CheckoutControl extends HttpServlet {
             return;
         }
 
+        // Tính toán giảm giá theo hạng thành viên
+        double discountPercent = getDiscountPercent(account.getCustomerType());
+        cart.setDiscountPercent(discountPercent); // Lưu % giảm giá vào giỏ hàng
+
         // Forward to the checkout page to display it
         request.getRequestDispatcher("checkout.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     * This method is for processing the order when the user submits the checkout
-     * form.
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -87,7 +82,10 @@ public class CheckoutControl extends HttpServlet {
             return;
         }
 
-        double totalMoney = cart.getTotalPrice();
+        // Tính toán tổng tiền sau khi giảm giá theo rank
+        double discountPercent = getDiscountPercent(user.getCustomerType());
+        cart.setDiscountPercent(discountPercent);
+        double totalMoney = cart.getFinalTotalPrice();
 
         OrderDAO dao = new OrderDAO();
         // Tạo đơn hàng mới với trạng thái 1 (Chờ xác nhận)
@@ -124,6 +122,25 @@ public class CheckoutControl extends HttpServlet {
             request.getRequestDispatcher("thanks.jsp").forward(request, response);
         } else {
             response.sendRedirect("home");
+        }
+    }
+
+    // Lấy phần trăm giảm giá dựa trên hạng thành viên.
+    public static double getDiscountPercent(String customerType) {
+        if (customerType == null) {
+            return 0.0;
+        }
+        switch (customerType) {
+            case "Diamond":
+                return 15.0;
+            case "Gold":
+                return 10.0;
+            case "Silver":
+                return 5.0;
+            case "Bronze":
+                return 2.0;
+            default:
+                return 0.0;
         }
     }
 }
