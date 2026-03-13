@@ -36,7 +36,7 @@
                                     </div>
 
                                     <%-- Filter Form --%>
-                                        <form action="manager-product" method="get"
+                                        <form action="admin-product-list" method="get"
                                             style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
                                             <input type="text" name="searchName" class="form-control"
                                                 placeholder="Tìm theo tên..." value="${searchName}"
@@ -56,7 +56,7 @@
                                                 </c:forEach>
                                             </select>
                                             <button type="submit" class="btn btn--primary">Lọc</button>
-                                            <a href="manager-product" class="btn">Reset</a>
+                                            <a href="admin-product-list" class="btn">Reset</a>
                                         </form>
 
                                         <div class="card-body">

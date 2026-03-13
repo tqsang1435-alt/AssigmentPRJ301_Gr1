@@ -103,7 +103,7 @@
                                                 style="height: 100px;"></textarea>
                                         </div>
                                         <div class="form-group" style="text-align: right;">
-                                            <a href="product-list" class="btn btn--normal">Hủy bỏ</a>
+                                            <a href="admin-product-list" class="btn btn--normal">Hủy bỏ</a>
                                             <button type="submit" class="btn btn--primary">Lưu sản phẩm</button>
                                         </div>
                                     </form>

@@ -17,6 +17,8 @@
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
                 <link rel="stylesheet"
                     href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+                <!-- Thêm thư viện Chart.js -->
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             </head>
 
             <body>
@@ -81,19 +83,93 @@
                                     </div>
                                 </div>
 
-                                <div class="card" style="margin-top: 30px;">
-                                    <div class="card-header">
-                                        <h3 class="card-title">Hoạt động gần đây</h3>
+                                <!-- KHU VỰC BIỂU ĐỒ -->
+                                <div class="row" style="margin-top: 30px;">
+                                    <!-- Biểu đồ doanh thu ngày -->
+                                    <div class="col l-8 m-12 c-12">
+                                        <div class="card" style="height: 100%">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Doanh thu theo ngày</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="dailyChart" style="width: 100%; height: 300px;"></canvas>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="card-body">
-                                        <p style="text-align: center; color: #888; padding: 40px;">Chưa có dữ liệu thống
-                                            kê
-                                            chi tiết.</p>
+                                    <!-- Biểu đồ sản phẩm -->
+                                    <div class="col l-4 m-12 c-12">
+                                        <div class="card" style="height: 100%">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Top sản phẩm</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="productChart" style="width: 100%; height: 250px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col l-12 m-12 c-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Doanh thu theo tháng</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="monthlyChart" style="width: 100%; height: 350px;"></canvas>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                 </div>
+
+                <!-- Script vẽ biểu đồ -->
+                <script>
+                    // 1. Biểu đồ ngày (Line Chart)
+                    new Chart(document.getElementById('dailyChart'), {
+                        type: 'line',
+                        data: {
+                            labels: ${ dailyLabels },
+                        datasets: [{
+                            label: 'Doanh thu (VNĐ)',
+                            data: ${ dailyData },
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        tension: 0.3, fill: true
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+
+                    // 2. Biểu đồ sản phẩm (Doughnut Chart)
+                    new Chart(document.getElementById('productChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ${ productLabels },
+                        datasets: [{
+                            data: ${ productData },
+                        backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff']
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                    });
+
+                    // 3. Biểu đồ tháng (Bar Chart)
+                    new Chart(document.getElementById('monthlyChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ${ monthlyLabels },
+                        datasets: [{
+                            label: 'Doanh thu tháng (VNĐ)',
+                            data: ${ monthlyData },
+                        backgroundColor: '#198754'
+                            }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                </script>
             </body>
 
             </html>

@@ -1,44 +1,31 @@
 package vn.edu.phoneshop.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class Order {
-    private int orderID;
-    private int userID;
+    private int orderId;
+    private int userId;
     private Date orderDate;
     private double totalMoney;
     private String shippingAddress;
     private String note;
     private int status;
+    private String customerName;
 
-    public Order() {
+    public int getOrderId() {
+        return orderId;
     }
 
-    public Order(int orderID, int userID, Date orderDate, double totalMoney, String shippingAddress, String note,
-            int status) {
-        this.orderID = orderID;
-        this.userID = userID;
-        this.orderDate = orderDate;
-        this.totalMoney = totalMoney;
-        this.shippingAddress = shippingAddress;
-        this.note = note;
-        this.status = status;
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
-    public int getOrderID() {
-        return orderID;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setOrderID(int orderID) {
-        this.orderID = orderID;
-    }
-
-    public int getUserID() {
-        return userID;
-    }
-
-    public void setUserID(int userID) {
-        this.userID = userID;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public Date getOrderDate() {
@@ -79,5 +66,13 @@ public class Order {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 }

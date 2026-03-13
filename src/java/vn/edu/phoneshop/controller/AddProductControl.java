@@ -31,6 +31,8 @@ public class AddProductControl extends HttpServlet {
             response.sendRedirect("user-login");
             return;
         }
+        // Đánh dấu trang đang active cho sidebar
+        request.setAttribute("activePage", "product-management");
         request.getRequestDispatcher("AddProduct.jsp").forward(request, response);
     }
 
@@ -72,7 +74,7 @@ public class AddProductControl extends HttpServlet {
             dao.insertProduct(name, price, quantity, desc, img, cateId, suppId, ram, rom, color);
 
             // 4. Lưu thành công thì quay về trang danh sách
-            response.sendRedirect("product-list");
+            response.sendRedirect("admin-product-list");
 
         } catch (Exception e) {
             e.printStackTrace();

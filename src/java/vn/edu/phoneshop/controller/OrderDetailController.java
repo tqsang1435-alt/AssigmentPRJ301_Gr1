@@ -15,29 +15,25 @@ import java.util.Map;
 import vn.edu.phoneshop.dao.OrderDAO;
 import vn.edu.phoneshop.model.OrderDetail;
 
-/**
- *
- * @author Lenovo
- */
 @WebServlet("/order-detail")
 public class OrderDetailController extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-        throws ServletException, IOException {
-    String idRaw = request.getParameter("id");
-    if (idRaw != null) {
-        int orderID = Integer.parseInt(idRaw);
-        OrderDAO dao = new OrderDAO();
-        List<OrderDetail> details = dao.getOrderDetailByOrderID(orderID);
-        
-        Map<Integer, String> pNames = dao.getProductNamesMap(orderID);
 
-        request.setAttribute("detailList", details);
-        request.setAttribute("productNames", pNames); 
-        request.setAttribute("orderID", orderID);
-        request.getRequestDispatcher("order-detail.jsp").forward(request, response);
-    } else {
-        response.sendRedirect("order-history");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idRaw = request.getParameter("id");
+        if (idRaw != null) {
+            int orderID = Integer.parseInt(idRaw);
+            OrderDAO dao = new OrderDAO();
+            List<OrderDetail> details = dao.getOrderDetailByOrderID(orderID);
+
+            Map<Integer, String> pNames = dao.getProductNamesMap(orderID);
+
+            request.setAttribute("detailList", details);
+            request.setAttribute("productNames", pNames);
+            request.setAttribute("orderID", orderID);
+            request.getRequestDispatcher("order-detail.jsp").forward(request, response);
+        } else {
+            response.sendRedirect("order-history");
+        }
     }
 }
-}
-

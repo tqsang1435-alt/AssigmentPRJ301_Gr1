@@ -7,10 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 import vn.edu.phoneshop.dao.UserDAO;
 import vn.edu.phoneshop.model.User;
 
-@WebServlet(name = "UserControl", urlPatterns = { "/user-login", "/user-register", "/user-profile", "/user-logout" })
+@WebServlet(name = "UserControl", urlPatterns = {"/user-login", "/user-register", "/user-profile", "/user-logout",
+    "/edit-profile",
+    "/update-profile", "/admin-delete-user", "/admin-customer-list"})
 public class UserControl extends HttpServlet {
 
     // Xử lý Đăng nhập
@@ -72,19 +75,50 @@ public class UserControl extends HttpServlet {
         User acc = (User) session.getAttribute("ACC");
 
         if (acc != null) {
-            String fullName = request.getParameter("fullname");
+            String fullName = request.getParameter("fullName");
             String phone = request.getParameter("phone");
             String address = request.getParameter("address");
             dao.updateUserProfile(acc.getUserID(), fullName, phone, address);
+
+            // Cập nhật lại thông tin trong session
             acc.setFullName(fullName);
             acc.setPhoneNumber(phone);
             acc.setAddress(address);
             session.setAttribute("ACC", acc);
 
-            request.setAttribute("mess", "Cập nhật thông tin thành công!");
-            request.getRequestDispatcher("profile.jsp").forward(request, response);
+            // Chuyển hướng về trang profile với thông báo thành công
+            response.sendRedirect("user-profile?message=success");
         } else {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("user-login");
+        }
+    }
+
+    // Xử lý Xóa người dùng (Admin)
+    private void handleDeleteUser(HttpServletRequest request, HttpServletResponse response, UserDAO dao)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        User adminUser = (session != null) ? (User) session.getAttribute("ACC") : null;
+
+        // Chỉ Admin mới có quyền xóa
+        if (adminUser == null || !"Admin".equalsIgnoreCase(adminUser.getRole())) {
+            response.sendRedirect("user-login");
+            return;
+        }
+
+        try {
+            int userIDToDelete = Integer.parseInt(request.getParameter("userID"));
+
+            // Admin không thể tự xóa chính mình
+            if (userIDToDelete == adminUser.getUserID()) {
+                response.sendRedirect("admin-customer-list?delete_error=self");
+                return;
+            }
+
+            dao.deleteUser(userIDToDelete); // Giả định hàm này tồn tại trong UserDAO và sẽ xóa user
+            response.sendRedirect("admin-customer-list?delete_success=true");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("admin-customer-list?delete_error=true");
         }
     }
 
@@ -95,6 +129,7 @@ public class UserControl extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getServletPath();
         HttpSession session = request.getSession(false);
+        UserDAO dao = new UserDAO();
 
         try {
             switch (action) {
@@ -114,7 +149,14 @@ public class UserControl extends HttpServlet {
                     if (session != null && session.getAttribute("ACC") != null) {
                         request.getRequestDispatcher("profile.jsp").forward(request, response);
                     } else {
-                        response.sendRedirect("login.jsp");
+                        response.sendRedirect("user-login");
+                    }
+                    break;
+                case "/edit-profile":
+                    if (session != null && session.getAttribute("ACC") != null) {
+                        request.getRequestDispatcher("edit-profile.jsp").forward(request, response);
+                    } else {
+                        response.sendRedirect("user-login");
                     }
                     break;
                 case "/user-logout":
@@ -122,6 +164,23 @@ public class UserControl extends HttpServlet {
                         session.invalidate();
                     }
                     response.sendRedirect("home");
+                    break;
+                case "/admin-delete-user":
+                    handleDeleteUser(request, response, dao);
+                    break;
+                case "/admin-customer-list":
+                    if (session != null && session.getAttribute("ACC") != null) {
+                        User u = (User) session.getAttribute("ACC");
+                        if ("Admin".equalsIgnoreCase(u.getRole())) {
+                            List<User> list = dao.getAllCustomers();
+                            request.setAttribute("listC", list);
+                            request.getRequestDispatcher("CustomerList.jsp").forward(request, response);
+                        } else {
+                            response.sendRedirect("home");
+                        }
+                    } else {
+                        response.sendRedirect("user-login");
+                    }
                     break;
                 default:
                     response.sendRedirect("home");
@@ -148,7 +207,7 @@ public class UserControl extends HttpServlet {
                 case "/user-register":
                     handleRegister(request, response, dao);
                     break;
-                case "/user-profile":
+                case "/update-profile":
                     handleUpdateProfile(request, response, dao);
                     break;
                 default:

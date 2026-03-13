@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package vn.edu.phoneshop.controller;
 
 import jakarta.servlet.ServletException;
@@ -14,8 +10,9 @@ import java.io.IOException;
 import vn.edu.phoneshop.dao.UserDAO;
 import vn.edu.phoneshop.model.User;
 
-@WebServlet(name = "ProfileController", urlPatterns = { "/profile" })
+@WebServlet(name = "ProfileController", urlPatterns = {"/profile"})
 public class ProfileController extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

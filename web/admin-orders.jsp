@@ -50,26 +50,45 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <%-- Dữ liệu mẫu hoặc vòng lặp c:forEach --%>
+                                                    <c:if test="${empty listOrders}">
                                                         <tr>
-                                                            <td>#1001</td>
-                                                            <td>Nguyễn Văn A</td>
-                                                            <td>2023-10-25</td>
-                                                            <td style="color: var(--primary-color); font-weight: bold;">
-                                                                15,000,000₫</td>
-                                                            <td><span class="badge badge--normal">Chờ xử lý</span></td>
+                                                            <td colspan="6" style="text-align: center; padding: 40px;">
+                                                                Chưa có đơn hàng nào.</td>
+                                                        </tr>
+                                                    </c:if>
+                                                    <c:forEach items="${listOrders}" var="o">
+                                                        <tr>
+                                                            <td>#${o.orderId}</td>
+                                                            <td>${o.customerName}</td>
                                                             <td>
-                                                                <a href="#" class="action-btn" title="Xem chi tiết"><i
+                                                                <fmt:formatDate value="${o.orderDate}"
+                                                                    pattern="dd/MM/yyyy HH:mm" />
+                                                            </td>
+                                                            <td style="color: var(--primary-color); font-weight: bold;">
+                                                                <fmt:formatNumber value="${o.totalMoney}"
+                                                                    type="currency" currencySymbol="₫" />
+                                                            </td>
+                                                            <td>
+                                                                <c:if test="${o.status == 1}">
+                                                                    <span class="badge badge--normal">Chờ xử lý</span>
+                                                                </c:if>
+                                                                <c:if test="${o.status == 4}">
+                                                                    <span class="badge badge--tech">Hoàn thành</span>
+                                                                </c:if>
+                                                                <%-- Bạn có thể thêm các trạng thái khác ở đây --%>
+                                                            </td>
+                                                            <td>
+                                                                <a href="order-detail?id=${o.orderId}"
+                                                                    class="action-btn" title="Xem chi tiết"><i
                                                                         class="ti-eye"></i></a>
-                                                                <a href="update-order-status?orderId=1001&status=4"
+                                                                <a href="update-order-status?orderId=${o.orderId}&status=4"
                                                                     class="action-btn" title="Hoàn thành"><i
                                                                         class="ti-check"></i></a>
                                                             </td>
                                                         </tr>
+                                                    </c:forEach>
                                                 </tbody>
                                             </table>
-                                            <p style="text-align: center; color: #888; margin-top: 20px;">(Dữ liệu đang
-                                                được cập nhật...)</p>
                                     </div>
                                 </div>
                             </div>

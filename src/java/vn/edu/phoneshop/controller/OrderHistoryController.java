@@ -16,13 +16,10 @@ import vn.edu.phoneshop.dao.OrderDAO;
 import vn.edu.phoneshop.model.Order;
 import vn.edu.phoneshop.model.User;
 
-/**
- *
- * @author Lenovo
- */
 @WebServlet("/order-history")
 public class OrderHistoryController extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
@@ -35,7 +32,7 @@ public class OrderHistoryController extends HttpServlet {
         OrderDAO oDao = new OrderDAO();
         // Sử dụng getUserID() đã được cập nhật trong Model User
         List<Order> list = oDao.getOrdersByUserId(user.getUserID());
-        
+
         request.setAttribute("orderList", list);
         request.getRequestDispatcher("order-history.jsp").forward(request, response);
     }

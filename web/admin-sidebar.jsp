@@ -6,35 +6,35 @@
         <ul class="admin-menu">
             <li class="admin-menu__item">
                 <a href="admin-dashboard"
-                    class="admin-menu__link ${pageContext.request.servletPath.contains('dashboard') ? 'admin-menu__link--active' : ''}">
+                    class="admin-menu__link ${activePage == 'dashboard' ? 'admin-menu__link--active' : ''}">
                     <i class="ti-dashboard admin-menu__icon"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <li class="admin-menu__item">
-                <a href="customer-list"
-                    class="admin-menu__link ${pageContext.request.servletPath.contains('customer') ? 'admin-menu__link--active' : ''}">
+                <a href="admin-customer-list"
+                    class="admin-menu__link ${activePage == 'customer-management' ? 'admin-menu__link--active' : ''}">
                     <i class="ti-user admin-menu__icon"></i>
                     <span>Quản lý Khách hàng</span>
                 </a>
             </li>
             <li class="admin-menu__item">
-                <a href="product-list"
-                    class="admin-menu__link ${pageContext.request.servletPath.contains('product') ? 'admin-menu__link--active' : ''}">
+                <a href="admin-product-list"
+                    class="admin-menu__link ${activePage == 'product-management' ? 'admin-menu__link--active' : ''}">
                     <i class="ti-mobile admin-menu__icon"></i>
                     <span>Quản lý Sản phẩm</span>
                 </a>
             </li>
-            <li class="admin-menu__item">
+            <!-- <li class="admin-menu__item">
                 <a href="revenue-stats"
                     class="admin-menu__link ${pageContext.request.servletPath.contains('revenue') ? 'admin-menu__link--active' : ''}">
                     <i class="ti-bar-chart admin-menu__icon"></i>
                     <span>Thống kê Doanh thu</span>
                 </a>
-            </li>
+            </li> -->
             <li class="admin-menu__item">
-                <a href="admin-orders.jsp"
-                    class="admin-menu__link ${pageContext.request.servletPath.contains('order') ? 'admin-menu__link--active' : ''}">
+                <a href="order-list"
+                    class="admin-menu__link ${activePage == 'order-management' ? 'admin-menu__link--active' : ''}">
                     <i class="ti-shopping-cart admin-menu__icon"></i>
                     <span>Quản lý Đơn hàng</span>
                 </a>

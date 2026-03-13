@@ -12,7 +12,7 @@ import vn.edu.phoneshop.dao.ProductDAO;
 import vn.edu.phoneshop.model.Product;
 import vn.edu.phoneshop.model.User;
 
-@WebServlet(name = "ProductListControl", urlPatterns = { "/manager-product" })
+@WebServlet(name = "ProductListControl", urlPatterns = { "/admin-product-list" })
 public class ProductListControl extends HttpServlet {
 
     @Override
@@ -48,6 +48,9 @@ public class ProductListControl extends HttpServlet {
         request.setAttribute("selectedRam", ramFilter);
         request.setAttribute("selectedRom", romFilter);
         request.setAttribute("selectedColor", colorFilter);
+
+        // Đánh dấu trang đang active cho sidebar
+        request.setAttribute("activePage", "product-management");
 
         request.getRequestDispatcher("ManagerProduct.jsp").forward(request, response);
     }
