@@ -36,7 +36,6 @@
                         height: 100%;
                         opacity: 0;
                         transition: opacity 0.8s ease-in-out;
-                        /* Hiệu ứng mờ chuyển cảnh mượt mà */
                         z-index: 1;
                     }
 
@@ -173,7 +172,6 @@
                     .home-product-item__img-wrap {
                         width: 100%;
                         padding-top: 100%;
-                        /* Giữ khung ảnh vuông 1:1 */
                         position: relative;
                         overflow: hidden;
                     }
@@ -371,7 +369,7 @@
                         <div class="row sm-gutter">
                             <c:forEach items="${listP}" var="p">
                                 <div class="col l-2-4 m-4 c-6" style="margin-bottom: 20px;">
-                                    <a href="product-detail?id=${p.productID}" class="home-product-item">
+                                    <a href="detail?id=${p.productID}" class="home-product-item">
 
                                         <div class="home-product-item__img-wrap">
                                             <div class="home-product-item__img"
