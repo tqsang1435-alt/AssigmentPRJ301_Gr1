@@ -18,11 +18,16 @@ public class SupplierServlet extends HttpServlet {
     private SupplierDAO dao = new SupplierDAO();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String action = request.getParameter("action");
         if (action == null) {
             action = "list";
         }
+
+        // Đánh dấu active sidebar cho giao diện Admin
+        request.setAttribute("activePage", "supplier-management");
+
         try {
             HttpSession session = request.getSession();
             String flash = (String) session.getAttribute("message");
@@ -80,6 +85,9 @@ public class SupplierServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
+        // Đánh dấu active sidebar cho giao diện Admin
+        request.setAttribute("activePage", "supplier-management");
+
         try {
             String name = request.getParameter("name");
             String contact = request.getParameter("contact");
@@ -97,12 +105,12 @@ public class SupplierServlet extends HttpServlet {
                 if (idStr != null && !idStr.isEmpty()) {
                     try {
                         int id = Integer.parseInt(idStr);
-//                        sErr = new Supplier(id, name, contact, phone, email, address, logo, true);
+                        sErr = new Supplier(id, name, contact, phone, email, address, logo, true);
                     } catch (NumberFormatException ex) {
-//                        sErr = new Supplier(name, contact, phone, email, address, logo, true);
+                        sErr = new Supplier(name, contact, phone, email, address, logo, true);
                     }
                 } else {
-//                    sErr = new Supplier(name, contact, phone, email, address, logo, true);
+                    sErr = new Supplier(name, contact, phone, email, address, logo, true);
                 }
                 request.setAttribute("supplier", sErr);
                 request.getRequestDispatcher("supplier-form.jsp").forward(request, response);
@@ -111,15 +119,15 @@ public class SupplierServlet extends HttpServlet {
 
             if ("add".equals(action)) {
 
-//                Supplier s = new Supplier(name, contact, phone, email, address, logo, true);
-//                dao.insert(s);
+                Supplier s = new Supplier(name, contact, phone, email, address, logo, true);
+                dao.insert(s);
                 request.getSession().setAttribute("message", "Supplier added successfully.");
 
             } else if ("update".equals(action)) {
 
                 int id = Integer.parseInt(request.getParameter("id"));
-//                Supplier s = new Supplier(id, name, contact, phone, email, address, logo, true);
-//                dao.update(s);
+                Supplier s = new Supplier(id, name, contact, phone, email, address, logo, true);
+                dao.update(s);
                 request.getSession().setAttribute("message", "Supplier updated successfully.");
             }
 

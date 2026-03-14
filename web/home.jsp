@@ -18,116 +18,365 @@
                 <link rel="stylesheet"
                     href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+                <style>
+                    .my-slider {
+                        position: relative;
+                        width: 100%;
+                        height: 450px;
+                        overflow: hidden;
+                        background-color: #000;
+                    }
+
+                    .my-slide {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        opacity: 0;
+                        transition: opacity 0.8s ease-in-out;
+                        /* Hiệu ứng mờ chuyển cảnh mượt mà */
+                        z-index: 1;
+                    }
+
+                    .my-slide.active {
+                        opacity: 1;
+                        z-index: 2;
+                    }
+
+                    .my-slide img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        filter: brightness(0.65);
+                        /* Tối màu ảnh nền để nổi chữ */
+                    }
+
+                    .my-slide__content {
+                        position: absolute;
+                        top: 50%;
+                        left: 10%;
+                        transform: translateY(-50%);
+                        color: #fff;
+                        z-index: 3;
+                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                        max-width: 600px;
+                    }
+
+                    .my-slide__content h2 {
+                        font-size: 4rem;
+                        font-weight: bold;
+                        margin-bottom: 15px;
+                        text-transform: uppercase;
+                    }
+
+                    .my-slide__content p {
+                        font-size: 1.8rem;
+                        margin-bottom: 25px;
+                        line-height: 1.4;
+                    }
+
+                    .my-slide__btn {
+                        display: inline-block;
+                        padding: 12px 35px;
+                        background-color: var(--primary-color, #ee4d2d);
+                        color: #fff;
+                        text-decoration: none;
+                        font-size: 1.6rem;
+                        border-radius: 30px;
+                        font-weight: bold;
+                        transition: background-color 0.3s;
+                        text-shadow: none;
+                    }
+
+                    .my-slide__btn:hover {
+                        background-color: #d73a1e;
+                    }
+
+                    /* Nút Prev / Next */
+                    .slider-nav {
+                        position: absolute;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        background: rgba(255, 255, 255, 0.2);
+                        border: none;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 50%;
+                        color: white;
+                        font-size: 2rem;
+                        cursor: pointer;
+                        z-index: 10;
+                        transition: all 0.3s;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .slider-nav:hover {
+                        background: var(--primary-color, #ee4d2d);
+                    }
+
+                    .slider-nav.prev {
+                        left: 20px;
+                    }
+
+                    .slider-nav.next {
+                        right: 20px;
+                    }
+
+                    /* Chấm tròn Dots */
+                    .slider-dots {
+                        position: absolute;
+                        bottom: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        display: flex;
+                        gap: 12px;
+                        z-index: 10;
+                    }
+
+                    .dot {
+                        width: 14px;
+                        height: 14px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.5);
+                        cursor: pointer;
+                        transition: all 0.3s;
+                    }
+
+                    .dot.active {
+                        background: var(--primary-color, #ee4d2d);
+                        transform: scale(1.2);
+                    }
+
+                    .home-product-item {
+                        display: flex;
+                        flex-direction: column;
+                        text-decoration: none;
+                        background-color: #ffffff;
+                        border-radius: 8px;
+                        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        height: 100%;
+                        overflow: hidden;
+                        border: 1px solid transparent;
+                    }
+
+                    .home-product-item:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.12);
+                        border: 1px solid var(--primary-color, #ee4d2d);
+                    }
+
+                    .home-product-item__img-wrap {
+                        width: 100%;
+                        padding-top: 100%;
+                        /* Giữ khung ảnh vuông 1:1 */
+                        position: relative;
+                        overflow: hidden;
+                    }
+
+                    .home-product-item__img {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-repeat: no-repeat;
+                        background-size: contain;
+                        background-position: center;
+                        background-color: #fff;
+                        padding: 15px;
+                        background-clip: content-box;
+                        transition: transform 0.3s ease-in-out;
+                    }
+
+                    .home-product-item:hover .home-product-item__img {
+                        transform: scale(1.05);
+                    }
+
+                    .home-product-item__name {
+                        font-size: 1.4rem;
+                        font-weight: 500;
+                        color: var(--text-color, #333);
+                        line-height: 2rem;
+                        height: 4rem;
+                        margin: 10px 12px 5px 12px;
+                        overflow: hidden;
+                        display: -webkit-box;
+                        -webkit-box-orient: vertical;
+                        -webkit-line-clamp: 2;
+                    }
+
+                    .home-product-item:hover .home-product-item__name {
+                        color: var(--primary-color, #ee4d2d);
+                    }
+
+                    .home-product-item__price {
+                        padding: 0 12px;
+                        margin-bottom: 12px;
+                    }
+
+                    .home-product-item__price-current {
+                        font-size: 1.7rem;
+                        color: #ee4d2d;
+                        font-weight: 700;
+                    }
+
+                    .home-product-item__action {
+                        display: flex;
+                        gap: 8px;
+                        padding: 0 12px 15px 12px;
+                        margin-top: auto;
+                    }
+
+                    .btn-add-cart-custom {
+                        flex: 0 0 42px;
+                        height: 36px;
+                        font-size: 1.8rem;
+                        background-color: rgba(238, 77, 43, 0.08);
+                        color: var(--primary-color, #ee4d2d);
+                        border: 1px solid var(--primary-color, #ee4d2d);
+                        border-radius: 4px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s;
+                    }
+
+                    .btn-add-cart-custom:hover {
+                        background-color: var(--primary-color, #ee4d2d);
+                        color: #fff;
+                    }
+
+                    .btn-buy-now-custom {
+                        flex: 1;
+                        height: 36px;
+                        font-size: 1.3rem;
+                        background-color: var(--primary-color, #ee4d2d);
+                        color: #fff;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        text-transform: uppercase;
+                        font-weight: 600;
+                        transition: opacity 0.2s;
+                    }
+
+                    .btn-buy-now-custom:hover {
+                        opacity: 0.9;
+                    }
+
+                    .pagination-item__link {
+                        text-decoration: none !important;
+                    }
+
+                    select.filter-select {
+                        padding: 8px 12px;
+                        font-size: 1.4rem;
+                        border-radius: 4px;
+                        border: 1px solid #ccc;
+                        outline: none;
+                        cursor: pointer;
+                        background-color: #fff;
+                    }
+                </style>
             </head>
 
             <body>
 
                 <jsp:include page="header.jsp" />
 
-                <!-- BOOTSTRAP CAROUSEL -->
-                <div id="homeCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <!-- Indicators (Các dấu chấm tròn bên dưới) -->
-                    <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active"
-                            aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1"
-                            aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2"
-                            aria-label="Slide 3"></button>
+                <div class="my-slider">
+                    <div class="my-slide active">
+                        <img src="https://images.unsplash.com/photo-1605236453806-6ff36851218e?q=80&w=1920&auto=format&fit=crop"
+                            alt="iPhone">
+                        <div class="my-slide__content">
+                            <h2>iPhone 15 Pro Max</h2>
+                            <p>Thiết kế Titan tự nhiên. Chip A17 Pro mạnh mẽ vô song.</p>
+                            <a href="#" class="my-slide__btn">Mua Ngay <i class="ti-arrow-right"></i></a>
+                        </div>
                     </div>
-
-                    <!-- Inner (Chứa các slide) -->
-                    <div class="carousel-inner">
-                        <!-- Slide 1 -->
-                        <div class="carousel-item active">
-                            <!-- Thay đổi đường dẫn ảnh tại src -->
-                            <img src="https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=1920&auto=format&fit=crop"
-                                class="d-block w-100" alt="Banner 1" style="height: 450px; object-fit: cover;">
-                            <div class="carousel-caption d-none d-md-block">
-                                <h5>Chào mừng đến với PhoneShop</h5>
-                                <p>Điện thoại chính hãng, giá tốt nhất thị trường.</p>
-                            </div>
+                    <div class="my-slide">
+                        <img src="https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=1920&auto=format&fit=crop"
+                            alt="Samsung">
+                        <div class="my-slide__content">
+                            <h2>Samsung Galaxy S24 Ultra</h2>
+                            <p>Quyền năng Galaxy AI. Zoom quang học vươn tầm mắt thần.</p>
+                            <a href="#" class="my-slide__btn">Khám Phá <i class="ti-arrow-right"></i></a>
                         </div>
-                        <!-- Slide 2 -->
-                        <div class="carousel-item">
-                            <img src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=1920&auto=format&fit=crop"
-                                class="d-block w-100" alt="Banner 2" style="height: 450px; object-fit: cover;">
-                            <div class="carousel-caption d-none d-md-block">
-                                <h5>Sản phẩm mới nhất</h5>
-                                <p>Cập nhật những mẫu flagship đỉnh cao.</p>
-                            </div>
-                        </div>
-                        <!-- Slide 3 -->
-                        <div class="carousel-item">
-                            <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?q=80&w=1920&auto=format&fit=crop"
-                                class="d-block w-100" alt="Banner 3" style="height: 450px; object-fit: cover;">
-                            <div class="carousel-caption d-none d-md-block">
-                                <h5>Khuyến mãi hấp dẫn</h5>
-                                <p>Giảm giá cực sốc trong tháng này.</p>
-                            </div>
+                    </div>
+                    <div class="my-slide">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1920&auto=format&fit=crop"
+                            alt="Accessories">
+                        <div class="my-slide__content">
+                            <h2>Phụ kiện Âm thanh</h2>
+                            <p>Tai nghe chống ồn cực đỉnh. Không gian âm nhạc sống động.</p>
+                            <a href="#" class="my-slide__btn">Xem Thêm <i class="ti-arrow-right"></i></a>
                         </div>
                     </div>
 
-                    <!-- Controls (Nút Previous/Next) -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel"
-                        data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel"
-                        data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
+                    <button class="slider-nav prev" onclick="changeSlide(-1)"><i class="ti-angle-left"></i></button>
+                    <button class="slider-nav next" onclick="changeSlide(1)"><i class="ti-angle-right"></i></button>
+
+                    <div class="slider-dots">
+                        <span class="dot active" onclick="goToSlide(0)"></span>
+                        <span class="dot" onclick="goToSlide(1)"></span>
+                        <span class="dot" onclick="goToSlide(2)"></span>
+                    </div>
                 </div>
-
 
                 <div class="container" id="product-section"
                     style="background-color: #f5f5f5; padding-top: 20px; padding-bottom: 12px;">
                     <div class="grid wide">
                         <div class="row">
                             <div class="col l-12">
-                                <div class="home-section-title">
-                                    <h1>Sản phẩm nổi bật</h1>
+                                <div class="home-section-title" style="text-align: center; margin-bottom: 30px;">
+                                    <h1
+                                        style="font-size: 2.8rem; font-weight: 700; color: var(--text-color); text-transform: uppercase;">
+                                        Sản phẩm nổi bật</h1>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Bộ lọc RAM và ROM -->
-                        <div class="grid wide" style="margin-top: 20px; margin-bottom: 10px;">
-                            <form action="home" method="get" class="filter-group"
-                                style="display: flex; gap: 15px; justify-content: flex-end; align-items: center;">
-                                <!-- Giữ lại từ khóa tìm kiếm nếu người dùng đang tìm kiếm từ Header -->
-                                <input type="hidden" name="txtSearch" value="${searchName}">
-                                <!-- Dropdown chọn RAM -->
-                                <select name="ramFilter" onchange="this.form.submit()" class="form-control"
-                                    style="width: auto; height: 36px; cursor: pointer;">
-                                    <option value="">Tất cả RAM</option>
-                                    <c:forEach items="${listRAM}" var="r">
-                                        <option value="${r}" ${r==selectedRam ? 'selected' : '' }>${r}</option>
-                                    </c:forEach>
-                                </select>
-                                <!-- Dropdown chọn ROM -->
-                                <select name="romFilter" onchange="this.form.submit()" class="form-control"
-                                    style="width: auto; height: 36px; cursor: pointer;">
-                                    <option value="">Tất cả ROM</option>
-                                    <c:forEach items="${listROM}" var="r">
-                                        <option value="${r}" ${r==selectedRom ? 'selected' : '' }>${r}</option>
-                                    </c:forEach>
-                                </select>
-                            </form>
-                        </div>
+                        <div class="row" style="margin-bottom: 20px;">
+                            <div class="col l-12">
+                                <form action="home" method="get" class="filter-group"
+                                    style="display: flex; gap: 15px; justify-content: flex-end; align-items: center;">
+                                    <input type="hidden" name="txtSearch" value="${searchName}">
 
+                                    <select name="ramFilter" onchange="this.form.submit()" class="filter-select">
+                                        <option value="">Tất cả RAM</option>
+                                        <c:forEach items="${listRAM}" var="r">
+                                            <option value="${r}" ${r==selectedRam ? 'selected' : '' }>${r}</option>
+                                        </c:forEach>
+                                    </select>
+
+                                    <select name="romFilter" onchange="this.form.submit()" class="filter-select">
+                                        <option value="">Tất cả ROM</option>
+                                        <c:forEach items="${listROM}" var="r">
+                                            <option value="${r}" ${r==selectedRom ? 'selected' : '' }>${r}</option>
+                                        </c:forEach>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
 
                         <div class="row sm-gutter">
                             <c:forEach items="${listP}" var="p">
                                 <div class="col l-2-4 m-4 c-6" style="margin-bottom: 20px;">
                                     <a href="product-detail?id=${p.productID}" class="home-product-item">
-                                        <div class="home-product-item__img"
-                                            style="background-image: url('${not empty p.imageURL ? p.imageURL : 'assets/img/default-phone.png'}');">
+
+                                        <div class="home-product-item__img-wrap">
+                                            <div class="home-product-item__img"
+                                                style="background-image: url('${not empty p.imageURL ? p.imageURL : 'assets/img/default-phone.png'}');">
+                                            </div>
                                         </div>
 
                                         <h4 class="home-product-item__name">${p.productName}</h4>
@@ -141,12 +390,12 @@
                                         <div class="home-product-item__action">
                                             <button
                                                 onclick="event.preventDefault(); confirmAddCart('${p.productID}', '${p.productName}')"
-                                                class="btn btn--primary btn-add-cart">
+                                                class="btn-add-cart-custom">
                                                 <i class="ti-shopping-cart"></i>
                                             </button>
                                             <button
                                                 onclick="event.preventDefault(); confirmBuyNow('${p.productID}', '${p.productName}')"
-                                                class="btn btn-buy-now">
+                                                class="btn-buy-now-custom">
                                                 Mua ngay
                                             </button>
                                         </div>
@@ -181,7 +430,7 @@
                                 <li
                                     class="pagination-item ${currentPage == totalPages ? 'pagination-item--disabled' : ''}">
                                     <a href="home?page=${currentPage + 1}&searchName=${searchName}#product-section"
-                                        class="pagination-item__link ">
+                                        class="pagination-item__link">
                                         <i class="ti-angle-right"></i>
                                     </a>
                                 </li>
@@ -221,7 +470,51 @@
 
                 <jsp:include page="footer.jsp" />
                 <jsp:include page="chat-widget.jsp"></jsp:include>
+
                 <script>
+                    // ======= LOGIC SLIDER THUẦN (VANILLA JS) =======
+                    let currentSlideIdx = 0;
+                    const slides = document.querySelectorAll('.my-slide');
+                    const dots = document.querySelectorAll('.dot');
+                    let slideTimer;
+
+                    function showSlide(index) {
+                        // Xóa class active ở tất cả
+                        slides.forEach(slide => slide.classList.remove('active'));
+                        dots.forEach(dot => dot.classList.remove('active'));
+
+                        // Cập nhật index mới
+                        currentSlideIdx = index;
+                        if (currentSlideIdx >= slides.length) currentSlideIdx = 0;
+                        if (currentSlideIdx < 0) currentSlideIdx = slides.length - 1;
+
+                        // Thêm class active
+                        slides[currentSlideIdx].classList.add('active');
+                        dots[currentSlideIdx].classList.add('active');
+                    }
+
+                    function changeSlide(step) {
+                        showSlide(currentSlideIdx + step);
+                        resetSlideTimer();
+                    }
+
+                    function goToSlide(index) {
+                        showSlide(index);
+                        resetSlideTimer();
+                    }
+
+                    function resetSlideTimer() {
+                        clearInterval(slideTimer);
+                        slideTimer = setInterval(() => {
+                            changeSlide(1);
+                        }, 4000); // 4 giây tự động đổi slide
+                    }
+
+                    // Bắt đầu chạy slider
+                    resetSlideTimer();
+
+
+                    // ======= LOGIC GIỎ HÀNG =======
                     function confirmAddCart(id, name) {
                         Swal.fire({
                             title: 'Thêm vào giỏ hàng?',
@@ -255,81 +548,6 @@
                             }
                         })
                     };
-
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const slider = document.querySelector('#home-slider');
-                        if (!slider) return;
-
-                        const wrapper = slider.querySelector('.hero-slider__wrapper');
-                        const slides = slider.querySelectorAll('.hero-slider__item');
-                        const prevBtn = slider.querySelector('.slider-prev');
-                        const nextBtn = slider.querySelector('.slider-next');
-                        const dotsContainer = slider.querySelector('.slider-dots');
-
-                        let currentIndex = 0;
-                        const totalSlides = slides.length;
-                        let slideInterval;
-
-                        // Tạo các dấu chấm (dots)
-                        slides.forEach((_, index) => {
-                            const dot = document.createElement('span');
-                            dot.classList.add('slider-dot');
-                            if (index === 0) dot.classList.add('active');
-                            dot.addEventListener('click', () => {
-                                goToSlide(index);
-                                resetInterval();
-                            });
-                            dotsContainer.appendChild(dot);
-                        });
-
-                        const dots = dotsContainer.querySelectorAll('.slider-dot');
-
-                        // Hàm chuyển slide "miễn nhiễm" với lỗi CSS
-                        function updateSlider() {
-                            const sliderWidth = slider.offsetWidth; // Lấy đúng chiều rộng thực tế
-                            wrapper.style.transform = `translateX(-${currentIndex * sliderWidth}px)`;
-
-                            // Cập nhật chấm
-                            dots.forEach(dot => dot.classList.remove('active'));
-                            if (dots[currentIndex]) dots[currentIndex].classList.add('active');
-                        }
-
-                        // Fix lỗi resize màn hình làm lệch slide
-                        window.addEventListener('resize', updateSlider);
-
-                        function goToSlide(index) {
-                            currentIndex = index;
-                            if (currentIndex < 0) currentIndex = totalSlides - 1;
-                            if (currentIndex >= totalSlides) currentIndex = 0;
-                            updateSlider();
-                        }
-
-                        function nextSlide() {
-                            goToSlide(currentIndex + 1);
-                        }
-
-                        function prevSlide() {
-                            goToSlide(currentIndex - 1);
-                        }
-
-                        function resetInterval() {
-                            clearInterval(slideInterval);
-                            slideInterval = setInterval(nextSlide, 5000); // Tự động chuyển sau 5 giây
-                        }
-
-                        // Gắn sự kiện click
-                        if (nextBtn) nextBtn.addEventListener('click', () => {
-                            nextSlide();
-                            resetInterval();
-                        });
-
-                        if (prevBtn) prevBtn.addEventListener('click', () => {
-                            prevSlide();
-                            resetInterval();
-                        });
-
-                        resetInterval();
-                    });
                 </script>
             </body>
 

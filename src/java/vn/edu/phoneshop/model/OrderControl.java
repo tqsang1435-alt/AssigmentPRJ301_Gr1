@@ -26,7 +26,7 @@ public class OrderControl extends HttpServlet {
             orderDAO.updateOrderStatus(orderId, status);
 
             // 4. Quay lại trang quản lý đơn hàng
-            response.sendRedirect("admin-orders.jsp");
+            response.sendRedirect("order-list");
 
         } catch (Exception e) {
             e.printStackTrace();

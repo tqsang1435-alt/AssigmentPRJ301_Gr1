@@ -25,13 +25,13 @@
                     <span>Quản lý Sản phẩm</span>
                 </a>
             </li>
-            <!-- <li class="admin-menu__item">
-                <a href="revenue-stats"
-                    class="admin-menu__link ${pageContext.request.servletPath.contains('revenue') ? 'admin-menu__link--active' : ''}">
-                    <i class="ti-bar-chart admin-menu__icon"></i>
-                    <span>Thống kê Doanh thu</span>
+            <li class="admin-menu__item">
+                <a href="supplier"
+                    class="admin-menu__link ${activePage == 'supplier-management' ? 'admin-menu__link--active' : ''}">
+                    <i class="ti-truck admin-menu__icon"></i>
+                    <span>Quản lý nhà cung cấp</span>
                 </a>
-            </li> -->
+            </li>
             <li class="admin-menu__item">
                 <a href="order-list"
                     class="admin-menu__link ${activePage == 'order-management' ? 'admin-menu__link--active' : ''}">
