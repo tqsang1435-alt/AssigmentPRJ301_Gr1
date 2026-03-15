@@ -18,8 +18,6 @@ public class OrderControl extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         try {
-            // 1. Lấy thông tin từ request (Admin gửi lên từ trang quản lý đơn)
-            // Ví dụ link: /update-order-status?orderId=5&status=4
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             int status = Integer.parseInt(request.getParameter("status"));
 
@@ -27,19 +25,8 @@ public class OrderControl extends HttpServlet {
             OrderDAO orderDAO = new OrderDAO();
             orderDAO.updateOrderStatus(orderId, status);
 
-            // 3. LOGIC TÍCH ĐIỂM
-            // Nếu trạng thái là 4 (Hoàn thành), thực hiện tích điểm cho User
-            if (status == 4) {
-                Order order = orderDAO.getOrderById(orderId);
-                if (order != null) {
-                    UserDAO userDAO = new UserDAO();
-                    // Gọi hàm tích điểm đã viết sẵn trong UserDAO
-                    userDAO.updateRewardPoints(order.getUserID(), order.getTotalMoney());
-                }
-            }
-
             // 4. Quay lại trang quản lý đơn hàng
-            response.sendRedirect("admin-orders.jsp");
+            response.sendRedirect("order-list");
 
         } catch (Exception e) {
             e.printStackTrace();

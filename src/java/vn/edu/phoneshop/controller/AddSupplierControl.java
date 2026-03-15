@@ -11,38 +11,39 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import vn.edu.phoneshop.dao.SupplierDAO;
+
 /**
  *
  * @author tqsan
  */
-@WebServlet(name = "AddSupplierControl", urlPatterns = {"/add-supplier"})
+@WebServlet(name = "AddSupplierControl", urlPatterns = { "/add-supplier" })
 public class AddSupplierControl extends HttpServlet {
 
-    // Khi bấm link "Thêm mới" -> Chuyển sang trang nhập liệu
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("AddSupplier.jsp").forward(request, response);
     }
 
-    // Khi bấm nút "Lưu lại" ở Form -> Xử lý lưu vào DB
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // 1. Lấy tiếng Việt không bị lỗi font
-        request.setCharacterEncoding("UTF-8"); 
-        
+        request.setCharacterEncoding("UTF-8");
+
         // 2. Lấy dữ liệu từ form
         String name = request.getParameter("name");
         String phone = request.getParameter("phone");
         String email = request.getParameter("email");
         String address = request.getParameter("address");
 
-        // 3. Gọi DAO để lưu
-        SupplierDAO dao = new SupplierDAO();
-        dao.insertSupplier(name, phone, email, address);
+        try {
+            SupplierDAO dao = new SupplierDAO();
+            dao.insertSupplier(name, phone, email, address);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        // 4. Lưu xong thì quay về trang danh sách để xem kết quả
         response.sendRedirect("supplier-list");
     }
 }

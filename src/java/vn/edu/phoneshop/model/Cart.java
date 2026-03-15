@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class Cart {
     private List<CartItem> cartItems;
+    private double discountPercent;
 
     public Cart() {
         this.cartItems = new ArrayList<>();
@@ -89,5 +90,21 @@ public class Cart {
     // Lấy số lượng sản phẩm trong giỏ
     public int getCartSize() {
         return cartItems.size();
+    }
+
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(double discountPercent) {
+        this.discountPercent = discountPercent;
+    }
+
+    public double getDiscountAmount() {
+        return getTotalPrice() * (discountPercent / 100.0);
+    }
+
+    public double getFinalTotalPrice() {
+        return getTotalPrice() - getDiscountAmount();
     }
 }

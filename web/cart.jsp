@@ -1,6 +1,7 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
     <%@ taglib prefix="c" uri="jakarta.tags.core" %>
         <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+            <fmt:setLocale value="vi_VN" />
             <!DOCTYPE html>
             <html lang="vi">
 
@@ -16,51 +17,8 @@
                     href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
             </head>
 
-            <body class="cart_body">
-                <header class="header">
-                    <div class="grid wide">
-                        <div class="header__navbar">
-                            <a href="${pageContext.request.contextPath}/" class="header__logo">
-                                <i class="ti-mobile"></i> <label>PhoneShop</label>
-                            </a>
-
-                            <div class="header__search hide-on-mobile">
-                                <input type="text" class="header__search-input"
-                                    placeholder="Tìm kiếm điện thoại, laptop, phụ kiện...">
-                                <button class="header__search-btn"><i class="ti-search"></i></button>
-                            </div>
-
-                            <ul class="header__nav-list">
-                                <li class="header__nav-item">
-                                    <a href="${pageContext.request.contextPath}/view-cart"
-                                        class="header__nav-link header__nav-link--warning">
-                                        <i class="ti-shopping-cart"></i> <label class="hide-on-mobile">Giỏ hàng</label>
-                                        <span
-                                            style="background: var(--gold-color); color: var(--black-color); padding: 2px 6px; border-radius: 50%; font-size: 1.2rem; margin-left: 5px; font-weight: bold;">
-                                            ${cart.totalQuantity > 0 ? cart.totalQuantity : '0'}
-                                        </span>
-                                    </a>
-                                </li>
-                                <c:if test="${not empty sessionScope.ACC}">
-                                    <li class="header__nav-item">
-                                        <a href="${pageContext.request.contextPath}/user-profile"
-                                            class="header__nav-link">
-                                            <i class="ti-user"></i> <label class="hide-on-mobile">Tài khoản</label>
-                                        </a>
-                                    </li>
-                                </c:if>
-                                <c:if test="${empty sessionScope.ACC}">
-                                    <li class="header__nav-item">
-                                        <a href="${pageContext.request.contextPath}/user-login"
-                                            class="header__nav-link">
-                                            <i class="ti-user"></i> <label class="hide-on-mobile">Đăng nhập</label>
-                                        </a>
-                                    </li>
-                                </c:if>
-                            </ul>
-                        </div>
-                    </div>
-                </header>
+            <body>
+                <jsp:include page="header.jsp" />
 
                 <div class="container">
                     <div class="grid wide">
@@ -108,8 +66,8 @@
                                                 <div class="row no-gutters">
                                                     <div class="col l-5 m-5 c-12">
                                                         <div class="cart-item__product">
-                                                            <img src="${pageContext.request.contextPath}${item.product.imageURL}"
-                                                                alt="Ảnh" class="cart-item__img">
+                                                            <img src="${item.product.imageURL}" alt="Ảnh"
+                                                                class="cart-item__img">
                                                             <div class="cart-item__info">
                                                                 <h3 class="cart-item__name">${item.product.productName}
                                                                 </h3>
@@ -126,7 +84,7 @@
                                                     <div class="col l-2 m-2 c-0 hide-on-mobile">
                                                         <div class="cart-item__price">
                                                             <fmt:formatNumber value="${item.product.price}"
-                                                                type="currency" currencySymbol="₫" pattern="#,##0" />
+                                                                pattern="#,##0" /> đ
                                                         </div>
                                                     </div>
                                                     <div class="col l-3 m-3 c-12">
@@ -143,8 +101,8 @@
                                                     <div class="col l-2 m-2 c-12">
                                                         <div class="cart-item__subtotal"
                                                             style="justify-content: flex-end;">
-                                                            <fmt:formatNumber value="${item.subtotal}" type="currency"
-                                                                currencySymbol="₫" pattern="#,##0" />
+                                                            <fmt:formatNumber value="${item.subtotal}"
+                                                                pattern="#,##0" /> đ
                                                         </div>
                                                     </div>
                                                 </div>
@@ -170,10 +128,22 @@
                                         <div class="cart-summary__row">
                                             <span>Tạm tính (${cart.totalQuantity} SP):</span>
                                             <span style="font-weight: 500;">
-                                                <fmt:formatNumber value="${cart.totalPrice}" type="currency"
-                                                    currencySymbol="₫" pattern="#,##0" />
+                                                <fmt:formatNumber value="${cart.totalPrice}" pattern="#,##0" /> đ
                                             </span>
                                         </div>
+                                        <c:if test="${cart.discountPercent > 0}">
+                                            <div class="cart-summary__row">
+                                                <span>Giảm giá hạng thành viên (
+                                                    <fmt:formatNumber value="${cart.discountPercent}" pattern="#,##0" />
+                                                    %):
+                                                </span>
+                                                <span style="color: #28a745;">
+                                                    -
+                                                    <fmt:formatNumber value="${cart.totalPrice - cart.finalTotalPrice}"
+                                                        pattern="#,##0" /> đ
+                                                </span>
+                                            </div>
+                                        </c:if>
                                         <div class="cart-summary__row">
                                             <span>Phí giao hàng:</span>
                                             <span style="color: var(--primary-color);">Miễn phí</span>
@@ -181,8 +151,7 @@
                                         <div class="cart-summary__total">
                                             <span>Tổng cộng:</span>
                                             <span>
-                                                <fmt:formatNumber value="${cart.totalPrice}" type="currency"
-                                                    currencySymbol="₫" pattern="#,##0" />
+                                                <fmt:formatNumber value="${cart.finalTotalPrice}" pattern="#,##0" /> đ
                                             </span>
                                         </div>
 
@@ -204,6 +173,8 @@
                         </c:if>
                     </div>
                 </div>
+
+                <jsp:include page="footer.jsp" />
             </body>
 
             </html>

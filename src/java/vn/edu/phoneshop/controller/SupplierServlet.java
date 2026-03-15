@@ -3,11 +3,14 @@ package vn.edu.phoneshop.controller;
 import vn.edu.phoneshop.dao.SupplierDAO;
 import vn.edu.phoneshop.model.Supplier;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/supplier")
 public class SupplierServlet extends HttpServlet {
@@ -17,15 +20,15 @@ public class SupplierServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         String action = request.getParameter("action");
-
         if (action == null) {
             action = "list";
         }
 
+        // Đánh dấu active sidebar cho giao diện Admin
+        request.setAttribute("activePage", "supplier-management");
+
         try {
-            // flash message support (store in session from POST)
             HttpSession session = request.getSession();
             String flash = (String) session.getAttribute("message");
             if (flash != null) {
@@ -33,18 +36,16 @@ public class SupplierServlet extends HttpServlet {
                 session.removeAttribute("message");
             }
             switch (action) {
-
                 case "edit":
                     int id = Integer.parseInt(request.getParameter("id"));
-                    Supplier supplier = dao.getById(id);
+                    Supplier supplier = dao.findById(id);
                     request.setAttribute("supplier", supplier);
-                    request.getRequestDispatcher("supplier-form.jsp")
-                           .forward(request, response);
+                    request.getRequestDispatcher("supplier-form.jsp").forward(request, response);
                     break;
 
                 case "delete":
                     int deleteId = Integer.parseInt(request.getParameter("id"));
-                    dao.updateStatus(deleteId, false); // soft-disable
+                    dao.updateStatus(deleteId, false);
                     response.sendRedirect("supplier");
                     break;
 
@@ -56,7 +57,7 @@ public class SupplierServlet extends HttpServlet {
 
                 case "remove":
                     int removeId = Integer.parseInt(request.getParameter("id"));
-                    dao.delete(removeId); // hard delete
+                    dao.delete(removeId);
                     response.sendRedirect("supplier");
                     break;
 
@@ -64,20 +65,17 @@ public class SupplierServlet extends HttpServlet {
                     String keyword = request.getParameter("keyword");
                     List<Supplier> searchList = dao.searchByName(keyword);
                     request.setAttribute("suppliers", searchList);
-                    request.getRequestDispatcher("supplier-list.jsp")
-                           .forward(request, response);
+                    request.getRequestDispatcher("supplier-list.jsp").forward(request, response);
                     break;
 
-                default: // LIST
+                default:
                     List<Supplier> list = dao.getAll();
                     request.setAttribute("suppliers", list);
-                    request.getRequestDispatcher("supplier-list.jsp")
-                           .forward(request, response);
+                    request.getRequestDispatcher("supplier-list.jsp").forward(request, response);
                     break;
             }
-
         } catch (Exception e) {
-            throw new RuntimeException(e); // Không nuốt lỗi nữa
+            throw new RuntimeException(e);
         }
     }
 
@@ -86,6 +84,9 @@ public class SupplierServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
+
+        // Đánh dấu active sidebar cho giao diện Admin
+        request.setAttribute("activePage", "supplier-management");
 
         try {
             String name = request.getParameter("name");

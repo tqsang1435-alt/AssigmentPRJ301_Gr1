@@ -1,4 +1,3 @@
-package vn.edu.phoneshop.controller;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class CustomerController extends HttpServlet {
+
     private UserDAO userDAO = new UserDAO();
 
     @Override
@@ -15,9 +15,9 @@ public class CustomerController extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            List<User> customerList = userDAO.getAllUsers();
+            List<User> customerList = userDAO.getAllCustomers();
             request.setAttribute("customerList", customerList);
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/ManagerSupplier.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/ManagerCustomer.jsp");
             dispatcher.forward(request, response);
 
         } catch (Exception e) {
