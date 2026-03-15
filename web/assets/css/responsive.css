@@ -3,14 +3,6 @@
     .hide-on-mobile-tablet {
         display: none;
     }
-
-    .hero__heading {
-        line-height: 5rem;
-    }
-
-    .hero__desc {
-        line-height: 2.4rem;
-    }
 }
 
 /* Tablet */
@@ -27,8 +19,13 @@
         display: none;
     }
 
-    .features__row {
-        display: flex;
-        gap: 2rem;
+    /* Product Detail */
+    .product-info {
+        padding-left: 0;
+        margin-top: 20px;
+    }
+
+    .product-detail-container {
+        padding: 20px;
     }
 }

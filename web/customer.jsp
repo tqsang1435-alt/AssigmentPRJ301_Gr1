@@ -22,7 +22,7 @@
                             <i class="ti-mobile"></i><label>PhoneShop Admin</label>
                         </a>
                         <ul class="header__nav-list">
-                            <li class="header__nav-item"><a href="user-logout" class="header__nav-link">Đăng xuất</a>
+                            <li class="header__nav-item"><a href="user-logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?');" class="header__nav-link">Đăng xuất</a>
                             </li>
                         </ul>
                     </div>

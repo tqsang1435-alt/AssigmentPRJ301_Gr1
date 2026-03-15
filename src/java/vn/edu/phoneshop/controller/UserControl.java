@@ -25,15 +25,17 @@ public class UserControl extends HttpServlet {
         User user = dao.login(email, pass);
 
         if (user != null) {
+            if ("Admin".equalsIgnoreCase(user.getRole())) {
+                request.setAttribute("mess", "Vui lòng đăng nhập bằng Cổng Quản trị Admin (/admin-login).");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
+            }
+
             HttpSession session = request.getSession();
             session.setAttribute("ACC", user);
             session.setAttribute("ROLE", user.getRole());
             session.setMaxInactiveInterval(24 * 60 * 60);
-            if ("Admin".equalsIgnoreCase(user.getRole())) {
-                response.sendRedirect("admin-dashboard");
-            } else {
-                response.sendRedirect("home");
-            }
+            response.sendRedirect("home");
         } else {
             request.setAttribute("mess", "Sai email hoặc mật khẩu!");
             request.getRequestDispatcher("login.jsp").forward(request, response);
@@ -135,8 +137,12 @@ public class UserControl extends HttpServlet {
             switch (action) {
                 case "/user-login":
                     if (session != null && session.getAttribute("ACC") != null) {
-                        // Nếu đã đăng nhập, chuyển hướng đến trang profile
-                        response.sendRedirect("user-profile");
+                        User loggedInUser = (User) session.getAttribute("ACC");
+                        if ("Admin".equalsIgnoreCase(loggedInUser.getRole())) {
+                            response.sendRedirect("admin-dashboard");
+                        } else {
+                            response.sendRedirect("user-profile");
+                        }
                     } else {
                         // Nếu chưa đăng nhập, hiển thị trang login
                         request.getRequestDispatcher("login.jsp").forward(request, response);
@@ -161,7 +167,13 @@ public class UserControl extends HttpServlet {
                     break;
                 case "/user-logout":
                     if (session != null) {
+                        User user = (User) session.getAttribute("ACC");
+                        boolean wasAdmin = (user != null && "Admin".equalsIgnoreCase(user.getRole()));
                         session.invalidate();
+                        if (wasAdmin) {
+                            response.sendRedirect("admin-login");
+                            return;
+                        }
                     }
                     response.sendRedirect("home");
                     break;

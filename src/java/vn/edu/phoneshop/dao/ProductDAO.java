@@ -295,4 +295,80 @@ public class ProductDAO extends DBContext {
         }
         return list;
     }
+
+    public int getTotalProductsAdmin(String search, String ram, String rom) {
+        StringBuilder sql = new StringBuilder("SELECT count(*) FROM Products p JOIN Categories c ON p.CategoryID = c.CategoryID WHERE 1=1");
+        
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND p.ProductName LIKE ?");
+        }
+        if (ram != null && !ram.trim().isEmpty()) {
+            sql.append(" AND p.RAM = ?");
+        }
+        if (rom != null && !rom.trim().isEmpty()) {
+            sql.append(" AND p.ROM = ?");
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int index = 1;
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(index++, "%" + search.trim() + "%");
+            }
+            if (ram != null && !ram.trim().isEmpty()) {
+                ps.setString(index++, ram);
+            }
+            if (rom != null && !rom.trim().isEmpty()) {
+                ps.setString(index++, rom);
+            }
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Product> getProductsAdminPaginated(String search, String ram, String rom, int page, int pageSize) {
+        List<Product> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.*, c.CategoryName FROM Products p JOIN Categories c ON p.CategoryID = c.CategoryID WHERE 1=1");
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND p.ProductName LIKE ?");
+        }
+        if (ram != null && !ram.trim().isEmpty()) {
+            sql.append(" AND p.RAM = ?");
+        }
+        if (rom != null && !rom.trim().isEmpty()) {
+            sql.append(" AND p.ROM = ?");
+        }
+        sql.append(" ORDER BY p.ProductID DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY");
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int index = 1;
+            if (search != null && !search.trim().isEmpty()) {
+                ps.setString(index++, "%" + search.trim() + "%");
+            }
+            if (ram != null && !ram.trim().isEmpty()) {
+                ps.setString(index++, ram);
+            }
+            if (rom != null && !rom.trim().isEmpty()) {
+                ps.setString(index++, rom);
+            }
+            ps.setInt(index++, (page - 1) * pageSize);
+            ps.setInt(index++, pageSize);
+            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowToProduct(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

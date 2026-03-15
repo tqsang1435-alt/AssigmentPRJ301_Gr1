@@ -9,15 +9,8 @@
                         <i class="ti-mobile"></i> <label>PhoneShop</label>
                     </a>
 
-                    <!-- Search -->
-                    <form action="home" method="get" class="header__search hide-on-mobile">
-                        <input type="text" name="searchName" class="header__search-input"
-                            placeholder="Tìm kiếm điện thoại, phụ kiện..." value="${searchName}">
-                        <button class="header__search-btn"><i class="ti-search"></i></button>
-                    </form>
-
-                    <!-- Nav Links -->
-                    <ul class="header__nav-list">
+                    <!-- Nav Links Left -->
+                    <ul class="header__nav-list" style="margin-left: 20px;">
                         <li class="header__nav-item header__nav-item--has-sub">
                             <a href="#" class="header__nav-link">
                                 <i class="ti-menu"></i> <label class="hide-on-mobile">Danh mục</label> <i
@@ -40,6 +33,17 @@
                                         class="header__sub-nav-link">Xiaomi</a></li>
                             </ul>
                         </li>
+                    </ul>
+
+                    <!-- Search -->
+                    <form action="search" method="get" class="header__search hide-on-mobile">
+                        <input type="text" name="searchName" class="header__search-input"
+                            placeholder="Tìm kiếm điện thoại, phụ kiện..." value="${searchName}">
+                        <button class="header__search-btn"><i class="ti-search"></i></button>
+                    </form>
+
+                    <!-- Nav Links Right -->
+                    <ul class="header__nav-list">
 
                         <li class="header__nav-item">
                             <a href="${pageContext.request.contextPath}/view-cart"
@@ -63,7 +67,14 @@
                                             </a>
                                         </li>
                                         <li class="header__sub-nav-item">
+                                            <a href="${pageContext.request.contextPath}/purchase-history"
+                                                class="header__sub-nav-link">
+                                                <i class="ti-receipt" style="margin-right: 8px;"></i> Lịch sử mua hàng
+                                            </a>
+                                        </li>
+                                        <li class="header__sub-nav-item">
                                             <a href="${pageContext.request.contextPath}/user-logout"
+                                                onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?');"
                                                 class="header__sub-nav-link">
                                                 <i class="ti-power-off" style="margin-right: 8px;"></i> Đăng xuất
                                             </a>

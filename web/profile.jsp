@@ -78,20 +78,20 @@
                                                 </div>
 
                                                 <div class="profile-body">
-                                                    <div class="info-group">
+                                                    <!-- <div class="info-group">
                                                         <div class="info-label"><i class="ti-id-badge"></i> User ID
                                                         </div>
                                                         <div class="info-value">#${sessionScope.ACC.userID}</div>
-                                                    </div>
+                                                    </div> -->
 
                                                     <div class="info-group">
-                                                        <div class="info-label"><i class="ti-email"></i> Account Email
+                                                        <div class="info-label"><i class="ti-email"></i> Email
                                                         </div>
                                                         <div class="info-value">${sessionScope.ACC.email}</div>
                                                     </div>
 
                                                     <div class="info-group">
-                                                        <div class="info-label"><i class="ti-mobile"></i>SĐT
+                                                        <div class="info-label"><i class="ti-mobile"></i>Số điện thoại
                                                         </div>
                                                         <div class="info-value">
                                                             <c:choose>
@@ -109,7 +109,7 @@
                                                     </div>
 
                                                     <div class="info-group">
-                                                        <div class="info-label"><i class="ti-location-pin"></i> Address
+                                                        <div class="info-label"><i class="ti-location-pin"></i> Địa chỉ
                                                         </div>
                                                         <div class="info-value">
                                                             <c:choose>
@@ -126,16 +126,17 @@
                                                     </div>
 
                                                     <div class="info-group">
-                                                        <div class="info-label"><i class="ti-bolt"></i> Points</div>
+                                                        <div class="info-label"><i class="ti-bolt"></i> Điểm thưởng
+                                                        </div>
                                                         <div class="exp-points">
-                                                            ${sessionScope.ACC.rewardPoints} Point
+                                                            ${sessionScope.ACC.rewardPoints} Điểm
                                                         </div>
                                                     </div>
 
                                                     <div class="info-group"
                                                         style="text-align: center; border-bottom: none; margin-top: 20px;padding-bottom: 0;">
                                                         <div class="info-label" style="margin-bottom: 10px;">
-                                                            <i class="ti-target"></i> Current Rank
+                                                            <i class="ti-target"></i> Bậc hạng
                                                         </div>
 
                                                         <div class="membership-rank-badge">
@@ -159,9 +160,10 @@
                                                         Chỉnh sửa
                                                     </a>
                                                     <a href="user-logout" class="btn btn--outline-danger"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?');"
                                                         style="line-height: 40px; height: 44px; border-radius: 4px; padding: 0 25px; border: 2px solid #ff4757; color: #ff4757;">
                                                         <i class="ti-power-off" style="margin-right: 8px;"></i>
-                                                        Logout
+                                                        Đăng xuất
                                                     </a>
                                                 </div>
                                             </div>

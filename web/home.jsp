@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+        <%@taglib prefix="fn" uri="jakarta.tags.functions" %> <!-- Sử dụng namespace mới nhất theo thẻ chuẩn của Tomcat -->
             <fmt:setLocale value="vi_VN" />
 
             <!DOCTYPE html>
@@ -14,12 +15,13 @@
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cssreset.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
                 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/grid.css">
-                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css?v=1001">
                 <link rel="stylesheet"
                     href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css?v=1001">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/responsive.css">
                 <style>
+                    /* SLIDER */
                     .my-slider {
                         position: relative;
                         width: 100%;
@@ -55,12 +57,14 @@
                     .my-slide__content {
                         position: absolute;
                         top: 50%;
-                        left: 10%;
-                        transform: translateY(-50%);
+                        left: 50%;
+                        transform: translate(-50%, -50%);
                         color: #fff;
                         z-index: 3;
                         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
                         max-width: 600px;
+                        text-align: center;
+                        width: 100%;
                     }
 
                     .my-slide__content h2 {
@@ -148,86 +152,6 @@
                     .dot.active {
                         background: var(--primary-color, #ee4d2d);
                         transform: scale(1.2);
-                    }
-
-                    .home-product-item {
-                        display: flex;
-                        flex-direction: column;
-                        text-decoration: none;
-                        background-color: #ffffff;
-                        border-radius: 8px;
-                        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
-                        transition: transform 0.2s ease, box-shadow 0.2s ease;
-                        height: 100%;
-                        overflow: hidden;
-                        border: 1px solid transparent;
-                    }
-
-                    .home-product-item:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.12);
-                        border: 1px solid var(--primary-color, #ee4d2d);
-                    }
-
-                    .home-product-item__img-wrap {
-                        width: 100%;
-                        padding-top: 100%;
-                        position: relative;
-                        overflow: hidden;
-                    }
-
-                    .home-product-item__img {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background-repeat: no-repeat;
-                        background-size: contain;
-                        background-position: center;
-                        background-color: #fff;
-                        padding: 15px;
-                        background-clip: content-box;
-                        transition: transform 0.3s ease-in-out;
-                    }
-
-                    .home-product-item:hover .home-product-item__img {
-                        transform: scale(1.05);
-                    }
-
-                    .home-product-item__name {
-                        font-size: 1.4rem;
-                        font-weight: 500;
-                        color: var(--text-color, #333);
-                        line-height: 2rem;
-                        height: 4rem;
-                        margin: 10px 12px 5px 12px;
-                        overflow: hidden;
-                        display: -webkit-box;
-                        -webkit-box-orient: vertical;
-                        -webkit-line-clamp: 2;
-                    }
-
-                    .home-product-item:hover .home-product-item__name {
-                        color: var(--primary-color, #ee4d2d);
-                    }
-
-                    .home-product-item__price {
-                        padding: 0 12px;
-                        margin-bottom: 12px;
-                    }
-
-                    .home-product-item__price-current {
-                        font-size: 1.7rem;
-                        color: #ee4d2d;
-                        font-weight: 700;
-                    }
-
-                    .home-product-item__action {
-                        display: flex;
-                        gap: 8px;
-                        padding: 0 12px 15px 12px;
-                        margin-top: auto;
                     }
 
                     .btn-add-cart-custom {
@@ -367,21 +291,43 @@
                         </div>
 
                         <div class="row sm-gutter">
+                            <c:set var="userRank" value="${sessionScope.ACC.customerType}" />
+                            <c:set var="discountPercent" value="0" />
+                            <c:if test="${not empty sessionScope.ACC and not empty userRank}">
+                                <c:choose>
+                                    <c:when test="${fn:contains(userRank, 'Diamond')}"><c:set var="discountPercent" value="15" /></c:when>
+                                    <c:when test="${fn:contains(userRank, 'Gold')}"><c:set var="discountPercent" value="10" /></c:when>
+                                    <c:when test="${fn:contains(userRank, 'Silver')}"><c:set var="discountPercent" value="5" /></c:when>
+                                    <c:when test="${fn:contains(userRank, 'Bronze')}"><c:set var="discountPercent" value="2" /></c:when>
+                                </c:choose>
+                            </c:if>
+
                             <c:forEach items="${listP}" var="p">
+                                <c:set var="finalPrice" value="${p.price - (p.price * discountPercent / 100)}" />
                                 <div class="col l-2-4 m-4 c-6" style="margin-bottom: 20px;">
                                     <a href="detail?id=${p.productID}" class="home-product-item">
 
-                                        <div class="home-product-item__img-wrap">
+                                        <div class="home-product-item__img-wrap" style="position: relative;">
                                             <div class="home-product-item__img"
                                                 style="background-image: url('${not empty p.imageURL ? p.imageURL : 'assets/img/default-phone.png'}');">
                                             </div>
+                                            <c:if test="${discountPercent > 0}">
+                                                <div class="home-product-item__sale-off" style="position: absolute; top: 10px; right: 10px; background-color: rgba(255,212,36,.9); padding: 4px 6px; border-radius: 4px; z-index: 10; font-weight: bold; color: #ee4d2d;">
+                                                    <span class="home-product-item__percent">-${discountPercent}%</span>
+                                                </div>
+                                            </c:if>
                                         </div>
 
                                         <h4 class="home-product-item__name">${p.productName}</h4>
 
-                                        <div class="home-product-item__price">
+                                        <div class="home-product-item__price" style="display: flex; flex-wrap: wrap; align-items: baseline;">
+                                            <c:if test="${discountPercent > 0}">
+                                                <span class="home-product-item__price-old" style="text-decoration: line-through; color: #999; font-size: 1.3rem; margin-right: 8px;">
+                                                    <fmt:formatNumber value="${p.price}" pattern="#,##0" /> đ
+                                                </span>
+                                            </c:if>
                                             <span class="home-product-item__price-current">
-                                                <fmt:formatNumber value="${p.price}" pattern="#,##0" /> đ
+                                                <fmt:formatNumber value="${finalPrice}" pattern="#,##0" /> đ
                                             </span>
                                         </div>
 
@@ -418,11 +364,25 @@
                                     </a>
                                 </li>
 
+                                <c:set var="showEllipsis" value="false" />
                                 <c:forEach begin="1" end="${totalPages}" var="i">
-                                    <li class="pagination-item">
-                                        <a href="home?page=${i}&searchName=${searchName}#product-section"
-                                            class="pagination-item__link ${currentPage == i ? 'pagination-item__link--active' : ''}">${i}</a>
-                                    </li>
+                                    <c:choose>
+                                        <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+                                            <c:set var="showEllipsis" value="false" />
+                                            <li class="pagination-item">
+                                                <a href="home?page=${i}&searchName=${searchName}&ramFilter=${param.ramFilter}&romFilter=${param.romFilter}#product-section"
+                                                    class="pagination-item__link ${currentPage == i ? 'pagination-item__link--active' : ''}">${i}</a>
+                                            </li>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:if test="${!showEllipsis}">
+                                                <li class="pagination-item">
+                                                    <span class="pagination-item__link" style="cursor: default; background: transparent; color: #939393;">...</span>
+                                                </li>
+                                                <c:set var="showEllipsis" value="true" />
+                                            </c:if>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </c:forEach>
 
                                 <li
