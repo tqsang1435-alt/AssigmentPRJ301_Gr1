@@ -120,14 +120,14 @@ public class SupplierServlet extends HttpServlet {
             if ("add".equals(action)) {
 
                 Supplier s = new Supplier(name, contact, phone, email, address, logo, true);
-                dao.insert(s);
+//                dao.insert(s);
                 request.getSession().setAttribute("message", "Supplier added successfully.");
 
             } else if ("update".equals(action)) {
 
                 int id = Integer.parseInt(request.getParameter("id"));
                 Supplier s = new Supplier(id, name, contact, phone, email, address, logo, true);
-                dao.update(s);
+//                dao.update(s);
                 request.getSession().setAttribute("message", "Supplier updated successfully.");
             }
 
