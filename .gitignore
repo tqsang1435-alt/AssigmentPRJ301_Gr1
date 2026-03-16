@@ -8,8 +8,7 @@ build/
 
 # --- [2] NetBeans Private Data (BẮT BUỘC) ---
 # Đây là phần quan trọng nhất để làm việc nhóm không bị lỗi
-nbproject/private/
-
+nbproject/
 # --- [3] Archive & Package Files ---
 *.jar
 *.war
