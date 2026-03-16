@@ -34,17 +34,17 @@
                                     <div class="form-group">
                                         <label for="name" class="form-label">Họ và tên</label>
                                         <input id="name" name="name" type="text" class="form-control"
-                                            placeholder="Nhập họ và tên">
+                                            placeholder="Nhập họ và tên" value="${sessionScope.ACC.fullName}">
                                     </div>
                                     <div class="form-group">
                                         <label for="phone" class="form-label">Số điện thoại</label>
                                         <input id="phone" name="phone" type="text" class="form-control"
-                                            placeholder="Nhập số điện thoại">
+                                            placeholder="Nhập số điện thoại" value="${sessionScope.ACC.phoneNumber}">
                                     </div>
                                     <div class="form-group">
                                         <label for="address" class="form-label">Địa chỉ giao hàng</label>
                                         <input id="address" name="address" type="text" class="form-control"
-                                            placeholder="Nhập địa chỉ">
+                                            placeholder="Nhập địa chỉ" value="${sessionScope.ACC.address}">
                                     </div>
                                     <button type="submit" class="btn btn--primary"
                                         style="min-width: 200px; height: 40px;">Hoàn tất đơn hàng</button>

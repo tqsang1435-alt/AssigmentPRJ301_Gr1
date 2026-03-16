@@ -14,7 +14,7 @@ import vn.edu.phoneshop.dao.StatisticDAO;
 import vn.edu.phoneshop.model.RevenueStat;
 import vn.edu.phoneshop.model.User;
 
-@WebServlet(name = "AdminDashboardControl", urlPatterns = { "/admin-dashboard" })
+@WebServlet(name = "AdminDashboardControl", urlPatterns = {"/admin-dashboard", "/admin"})
 public class AdminDashboardControl extends HttpServlet {
 
     @Override
@@ -51,7 +51,6 @@ public class AdminDashboardControl extends HttpServlet {
         request.setAttribute("productRevenue", productRevenue);
 
         // --- Xử lý dữ liệu JSON cho biểu đồ (Chart.js) ---
-
         // 1. Biểu đồ doanh thu theo NGÀY (Line Chart)
         List<RevenueStat> chartDailyList = new ArrayList<>(dailyRevenue);
         Collections.reverse(chartDailyList); // Đảo ngược để hiển thị từ cũ -> mới

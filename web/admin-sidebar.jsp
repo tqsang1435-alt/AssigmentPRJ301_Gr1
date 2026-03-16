@@ -26,6 +26,13 @@
                 </a>
             </li>
             <li class="admin-menu__item">
+                <a href="category-list"
+                    class="admin-menu__link ${activePage == 'category-management' ? 'admin-menu__link--active' : ''}">
+                    <i class="ti-view-list-alt admin-menu__icon"></i>
+                    <span>Quản lý Loại sản phẩm</span>
+                </a>
+            </li>
+            <li class="admin-menu__item">
                 <a href="supplier"
                     class="admin-menu__link ${activePage == 'supplier-management' ? 'admin-menu__link--active' : ''}">
                     <i class="ti-truck admin-menu__icon"></i>
@@ -39,14 +46,9 @@
                     <span>Quản lý Đơn hàng</span>
                 </a>
             </li>
-            <!-- <li class="admin-menu__item">
-                <a href="home" class="admin-menu__link">
-                    <i class="ti-home admin-menu__icon"></i>
-                    <span>Về trang chủ</span>
-                </a>
-            </li> -->
             <li class="admin-menu__item">
-                <a href="user-logout" class="admin-menu__link">
+                <a href="user-logout" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?');"
+                    class="admin-menu__link">
                     <i class="ti-power-off admin-menu__icon"></i>
                     <span>Đăng xuất</span>
                 </a>

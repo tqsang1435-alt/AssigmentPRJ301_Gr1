@@ -89,13 +89,26 @@
                                                     </div>
                                                     <div class="col l-3 m-3 c-12">
                                                         <form action="${pageContext.request.contextPath}/update-cart"
-                                                            method="GET" class="cart-item__quantity">
+                                                            method="GET" class="cart-item__quantity" style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; width: max-content;">
                                                             <input type="hidden" name="productID"
                                                                 value="${item.product.productID}">
+                                                                
+                                                            <button type="button" 
+                                                                    onclick="var input = this.nextElementSibling; if(input.value > 1) { input.value--; input.form.submit(); }" 
+                                                                    style="width: 30px; height: 30px; background: #f5f5f5; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #555; transition: background 0.2s;">
+                                                                <i class="ti-minus"></i>
+                                                            </button>
+                                                            
                                                             <input type="number" class="quantity-input" name="quantity"
-                                                                value="${item.quantity}" min="1">
-                                                            <button type="submit" class="btn btn--primary btn--small"><i
-                                                                    class="ti-reload"></i></button>
+                                                                value="${item.quantity}" min="1" 
+                                                                onchange="this.form.submit()"
+                                                                style="width: 40px; height: 30px; text-align: center; border: none; border-left: 1px solid #ddd; border-right: 1px solid #ddd; outline: none; font-size: 1.4rem; padding: 0;">
+                                                                
+                                                            <button type="button" 
+                                                                    onclick="var input = this.previousElementSibling; input.value++; input.form.submit();" 
+                                                                    style="width: 30px; height: 30px; background: #f5f5f5; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #555; transition: background 0.2s;">
+                                                                <i class="ti-plus"></i>
+                                                            </button>
                                                         </form>
                                                     </div>
                                                     <div class="col l-2 m-2 c-12">

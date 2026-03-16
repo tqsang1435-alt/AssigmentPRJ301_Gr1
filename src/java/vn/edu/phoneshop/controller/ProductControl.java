@@ -35,11 +35,37 @@ public class ProductControl extends HttpServlet {
             String search = request.getParameter("searchName");
             String ram = request.getParameter("ramFilter");
             String rom = request.getParameter("romFilter");
-            List<Product> list = dao.searchAndFilterProducts(search, ram, rom);
+
+            // Pagination logic
+            int page = 1;
+            int pageSize = 6;
+            String pageStr = request.getParameter("page");
+            if (pageStr != null && !pageStr.trim().isEmpty()) {
+                try {
+                    page = Integer.parseInt(pageStr);
+                    if (page < 1) page = 1;
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
+            }
+
+            int totalProducts = dao.getTotalProductsAdmin(search, ram, rom);
+            int totalPages = (int) Math.ceil((double) totalProducts / pageSize);
+            if (page > totalPages && totalPages > 0) {
+                page = totalPages;
+            }
+
+            List<Product> list = dao.getProductsAdminPaginated(search, ram, rom, page, pageSize);
+
             request.setAttribute("listP", list);
             request.setAttribute("searchName", search);
             request.setAttribute("selectedRam", ram);
             request.setAttribute("selectedRom", rom);
+            
+            // Pagination attributes
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+
             request.getRequestDispatcher("ManagerProduct.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();

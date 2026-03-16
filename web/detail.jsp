@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
     <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
         <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+        <%@taglib prefix="fn" uri="jakarta.tags.functions" %> <!-- Thêm function taglib -->
             <fmt:setLocale value="vi_VN" />
 
             <!DOCTYPE html>
@@ -43,8 +44,30 @@
                                             <div class="product-info">
                                                 <h1 class="product-name">${product.productName}</h1>
 
+                                                <c:set var="userRank" value="${sessionScope.ACC.customerType}" />
+                                                <c:set var="discountPercent" value="0" />
+                                                <c:if test="${not empty sessionScope.ACC and not empty userRank}">
+                                                    <c:choose>
+                                                        <c:when test="${fn:contains(userRank, 'Diamond')}"><c:set var="discountPercent" value="15" /></c:when>
+                                                        <c:when test="${fn:contains(userRank, 'Gold')}"><c:set var="discountPercent" value="10" /></c:when>
+                                                        <c:when test="${fn:contains(userRank, 'Silver')}"><c:set var="discountPercent" value="5" /></c:when>
+                                                        <c:when test="${fn:contains(userRank, 'Bronze')}"><c:set var="discountPercent" value="2" /></c:when>
+                                                    </c:choose>
+                                                </c:if>
+                                                <c:set var="finalPrice" value="${product.price - (product.price * discountPercent / 100)}" />
+
                                                 <div class="product-price">
-                                                    <fmt:formatNumber value="${product.price}" pattern="#,##0" /> đ
+                                                    <c:if test="${discountPercent > 0}">
+                                                        <span style="font-size: 1.8rem; color: #666; text-decoration: line-through; display: block; margin-bottom: 5px;">
+                                                            <fmt:formatNumber value="${product.price}" pattern="#,##0" /> đ
+                                                        </span>
+                                                    </c:if>
+                                                    <fmt:formatNumber value="${finalPrice}" pattern="#,##0" /> đ
+                                                    <c:if test="${discountPercent > 0}">
+                                                        <span style="font-size: 1.6rem; color: #fff; background: var(--primary-color); padding: 4px 8px; border-radius: 4px; margin-left: 10px; vertical-align: middle; display: inline-block;">
+                                                            -${discountPercent}%
+                                                        </span>
+                                                    </c:if>
                                                 </div>
 
                                                 <div class="product-meta">
@@ -118,13 +141,13 @@
                             text: "Bạn muốn thêm " + name + " vào giỏ hàng chứ?",
                             icon: 'question',
                             showCancelButton: true,
-                            confirmButtonColor: '#ffc107',
+                            confirmButtonColor: '#ee4b2b',
                             cancelButtonColor: '#6c757d',
                             confirmButtonText: 'Đúng, thêm ngay!',
                             cancelButtonText: 'Hủy'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = "add-cart?id=" + id + "&action=add";
+                                window.location.href = "add-to-cart?pid=" + id;
                             }
                         })
                     }
@@ -135,13 +158,13 @@
                             text: "Bạn sẽ được chuyển đến trang thanh toán cho " + name,
                             icon: 'info',
                             showCancelButton: true,
-                            confirmButtonColor: '#ffc107',
+                            confirmButtonColor: '#ee4b2b',
                             cancelButtonColor: '#6c757d',
                             confirmButtonText: 'Thanh toán ngay',
                             cancelButtonText: 'Để sau'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = "add-cart?id=" + id + "&action=buynow";
+                                window.location.href = "add-to-cart?pid=" + id + "&returnURL=view-cart";
                             }
                         })
                     }
