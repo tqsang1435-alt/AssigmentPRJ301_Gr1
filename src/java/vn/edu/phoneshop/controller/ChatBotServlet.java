@@ -27,8 +27,6 @@ public class ChatBotServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/plain;charset=UTF-8");
         String message = request.getParameter("message");
-
-        // Gọi hàm xử lý qua Gemini API
         String reply = callGeminiAPI(message);
 
         try (PrintWriter out = response.getWriter()) {
@@ -66,7 +64,6 @@ public class ChatBotServlet extends HttpServlet {
 
             conn.setDoOutput(true);
 
-            // Lấy dữ liệu sản phẩm để cung cấp ngữ cảnh cho AI
             String context = getProductContext();
             String fullPrompt = context + "\n\nKhách hàng hỏi: " + message;
             String escapedMessage = fullPrompt.replace("\\", "\\\\")
@@ -80,7 +77,6 @@ public class ChatBotServlet extends HttpServlet {
                 os.write(input, 0, input.length);
             }
 
-            // 3. Đọc phản hồi
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
                 try (BufferedReader br = new BufferedReader(
@@ -93,7 +89,6 @@ public class ChatBotServlet extends HttpServlet {
                     return extractTextFromGeminiResponse(responseBuilder.toString());
                 }
             } else {
-                // Đọc chi tiết lỗi từ Google để debug
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8))) {
                     StringBuilder errorResponse = new StringBuilder();
@@ -102,7 +97,6 @@ public class ChatBotServlet extends HttpServlet {
                         errorResponse.append(line.trim());
                     }
                     System.err.println("Gemini API Error: " + errorResponse.toString());
-                    // Hiển thị chi tiết lỗi để dễ debug
                     return "Lỗi kết nối AI (" + responseCode + "): " + errorResponse.toString();
                 }
             }
@@ -112,7 +106,6 @@ public class ChatBotServlet extends HttpServlet {
         }
     }
 
-    // Hàm lấy danh sách sản phẩm từ Database để "dạy" cho AI
     private String getProductContext() {
         try {
             ProductDAO dao = new ProductDAO();
@@ -134,21 +127,17 @@ public class ChatBotServlet extends HttpServlet {
         }
     }
 
-    // ĐÃ FIX: Dùng Regex để bóc tách JSON thay vì dùng indexOf dễ gây lỗi
     private String extractTextFromGeminiResponse(String json) {
         try {
-            // Regex tìm chuỗi nằm giữa "text": " và " không bị escape
             Pattern pattern = Pattern.compile("\"text\":\\s*\"(.*?)(?<!\\\\)\"");
             Matcher matcher = pattern.matcher(json);
 
             if (matcher.find()) {
                 String rawText = matcher.group(1);
-
-                // Giải mã các ký tự escape ngược lại thành chữ bình thường để hiện lên Web
                 return rawText.replace("\\n", "\n")
                         .replace("\\\"", "\"")
                         .replace("\\\\", "\\")
-                        .replace("\\*", "*"); // Xử lý lỗi in hoa dấu sao của Markdown (tuỳ chọn)
+                        .replace("\\*", "*");
             }
         } catch (Exception e) {
             e.printStackTrace();
