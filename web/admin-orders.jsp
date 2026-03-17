@@ -124,6 +124,18 @@
                                                         <td>
                                                             <a href="order-detail?id=${o.orderId}" class="action-btn"
                                                                 title="Xem chi tiết"><i class="ti-eye"></i></a>
+                                                            <c:if test="${o.status == 1}">
+                                                                <a href="update-order-status?orderId=${o.orderId}&status=2"
+                                                                    class="action-btn" title="Xác nhận đơn"><i
+                                                                        class="ti-check-box"
+                                                                        style="color: #17a2b8;"></i></a>
+                                                            </c:if>
+                                                            <c:if test="${o.status == 2}">
+                                                                <a href="update-order-status?orderId=${o.orderId}&status=3"
+                                                                    class="action-btn" title="Giao hàng"><i
+                                                                        class="ti-truck"
+                                                                        style="color: #0d6efd;"></i></a>
+                                                            </c:if>
                                                             <c:if test="${o.status == 3}">
                                                                 <a href="update-order-status?orderId=${o.orderId}&status=4"
                                                                     class="action-btn" title="Hoàn thành"><i
