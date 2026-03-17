@@ -121,6 +121,19 @@
                         
                         <c:choose>
                             <c:when test="${not empty listOrders}">
+                                <c:if test="${not empty sessionScope.successMessage}">
+                                    <div class="alert alert-success" style="padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; color: #155724; background-color: #d4edda; border-color: #c3e6cb;">
+                                        ${sessionScope.successMessage}
+                                    </div>
+                                    <c:remove var="successMessage" scope="session" />
+                                </c:if>
+                                <c:if test="${not empty sessionScope.errorMessage}">
+                                    <div class="alert alert-danger" style="padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;">
+                                        ${sessionScope.errorMessage}
+                                    </div>
+                                    <c:remove var="errorMessage" scope="session" />
+                                </c:if>
+
                                 <div style="overflow-x: auto;">
                                     <table class="order-table">
                                         <thead>
@@ -130,6 +143,7 @@
                                                 <th>Tổng tiền</th>
                                                 <th>Địa chỉ giao hàng</th>
                                                 <th>Trạng thái</th>
+                                                <th>Hành động</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -159,6 +173,16 @@
                                                                 <span class="status-badge">Không xác định</span>
                                                             </c:otherwise>
                                                         </c:choose>
+                                                    </td>
+                                                    <td>
+                                                        <c:if test="${o.status == 0}">
+                                                            <a href="${pageContext.request.contextPath}/cancel-order?id=${o.orderId}" 
+                                                               class="btn-cancel"
+                                                               onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng #${o.orderId} này không?');"
+                                                               style="display: inline-block; padding: 6px 12px; background-color: #dc3545; color: white; border-radius: 4px; text-decoration: none; font-size: 1.3rem;">
+                                                                Hủy đơn
+                                                            </a>
+                                                        </c:if>
                                                     </td>
                                                 </tr>
                                             </c:forEach>
