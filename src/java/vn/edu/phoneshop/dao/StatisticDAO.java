@@ -10,12 +10,12 @@ import vn.edu.phoneshop.utils.DBContext;
 
 public class StatisticDAO extends DBContext {
 
-    // Lấy thống kê doanh thu theo tháng (Yêu cầu của bạn)
+    // Lấy thống kê doanh thu theo tháng
     public List<RevenueStat> getMonthlyRevenue() {
         List<RevenueStat> list = new ArrayList<>();
         String sql = "SELECT YEAR(OrderDate) AS [Year], MONTH(OrderDate) AS [Month], "
                 + "COUNT(OrderID) AS [OrderCount], SUM(TotalMoney) AS [TotalRevenue] "
-                + "FROM Orders WHERE Status != 0 "
+                + "FROM Orders WHERE Status = 4 "
                 + "GROUP BY YEAR(OrderDate), MONTH(OrderDate) "
                 + "ORDER BY YEAR(OrderDate) DESC, MONTH(OrderDate) DESC";
         try (Connection conn = getConnection();
@@ -40,7 +40,7 @@ public class StatisticDAO extends DBContext {
         List<RevenueStat> list = new ArrayList<>();
         String sql = "SELECT CAST(OrderDate AS DATE) AS [Date], "
                 + "COUNT(OrderID) AS [OrderCount], SUM(TotalMoney) AS [TotalRevenue] "
-                + "FROM Orders WHERE Status != 0 "
+                + "FROM Orders WHERE Status = 4 "
                 + "GROUP BY CAST(OrderDate AS DATE) "
                 + "ORDER BY CAST(OrderDate AS DATE) DESC";
         try (Connection conn = getConnection();
@@ -65,7 +65,7 @@ public class StatisticDAO extends DBContext {
         String sql = "SELECT p.ProductName, COUNT(DISTINCT o.OrderID) AS [OrderCount], "
                 + "SUM(od.Quantity) AS [TotalQuantity], SUM(od.Quantity * od.Price) AS [TotalRevenue] "
                 + "FROM Products p JOIN OrderDetails od ON p.ProductID = od.ProductID "
-                + "JOIN Orders o ON od.OrderID = o.OrderID WHERE o.Status != 0 "
+                + "JOIN Orders o ON od.OrderID = o.OrderID WHERE o.Status = 4 "
                 + "GROUP BY p.ProductID, p.ProductName ORDER BY SUM(od.Quantity * od.Price) DESC";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -128,7 +128,7 @@ public class StatisticDAO extends DBContext {
 
     // Doanh thu tháng hiện tại
     public double getCurrentMonthRevenue() {
-        String sql = "SELECT SUM(TotalMoney) FROM Orders WHERE Status != 0 AND MONTH(OrderDate) = MONTH(GETDATE()) AND YEAR(OrderDate) = YEAR(GETDATE())";
+        String sql = "SELECT SUM(TotalMoney) FROM Orders WHERE Status = 4 AND MONTH(OrderDate) = MONTH(GETDATE()) AND YEAR(OrderDate) = YEAR(GETDATE())";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
