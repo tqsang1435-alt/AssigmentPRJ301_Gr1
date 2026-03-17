@@ -20,13 +20,7 @@ public class SupplierDAO extends DBContext {
                 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Supplier s = new Supplier(
-                        rs.getInt("SupplierID"),
-                        rs.getString("SupplierName"),
-                        rs.getString("Phone"),
-                        rs.getString("Email"),
-                        rs.getString("Address"));
-                list.add(s);
+                list.add(mapResultSetToSupplier(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,12 +72,7 @@ public class SupplierDAO extends DBContext {
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new Supplier(
-                        rs.getInt("SupplierID"),
-                        rs.getString("SupplierName"),
-                        rs.getString("Phone"),
-                        rs.getString("Email"),
-                        rs.getString("Address"));
+                return mapResultSetToSupplier(rs);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,9 +84,12 @@ public class SupplierDAO extends DBContext {
         return new Supplier(
                 rs.getInt("SupplierID"),
                 rs.getString("SupplierName"),
+                rs.getString("ContactName"),
                 rs.getString("Phone"),
                 rs.getString("Email"),
-                rs.getString("Address"));
+                rs.getString("Address"),
+                rs.getString("Logo"),
+                rs.getBoolean("status"));
     }
 
     public Supplier findById(int id) {
