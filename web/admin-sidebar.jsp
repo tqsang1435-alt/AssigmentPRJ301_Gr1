@@ -56,4 +56,4 @@
         </ul>
     </div>
 
-    <!-- <jsp:include page="chat-widget.jsp" /> -->
+    <jsp:include page="chat-widget.jsp" />

@@ -177,50 +177,74 @@ public class ChatBotServlet extends HttpServlet {
         sb.append(
                 "Bạn là trợ lý AI thông minh dành riêng cho Admin của PhoneShop. Dưới đây là dữ liệu hệ thống hiện tại:\n");
         try {
-            vn.edu.phoneshop.dao.ProductDAO dao = new vn.edu.phoneshop.dao.ProductDAO();
-            java.sql.Connection conn = null;
-            dao.getAllActiveProducts(); // Kích hoạt kết nối (nếu cần)
-            Class<?> clazz = dao.getClass();
-            while (clazz != null) {
-                for (java.lang.reflect.Field field : clazz.getDeclaredFields()) {
-                    if (field.getType() == java.sql.Connection.class) {
-                        field.setAccessible(true);
-                        conn = (java.sql.Connection) field.get(dao);
-                        break;
-                    }
+            class AdminDB extends vn.edu.phoneshop.utils.DBContext {
+                public java.sql.Connection getDbConnection() throws Exception {
+                    return getConnection();
                 }
-                if (conn != null)
-                    break;
-                clazz = clazz.getSuperclass();
             }
-
-            if (conn != null && !conn.isClosed()) {
-                sb.append("- TOP KHÁCH HÀNG MUA NHIỀU NHẤT (dựa trên điểm tích lũy):\n");
+            AdminDB db = new AdminDB();
+            try (java.sql.Connection conn = db.getDbConnection()) {
+                sb.append("- DANH SÁCH 10 KHÁCH HÀNG MỚI NHẤT:\n");
                 try (java.sql.Statement stmt = conn.createStatement();
                         java.sql.ResultSet rs = stmt.executeQuery(
-                                "SELECT TOP 5 UserID, FullName, RewardPoints FROM Users ORDER BY RewardPoints DESC")) {
+                                "SELECT TOP 10 UserID, FullName, Email, PhoneNumber, Address, RewardPoints FROM Users ORDER BY UserID DESC")) {
                     while (rs.next()) {
-                        sb.append(String.format("  + ID: %s | Tên: %s | Điểm: %d\n", rs.getString("UserID"),
-                                rs.getString("FullName"), rs.getInt("RewardPoints")));
+                        sb.append(String.format("  + ID: %s | Tên: %s | Email: %s | SĐT: %s | Địa chỉ: %s | Điểm: %d\n",
+                                rs.getString("UserID"),
+                                rs.getString("FullName"),
+                                rs.getString("Email"),
+                                rs.getString("PhoneNumber"),
+                                rs.getString("Address"),
+                                rs.getInt("RewardPoints")));
                     }
                 } catch (Exception e) {
-                    try (java.sql.Statement stmt = conn.createStatement();
-                            java.sql.ResultSet rs = stmt.executeQuery(
-                                    "SELECT TOP 5 UserID, FullName, RewardPoints FROM [User] ORDER BY RewardPoints DESC")) {
-                        while (rs.next()) {
-                            sb.append(String.format("  + ID: %s | Tên: %s | Điểm: %d\n", rs.getString("UserID"),
-                                    rs.getString("FullName"), rs.getInt("RewardPoints")));
+                    sb.append("  (Không thể tải dữ liệu khách hàng)\n");
+                }
+
+                sb.append("\n- DANH SÁCH 10 ĐƠN HÀNG GẦN ĐÂY:\n");
+                try (java.sql.Statement stmt = conn.createStatement();
+                        java.sql.ResultSet rs = stmt.executeQuery(
+                                "SELECT TOP 10 o.OrderID, o.UserID, u.FullName, o.TotalMoney, o.Status, o.OrderDate FROM Orders o JOIN Users u ON o.UserID = u.UserID ORDER BY o.OrderDate DESC")) {
+                    while (rs.next()) {
+                        String statusStr = "";
+                        switch (rs.getInt("Status")) {
+                            case 0:
+                                statusStr = "Hủy";
+                                break;
+                            case 1:
+                                statusStr = "Chờ xác nhận";
+                                break;
+                            case 2:
+                                statusStr = "Đang đóng gói";
+                                break;
+                            case 3:
+                                statusStr = "Đang giao";
+                                break;
+                            case 4:
+                                statusStr = "Hoàn thành";
+                                break;
+                            default:
+                                statusStr = "Không rõ";
+                                break;
                         }
-                    } catch (Exception ex) {
-                        sb.append("  (Không thể tải dữ liệu khách hàng do sai tên bảng)\n");
+                        sb.append(String.format(
+                                "  + Đơn hàng ID: %d | KH ID: %s | Tên KH: %s | Tổng tiền: %,.0f | Trạng thái: %s | Ngày: %s\n",
+                                rs.getInt("OrderID"),
+                                rs.getString("UserID"),
+                                rs.getString("FullName"),
+                                rs.getDouble("TotalMoney"),
+                                statusStr,
+                                rs.getTimestamp("OrderDate")));
                     }
+                } catch (Exception e) {
+                    sb.append("  (Không thể tải dữ liệu đơn hàng)\n");
                 }
             }
         } catch (Exception e) {
+            sb.append("  (Lỗi kết nối cơ sở dữ liệu: ").append(e.getMessage()).append(")\n");
         }
-
         sb.append(
-                "\nHãy dùng dữ liệu trên để trả lời câu hỏi của Admin. Nếu admin yêu cầu thực hiện thao tác (thêm/sửa/xóa), hãy lịch sự từ chối và báo rằng bạn hiện tại chỉ có quyền đọc dữ liệu (Read-only).\n");
+                "\nHãy dùng các thông tin trên để phân tích và trả lời câu hỏi của Admin. Nếu admin hỏi thông tin không có trong danh sách trên, hãy báo rằng dữ liệu cung cấp bị giới hạn. Nếu admin yêu cầu thực hiện thao tác (thêm/sửa/xóa), hãy lịch sự từ chối và báo rằng bạn hiện tại chỉ có quyền đọc dữ liệu (Read-only).\n");
         return sb.toString();
     }
 

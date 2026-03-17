@@ -11,9 +11,9 @@ import java.util.List;
 import vn.edu.phoneshop.dao.UserDAO;
 import vn.edu.phoneshop.model.User;
 
-@WebServlet(name = "UserControl", urlPatterns = {"/user-login", "/user-register", "/user-profile", "/user-logout",
-    "/edit-profile",
-    "/update-profile", "/admin-delete-user", "/admin-customer-list"})
+@WebServlet(name = "UserControl", urlPatterns = { "/user-login", "/user-register", "/user-profile", "/user-logout",
+        "/edit-profile",
+        "/update-profile", "/admin-delete-user", "/admin-customer-list" })
 public class UserControl extends HttpServlet {
 
     // Xử lý Đăng nhập
@@ -26,7 +26,7 @@ public class UserControl extends HttpServlet {
 
         if (user != null) {
             if ("Admin".equalsIgnoreCase(user.getRole())) {
-                request.setAttribute("mess", "Vui lòng đăng nhập bằng Cổng Quản trị Admin (/admin-login).");
+                request.setAttribute("mess", "Bạn không có quyền truy cập tài khoản quản trị này.");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
                 return;
             }
