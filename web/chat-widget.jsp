@@ -46,13 +46,14 @@
             appendMessage(message, "user");
             input.value = ""; // Xóa ô nhập
 
+            var mode = "${sessionScope.ACC.role == 'Admin' ? 'admin' : 'user'}";
             // 2. Gửi tin nhắn đến Servlet qua API fetch
             fetch("chat-bot", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
                 },
-                body: "message=" + encodeURIComponent(message)
+                body: "message=" + encodeURIComponent(message) + "&mode=" + mode
             })
                 .then(response => response.text())
                 .then(data => {

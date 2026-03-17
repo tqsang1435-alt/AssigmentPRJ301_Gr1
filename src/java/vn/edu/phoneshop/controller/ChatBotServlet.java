@@ -138,7 +138,10 @@ public class ChatBotServlet extends HttpServlet {
             conn.setReadTimeout(30000);
             conn.setDoOutput(true);
 
-            String escapedMessage = message.replace("\\", "\\\\")
+            String context = getAdminContext();
+            String fullPrompt = context + "\n\nAdmin hỏi: " + message;
+
+            String escapedMessage = fullPrompt.replace("\\", "\\\\")
                     .replace("\"", "\\\"")
                     .replace("\n", "\\n")
                     .replace("\r", "");
@@ -167,6 +170,58 @@ public class ChatBotServlet extends HttpServlet {
             e.printStackTrace();
             return "Có lỗi xảy ra khi kết nối với AI: " + e.getMessage();
         }
+    }
+
+    private String getAdminContext() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(
+                "Bạn là trợ lý AI thông minh dành riêng cho Admin của PhoneShop. Dưới đây là dữ liệu hệ thống hiện tại:\n");
+        try {
+            vn.edu.phoneshop.dao.ProductDAO dao = new vn.edu.phoneshop.dao.ProductDAO();
+            java.sql.Connection conn = null;
+            dao.getAllActiveProducts(); // Kích hoạt kết nối (nếu cần)
+            Class<?> clazz = dao.getClass();
+            while (clazz != null) {
+                for (java.lang.reflect.Field field : clazz.getDeclaredFields()) {
+                    if (field.getType() == java.sql.Connection.class) {
+                        field.setAccessible(true);
+                        conn = (java.sql.Connection) field.get(dao);
+                        break;
+                    }
+                }
+                if (conn != null)
+                    break;
+                clazz = clazz.getSuperclass();
+            }
+
+            if (conn != null && !conn.isClosed()) {
+                sb.append("- TOP KHÁCH HÀNG MUA NHIỀU NHẤT (dựa trên điểm tích lũy):\n");
+                try (java.sql.Statement stmt = conn.createStatement();
+                        java.sql.ResultSet rs = stmt.executeQuery(
+                                "SELECT TOP 5 UserID, FullName, RewardPoints FROM Users ORDER BY RewardPoints DESC")) {
+                    while (rs.next()) {
+                        sb.append(String.format("  + ID: %s | Tên: %s | Điểm: %d\n", rs.getString("UserID"),
+                                rs.getString("FullName"), rs.getInt("RewardPoints")));
+                    }
+                } catch (Exception e) {
+                    try (java.sql.Statement stmt = conn.createStatement();
+                            java.sql.ResultSet rs = stmt.executeQuery(
+                                    "SELECT TOP 5 UserID, FullName, RewardPoints FROM [User] ORDER BY RewardPoints DESC")) {
+                        while (rs.next()) {
+                            sb.append(String.format("  + ID: %s | Tên: %s | Điểm: %d\n", rs.getString("UserID"),
+                                    rs.getString("FullName"), rs.getInt("RewardPoints")));
+                        }
+                    } catch (Exception ex) {
+                        sb.append("  (Không thể tải dữ liệu khách hàng do sai tên bảng)\n");
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+
+        sb.append(
+                "\nHãy dùng dữ liệu trên để trả lời câu hỏi của Admin. Nếu admin yêu cầu thực hiện thao tác (thêm/sửa/xóa), hãy lịch sự từ chối và báo rằng bạn hiện tại chỉ có quyền đọc dữ liệu (Read-only).\n");
+        return sb.toString();
     }
 
     private String getProductContext() {
