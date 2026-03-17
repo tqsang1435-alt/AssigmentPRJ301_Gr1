@@ -55,3 +55,5 @@
             </li>
         </ul>
     </div>
+
+    <!-- <jsp:include page="chat-widget.jsp" /> -->

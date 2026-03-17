@@ -19,17 +19,17 @@
                             </a>
                             <ul class="header__sub-nav">
                                 <li class="header__sub-nav-item"><a
-                                        href="${pageContext.request.contextPath}/home?brand=Apple"
+                                        href="${pageContext.request.contextPath}/search?searchName=iPhone"
                                         class="header__sub-nav-link">Apple (iPhone)</a>
                                 </li>
                                 <li class="header__sub-nav-item"><a
-                                        href="${pageContext.request.contextPath}/home?brand=Samsung"
+                                        href="${pageContext.request.contextPath}/search?searchName=Samsung"
                                         class="header__sub-nav-link">Samsung</a></li>
                                 <li class="header__sub-nav-item"><a
-                                        href="${pageContext.request.contextPath}/home?brand=Oppo"
+                                        href="${pageContext.request.contextPath}/search?searchName=Oppo"
                                         class="header__sub-nav-link">Oppo</a></li>
                                 <li class="header__sub-nav-item"><a
-                                        href="${pageContext.request.contextPath}/home?brand=Xiaomi"
+                                        href="${pageContext.request.contextPath}/search?searchName=Xiaomi"
                                         class="header__sub-nav-link">Xiaomi</a></li>
                             </ul>
                         </li>

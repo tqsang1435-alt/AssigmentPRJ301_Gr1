@@ -121,6 +121,29 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- KHU VỰC AI DỰ ĐOÁN -->
+                                <div class="row" style="margin-top: 20px;">
+                                    <div class="col l-12 m-12 c-12">
+                                        <div class="card">
+                                            <div class="card-header"
+                                                style="display: flex; justify-content: space-between; align-items: center;">
+                                                <h3 class="card-title"><i class="ti-wand"
+                                                        style="color: var(--primary-color);"></i> AI Phân Tích & Dự Đoán
+                                                </h3>
+                                                <button id="btn-ai-analyze" class="btn btn--primary"
+                                                    style="height: 36px; padding: 0 15px; border-radius: 4px; border: none; cursor: pointer; color: #fff; background-color: var(--primary-color);">Phân
+                                                    tích ngay</button>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="ai-result"
+                                                    style="padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 100px; font-size: 1.5rem; line-height: 1.6; white-space: pre-wrap; color: var(--text-color);">
+                                                    Nhấn nút "Phân tích ngay" để AI đưa ra nhận xét về tình hình kinh
+                                                    doanh và dự đoán xu hướng sắp tới dựa trên dữ liệu hiện tại...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                 </div>
@@ -169,7 +192,58 @@
                         },
                         options: { responsive: true, maintainAspectRatio: false }
                     });
+
+                    // AI Phân tích
+                    document.getElementById('btn-ai-analyze').addEventListener('click', function () {
+                        const btn = this;
+                        const resultDiv = document.getElementById('ai-result');
+
+                        btn.disabled = true;
+                        btn.innerText = 'Đang phân tích...';
+                        resultDiv.innerHTML = '<div style="text-align: center; color: #666;"><i class="ti-reload" style="animation: spin 1s linear infinite; display: inline-block;"></i> AI đang xử lý dữ liệu...</div>';
+
+                        const prompt = "Bạn là chuyên gia phân tích dữ liệu kinh doanh. Dưới đây là số liệu của cửa hàng PhoneShop:\n" +
+                            "- Tổng khách hàng: ${totalCustomers}\n" +
+                            "- Tổng sản phẩm: ${totalProducts}\n" +
+                            "- Đơn hàng mới: ${newOrders}\n" +
+                            "- Doanh thu tháng này: ${monthRevenue} VNĐ\n" +
+                            "- Doanh thu theo ngày: " + JSON.stringify(${ dailyData }) + "\n" +
+                            "- Doanh thu theo tháng: " + JSON.stringify(${ monthlyData }) + "\n\n" +
+                            "Dựa vào các số liệu trên, hãy đánh giá tình hình kinh doanh hiện tại, dự đoán xu hướng tháng tới và đề xuất 3 hành động cụ thể để tăng doanh thu. Viết ngắn gọn, trình bày rõ ràng.";
+
+                        const formData = new URLSearchParams();
+                        formData.append('message', prompt);
+                        formData.append('mode', 'admin');
+
+                        fetch('chat-bot', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: formData.toString()
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                let formattedData = data.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                                formattedData = formattedData.replace(/(^|\n)\* (.*?)/g, '$1• $2');
+                                resultDiv.innerHTML = formattedData;
+                            })
+                            .catch(error => {
+                                resultDiv.innerHTML = '<span style="color: red;">Lỗi kết nối đến AI. Vui lòng thử lại sau.</span>';
+                            })
+                            .finally(() => {
+                                btn.disabled = false;
+                                btn.innerText = 'Phân tích ngay';
+                            });
+                    });
                 </script>
+                <style>
+                    @keyframes spin {
+                        100% {
+                            transform: rotate(360deg);
+                        }
+                    }
+                </style>
             </body>
 
             </html>
