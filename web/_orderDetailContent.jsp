@@ -58,8 +58,9 @@
                 <tbody>
                     <c:forEach items="${detailList}" var="item">
                         <tr>
-                            <td><img src="${item.imageURL}" alt=""
-                                    style="width: 50px; height: 50px; object-fit: contain;"></td>
+                            <td><img src="${not empty item.imageURL ? item.imageURL : 'assets/img/default-phone.png'}"
+                                    alt="" style="width: 50px; height: 50px; object-fit: contain;"
+                                    onerror="this.onerror=null; this.src='assets/img/default-phone.png';"></td>
                             <td>${not empty item.productName ? item.productName : productNames[item.productId]}</td>
                             <td>
                                 <fmt:formatNumber value="${item.price}" pattern="#,##0" /> ₫
