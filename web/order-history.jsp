@@ -155,6 +155,36 @@
                         color: #777;
                         margin-bottom: 20px;
                     }
+
+                    .btn-cancel {
+                        color: #dc3545;
+                        border-color: #dc3545;
+                    }
+
+                    .btn-cancel:hover {
+                        background-color: #dc3545;
+                        color: #fff;
+                    }
+
+                    .alert {
+                        padding: 15px;
+                        margin-bottom: 20px;
+                        border: 1px solid transparent;
+                        border-radius: 4px;
+                        font-size: 1.4rem;
+                    }
+
+                    .alert-success {
+                        color: #155724;
+                        background-color: #d4edda;
+                        border-color: #c3e6cb;
+                    }
+
+                    .alert-danger {
+                        color: #721c24;
+                        background-color: #f8d7da;
+                        border-color: #f5c6cb;
+                    }
                 </style>
             </head>
 
@@ -171,6 +201,18 @@
                         </div>
 
                         <div class="history-card">
+                            <c:if test="${not empty sessionScope.successMessage}">
+                                <div class="alert alert-success" role="alert">
+                                    ${sessionScope.successMessage}
+                                </div>
+                                <c:remove var="successMessage" scope="session" />
+                            </c:if>
+                            <c:if test="${not empty sessionScope.errorMessage}">
+                                <div class="alert alert-danger" role="alert">
+                                    ${sessionScope.errorMessage}
+                                </div>
+                                <c:remove var="errorMessage" scope="session" />
+                            </c:if>
                             <c:choose>
                                 <c:when test="${empty listOrders}">
                                     <div class="empty-state">
@@ -231,6 +273,13 @@
                                                     <td style="text-align: center;">
                                                         <a href="order-detail?id=${o.orderId}" class="btn-view"><i
                                                                 class="ti-eye"></i> Chi tiết</a>
+                                                        <c:if test="${o.status == 1}">
+                                                            <a href="cancel-order?id=${o.orderId}"
+                                                                class="btn-view btn-cancel"
+                                                                onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng #${o.orderId} không?');">
+                                                                <i class="ti-close"></i> Hủy đơn
+                                                            </a>
+                                                        </c:if>
                                                     </td>
                                                 </tr>
                                             </c:forEach>
