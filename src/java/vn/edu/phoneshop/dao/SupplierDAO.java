@@ -20,13 +20,7 @@ public class SupplierDAO extends DBContext {
                 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Supplier s = new Supplier(
-                        rs.getInt("SupplierID"),
-                        rs.getString("SupplierName"),
-                        rs.getString("Phone"),
-                        rs.getString("Email"),
-                        rs.getString("Address"));
-                list.add(s);
+                list.add(mapResultSetToSupplier(rs));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,6 +44,25 @@ public class SupplierDAO extends DBContext {
         }
     }
 
+    public void insert(Supplier supplier) {
+        String sql = "INSERT INTO Suppliers (SupplierName, ContactName, Phone, Email, Address, Logo, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, supplier.getName());
+            ps.setString(2, supplier.getContactName());
+            ps.setString(3, supplier.getPhone());
+            ps.setString(4, supplier.getEmail());
+            ps.setString(5, supplier.getAddress());
+            ps.setString(6, supplier.getLogo());
+            ps.setBoolean(7, supplier.isStatus());
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public Supplier getSupplierByID(String id) {
         String sql = "SELECT * FROM Suppliers WHERE SupplierID = ?";
 
@@ -59,12 +72,7 @@ public class SupplierDAO extends DBContext {
             ps.setString(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                return new Supplier(
-                        rs.getInt("SupplierID"),
-                        rs.getString("SupplierName"),
-                        rs.getString("Phone"),
-                        rs.getString("Email"),
-                        rs.getString("Address"));
+                return mapResultSetToSupplier(rs);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,9 +84,12 @@ public class SupplierDAO extends DBContext {
         return new Supplier(
                 rs.getInt("SupplierID"),
                 rs.getString("SupplierName"),
+                rs.getString("ContactName"),
                 rs.getString("Phone"),
                 rs.getString("Email"),
-                rs.getString("Address"));
+                rs.getString("Address"),
+                rs.getString("Logo"),
+                rs.getBoolean("status"));
     }
 
     public Supplier findById(int id) {
@@ -108,6 +119,25 @@ public class SupplierDAO extends DBContext {
             ps.setString(3, email);
             ps.setString(4, address);
             ps.setString(5, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void update(Supplier supplier) {
+        String sql = "UPDATE Suppliers SET SupplierName = ?, ContactName = ?, Phone = ?, Email = ?, Address = ?, Logo = ?, status = ? WHERE SupplierID = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, supplier.getName());
+            ps.setString(2, supplier.getContactName());
+            ps.setString(3, supplier.getPhone());
+            ps.setString(4, supplier.getEmail());
+            ps.setString(5, supplier.getAddress());
+            ps.setString(6, supplier.getLogo());
+            ps.setBoolean(7, supplier.isStatus());
+            ps.setInt(8, supplier.getId());
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();

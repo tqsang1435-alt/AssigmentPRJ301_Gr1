@@ -215,6 +215,9 @@
                                                         style="position: relative;">
                                                         <div class="home-product-item__img"
                                                             style="background-image: url('${not empty p.imageURL ? p.imageURL : 'assets/img/default-phone.png'}');">
+                                                            <img src="${not empty p.imageURL ? p.imageURL : 'assets/img/default-phone.png'}"
+                                                                style="display: none;"
+                                                                onerror="this.onerror=null; this.parentElement.style.backgroundImage='url(\'assets/img/default-phone.png\')';" />
                                                         </div>
                                                         <c:if test="${discountPercent > 0}">
                                                             <div class="home-product-item__sale-off"

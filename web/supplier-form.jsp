@@ -83,6 +83,16 @@
                                                 value="${supplier.logo}">
                                         </div>
 
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Status</label>
+                                            <select name="status" class="form-control">
+                                                <option value="true" ${supplier==null || supplier.status ? 'selected'
+                                                    : '' }>Active</option>
+                                                <option value="false" ${supplier !=null && !supplier.status ? 'selected'
+                                                    : '' }>Inactive</option>
+                                            </select>
+                                        </div>
+
                                         <div class="mt-4 d-flex justify-content-between">
                                             <a href="supplier" class="btn btn-secondary">Back</a>
                                             <button type="submit" class="btn btn-success">

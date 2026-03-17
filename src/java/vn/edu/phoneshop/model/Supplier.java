@@ -1,6 +1,7 @@
 package vn.edu.phoneshop.model;
 
 public class Supplier {
+
     private int id;
     private String name;
     private String phone;
@@ -44,7 +45,6 @@ public class Supplier {
         this.address = address;
     }
 
-    // Getters và Setters (Bắt buộc để JSP hiểu được)
     public int getId() {
         return id;
     }

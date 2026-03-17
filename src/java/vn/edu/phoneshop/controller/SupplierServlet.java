@@ -96,6 +96,11 @@ public class SupplierServlet extends HttpServlet {
             String address = request.getParameter("address");
             String logo = request.getParameter("logo");
 
+            boolean status = true;
+            if (request.getParameter("status") != null) {
+                status = Boolean.parseBoolean(request.getParameter("status"));
+            }
+
             // basic server-side validation
             if (name == null || name.trim().isEmpty()) {
                 request.setAttribute("error", "Supplier name is required.");
@@ -105,12 +110,12 @@ public class SupplierServlet extends HttpServlet {
                 if (idStr != null && !idStr.isEmpty()) {
                     try {
                         int id = Integer.parseInt(idStr);
-                        sErr = new Supplier(id, name, contact, phone, email, address, logo, true);
+                        sErr = new Supplier(id, name, contact, phone, email, address, logo, status);
                     } catch (NumberFormatException ex) {
-                        sErr = new Supplier(name, contact, phone, email, address, logo, true);
+                        sErr = new Supplier(name, contact, phone, email, address, logo, status);
                     }
                 } else {
-                    sErr = new Supplier(name, contact, phone, email, address, logo, true);
+                    sErr = new Supplier(name, contact, phone, email, address, logo, status);
                 }
                 request.setAttribute("supplier", sErr);
                 request.getRequestDispatcher("supplier-form.jsp").forward(request, response);
@@ -119,15 +124,15 @@ public class SupplierServlet extends HttpServlet {
 
             if ("add".equals(action)) {
 
-                Supplier s = new Supplier(name, contact, phone, email, address, logo, true);
-//                dao.insert(s);
+                Supplier s = new Supplier(name, contact, phone, email, address, logo, status);
+                dao.insert(s);
                 request.getSession().setAttribute("message", "Supplier added successfully.");
 
             } else if ("update".equals(action)) {
 
                 int id = Integer.parseInt(request.getParameter("id"));
-                Supplier s = new Supplier(id, name, contact, phone, email, address, logo, true);
-//                dao.update(s);  
+                Supplier s = new Supplier(id, name, contact, phone, email, address, logo, status);
+                dao.update(s);
                 request.getSession().setAttribute("message", "Supplier updated successfully.");
             }
 

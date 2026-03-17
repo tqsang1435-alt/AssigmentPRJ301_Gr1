@@ -53,10 +53,12 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th>ID</th>
+                                                <!-- <th>Logo</th> -->
                                                 <th>Name</th>
                                                 <th>Contact</th>
                                                 <th>Phone</th>
                                                 <th>Email</th>
+                                                <th>Address</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
@@ -65,10 +67,21 @@
                                             <c:forEach items="${suppliers}" var="s">
                                                 <tr>
                                                     <td>${s.id}</td>
+                                                    <!-- <td>
+                                                        <c:choose>
+                                                            <c:when test="${not empty s.logo}">
+                                                                <img src="${s.logo}" alt="Logo" width="50" height="50" style="object-fit: contain; border: 1px solid #ddd; border-radius: 4px; background-color: #fff;">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <div style="width: 50px; height: 50px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: #999; font-size: 10px; border: 1px solid #ddd;">N/A</div>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td> -->
                                                     <td>${s.name}</td>
                                                     <td>${s.contactName}</td>
                                                     <td>${s.phone}</td>
                                                     <td>${s.email}</td>
+                                                    <td>${s.address}</td>
                                                     <td>
                                                         <c:choose>
                                                             <c:when test="${s.status}"><span
