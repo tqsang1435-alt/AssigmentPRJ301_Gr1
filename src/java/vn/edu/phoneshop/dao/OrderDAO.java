@@ -135,7 +135,7 @@ public class OrderDAO extends DBContext {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     OrderDetail od = new OrderDetail();
-                    od.setDetailId(rs.getInt("DetailID"));
+                    od.setDetailId(rs.getInt("OrderDetailID"));
                     od.setOrderId(rs.getInt("OrderID"));
                     od.setProductId(rs.getInt("ProductID"));
                     od.setQuantity(rs.getInt("Quantity"));
@@ -152,7 +152,8 @@ public class OrderDAO extends DBContext {
     }
 
     public Order getOrderById(int orderId) {
-        String sql = "SELECT * FROM Orders WHERE OrderID = ?";
+        String sql = "SELECT o.*, u.FullName, u.PhoneNumber " +
+                "FROM Orders o JOIN Users u ON o.UserID = u.UserID WHERE o.OrderID = ?";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
@@ -166,6 +167,8 @@ public class OrderDAO extends DBContext {
                     o.setShippingAddress(rs.getString("ShippingAddress"));
                     o.setNote(rs.getString("Note"));
                     o.setStatus(rs.getInt("Status"));
+                    o.setCustomerName(rs.getString("FullName"));
+                    // Giả sử bạn có thêm trường phone trong model Order để tiện hiển thị
                     return o;
                 }
             }

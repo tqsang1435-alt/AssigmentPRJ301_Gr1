@@ -67,7 +67,7 @@
                                             </a>
                                         </li>
                                         <li class="header__sub-nav-item">
-                                            <a href="${pageContext.request.contextPath}/purchase-history"
+                                            <a href="${pageContext.request.contextPath}/order-history"
                                                 class="header__sub-nav-link">
                                                 <i class="ti-receipt" style="margin-right: 8px;"></i> Lịch sử mua hàng
                                             </a>

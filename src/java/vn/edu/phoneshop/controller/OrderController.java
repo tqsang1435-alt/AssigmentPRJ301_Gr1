@@ -44,7 +44,8 @@ public class OrderController extends HttpServlet {
                 Order order = orderDAO.getOrderById(orderId);
 
                 // 2. Bảo mật: Đảm bảo người dùng chỉ xem được đơn hàng của chính mình
-                if (order != null && order.getUserId() == user.getUserID()) {
+                if (order != null
+                        && (order.getUserId() == user.getUserID() || "Admin".equalsIgnoreCase(user.getRole()))) {
                     List<OrderDetail> details = orderDAO.getOrderDetailByOrderID(orderId);
                     Map<Integer, String> pNames = orderDAO.getProductNamesMap(orderId);
 

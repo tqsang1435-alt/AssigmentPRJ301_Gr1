@@ -1,16 +1,95 @@
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
-    <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-        <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+        <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
             <!DOCTYPE html>
-            <html>
+            <html lang="vi">
 
             <head>
                 <meta charset="UTF-8">
-                <title>Lịch sử mua hàng | PHONEShop</title>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <title>Lịch sử mua hàng - PhoneShop</title>
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/cssreset.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/grid.css">
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
+                <link rel="stylesheet"
+                    href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
                 <style>
-                    /* Khớp mã màu với trạng thái từ Controller */
+                    .history-wrap {
+                        padding: 40px 0 60px 0;
+                        background-color: #f5f5f5;
+                        min-height: 70vh;
+                    }
+
+                    .history-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 25px;
+                    }
+
+                    .history-title {
+                        font-size: 2.4rem;
+                        color: var(--text-color);
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        margin: 0;
+                    }
+
+                    .history-card {
+                        background: #fff;
+                        border-radius: 8px;
+                        padding: 25px;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                        overflow-x: auto;
+                    }
+
+                    .history-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        min-width: 800px;
+                    }
+
+                    .history-table th,
+                    .history-table td {
+                        padding: 16px 15px;
+                        text-align: left;
+                        font-size: 1.4rem;
+                        border-bottom: 1px solid #eee;
+                    }
+
+                    .history-table th {
+                        background-color: #f8f9fa;
+                        font-weight: 600;
+                        color: #555;
+                        text-transform: uppercase;
+                        font-size: 1.3rem;
+                    }
+
+                    .history-table tbody tr:hover {
+                        background-color: #f1f5f9;
+                    }
+
+                    .price-col {
+                        color: var(--primary-color);
+                        font-weight: bold;
+                    }
+
+                    .badge-status {
+                        padding: 6px 12px;
+                        border-radius: 50px;
+                        font-size: 1.2rem;
+                        color: #fff;
+                        font-weight: 600;
+                        display: inline-block;
+                        text-align: center;
+                        min-width: 100px;
+                    }
+
+                    .status-0 {
+                        background-color: #6c757d;
+                    }
+
+                    /* Hủy */
                     .status-1 {
                         background-color: #ffc107;
                         color: #000;
@@ -18,136 +97,152 @@
 
                     /* Chờ xác nhận */
                     .status-2 {
-                        background-color: #0dcaf0;
-                        color: #000;
+                        background-color: #17a2b8;
+                    }
+
+                    /* Đang đóng gói */
+                    .status-3 {
+                        background-color: #0d6efd;
                     }
 
                     /* Đang giao */
-                    .status-3 {
-                        background-color: #dc3545;
-                        color: white;
-                    }
-
-                    /* Đã hủy */
                     .status-4 {
                         background-color: #198754;
-                        color: white;
                     }
 
                     /* Hoàn thành */
-                    .status-0 {
-                        background-color: #6c757d;
-                        color: white;
+
+                    .btn-view {
+                        text-decoration: none;
+                        color: var(--primary-color);
+                        border: 1px solid var(--primary-color);
+                        background-color: transparent;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        font-size: 1.3rem;
+                        transition: all 0.2s;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 5px;
                     }
 
-                    /* Khác */
-
-                    .table-container {
-                        border-radius: 15px;
-                        overflow: hidden;
-                        border: none;
-                    }
-
-                    .price-text {
-                        color: #d63031;
-                        font-weight: 700;
+                    .btn-view:hover {
+                        background-color: var(--primary-color);
+                        color: #fff;
                     }
 
                     .empty-state {
-                        padding: 80px 0;
                         text-align: center;
-                        background: white;
-                        border-radius: 15px;
+                        padding: 60px 20px;
+                    }
+
+                    .empty-state i {
+                        font-size: 6rem;
+                        color: #ccc;
+                        margin-bottom: 20px;
+                        display: block;
+                    }
+
+                    .empty-state h3 {
+                        font-size: 2rem;
+                        color: #333;
+                        margin-bottom: 10px;
+                        font-weight: 500;
+                    }
+
+                    .empty-state p {
+                        font-size: 1.4rem;
+                        color: #777;
+                        margin-bottom: 20px;
                     }
                 </style>
             </head>
 
-            <body class="bg-light">
-                <jsp:include page="navbar.jsp" />
+            <body>
+                <jsp:include page="header.jsp" />
 
-                <div class="container mt-5">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="fw-bold"><i class="fa-solid fa-clock-rotate-left me-2"></i>LỊCH SỬ ĐƠN HÀNG</h2>
-                        <a href="home" class="btn btn-outline-primary rounded-pill px-4 text-decoration-none">
-                            <i class="fa-solid fa-arrow-left me-1"></i> Tiếp tục mua sắm
-                        </a>
-                    </div>
+                <div class="history-wrap">
+                    <div class="grid wide">
+                        <div class="history-header">
+                            <h2 class="history-title"><i class="ti-receipt" style="color: var(--primary-color);"></i>
+                                Lịch sử đơn hàng</h2>
+                            <a href="${pageContext.request.contextPath}/home" class="btn btn--primary"><i
+                                    class="ti-shopping-cart"></i> &nbsp;Tiếp tục mua sắm</a>
+                        </div>
 
-                    <c:choose>
-                        <c:when test="${empty orderList}">
-                            <div class="empty-state shadow-sm">
-                                <i class="fa-solid fa-box-open fa-4x text-muted mb-3"></i>
-                                <h4 class="text-muted">Hiện tại bạn đang không có đơn hàng nào</h4>
-                                <p class="text-secondary">Hãy khám phá thêm các sản phẩm tuyệt vời của chúng tôi!</p>
-                                <a href="home" class="btn btn-primary rounded-pill px-5 mt-2">Mua sắm ngay</a>
-                            </div>
-                        </c:when>
-
-                        <c:otherwise>
-                            <div class="card table-container shadow-sm">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="table-dark">
+                        <div class="history-card">
+                            <c:choose>
+                                <c:when test="${empty listOrders}">
+                                    <div class="empty-state">
+                                        <i class="ti-package"></i>
+                                        <h3>Bạn chưa có đơn hàng nào</h3>
+                                        <p>Hãy tham khảo các sản phẩm tuyệt vời tại PhoneShop nhé!</p>
+                                        <a href="${pageContext.request.contextPath}/home" class="btn btn--primary">Mua
+                                            sắm ngay</a>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <table class="history-table">
+                                        <thead>
                                             <tr>
-                                                <th class="ps-4">STT</th>
+                                                <th>Mã ĐH</th>
                                                 <th>Ngày đặt</th>
-                                                <th>Tổng tiền</th>
                                                 <th>Địa chỉ giao hàng</th>
+                                                <th>Tổng tiền</th>
                                                 <th>Trạng thái</th>
-                                                <th class="text-center">Thao tác</th>
+                                                <th style="text-align: center;">Thao tác</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <c:forEach items="${orderList}" var="o" varStatus="loop">
+                                            <c:forEach items="${listOrders}" var="o">
                                                 <tr>
-                                                    <td class="ps-4 fw-bold text-primary">${loop.count}</td>
+                                                    <td style="font-weight: bold; color: var(--text-color);">
+                                                        #${o.orderId}</td>
                                                     <td>
                                                         <fmt:formatDate value="${o.orderDate}"
                                                             pattern="dd/MM/yyyy HH:mm" />
                                                     </td>
-                                                    <td class="price-text">
-                                                        <fmt:formatNumber value="${o.totalMoney}" groupingUsed="true" />
-                                                        đ
+                                                    <td style="color: #666;"><i class="ti-location-pin"
+                                                            style="color: var(--primary-color);"></i> ${not empty
+                                                        o.shippingAddress ? o.shippingAddress : 'Chưa cập nhật'}</td>
+                                                    <td class="price-col">
+                                                        <fmt:formatNumber value="${o.totalMoney}" pattern="#,##0" /> ₫
                                                     </td>
-
-                                                    <%-- FIX: Sử dụng đúng thuộc tính shippingAddress từ model Order
-                                                        --%>
-                                                        <td class="text-muted small">
-                                                            <i class="fa-solid fa-location-dot me-1 text-danger"></i>
-                                                            <c:out
-                                                                value="${not empty o.shippingAddress ? o.shippingAddress : 'Chưa cập nhật'}" />
-                                                        </td>
-
-                                                        <td>
-                                                            <span
-                                                                class="badge rounded-pill status-${o.status} px-3 py-2">
-                                                                <c:choose>
-                                                                    <c:when test="${o.status == 1}">Chờ xác nhận
-                                                                    </c:when>
-                                                                    <c:when test="${o.status == 2}">Đang giao</c:when>
-                                                                    <c:when test="${o.status == 3}">Đã hủy đơn</c:when>
-                                                                    <c:when test="${o.status == 4}">Hoàn thành</c:when>
-                                                                    <c:otherwise>Đang xử lý</c:otherwise>
-                                                                </c:choose>
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <a href="order-detail?id=${o.orderID}"
-                                                                class="btn btn-sm btn-outline-dark rounded-pill px-3">
-                                                                <i class="fa-solid fa-eye me-1"></i>Chi tiết
-                                                            </a>
-                                                        </td>
+                                                    <td>
+                                                        <c:choose>
+                                                            <c:when test="${o.status == 0}"><span
+                                                                    class="badge-status status-0">Đã hủy</span></c:when>
+                                                            <c:when test="${o.status == 1}"><span
+                                                                    class="badge-status status-1">Chờ xác nhận</span>
+                                                            </c:when>
+                                                            <c:when test="${o.status == 2}"><span
+                                                                    class="badge-status status-2">Đang đóng gói</span>
+                                                            </c:when>
+                                                            <c:when test="${o.status == 3}"><span
+                                                                    class="badge-status status-3">Đang giao</span>
+                                                            </c:when>
+                                                            <c:when test="${o.status == 4}"><span
+                                                                    class="badge-status status-4">Hoàn thành</span>
+                                                            </c:when>
+                                                            <c:otherwise><span class="badge-status status-1">Đang xử
+                                                                    lý</span></c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td style="text-align: center;">
+                                                        <a href="order-detail?id=${o.orderId}" class="btn-view"><i
+                                                                class="ti-eye"></i> Chi tiết</a>
+                                                    </td>
                                                 </tr>
                                             </c:forEach>
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
                 </div>
 
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <jsp:include page="footer.jsp" />
             </body>
 
             </html>

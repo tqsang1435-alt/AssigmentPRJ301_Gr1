@@ -1,6 +1,5 @@
 package vn.edu.phoneshop.controller;
 
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -34,7 +33,8 @@ public class WarrantyServlet extends HttpServlet {
 
         request.setAttribute("imei", imei);
 
-        // If IMEI is associated with an order, load order meta and items and compute warranty
+        // If IMEI is associated with an order, load order meta and items and compute
+        // warranty
         if (imei != null && imei.getOrderId() != null && imei.getOrderId() > 0) {
             int orderId = imei.getOrderId();
             Map<String, Object> orderMeta = new HashMap<>();
