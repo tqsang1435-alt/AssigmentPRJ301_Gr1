@@ -78,8 +78,11 @@
                                                     <c:forEach items="${listP}" var="p">
                                                         <tr>
                                                             <td>#${p.productID}</td>
-                                                            <td><img src="${p.imageURL}" alt=""
-                                                                    style="width: 50px; height: 50px; object-fit: contain;">
+                                                            <td>
+                                                                <img src="${not empty p.imageURL ? p.imageURL : pageContext.request.contextPath += '/assets/img/default-phone.png'}"
+                                                                    alt=""
+                                                                    style="width: 50px; height: 50px; object-fit: contain;"
+                                                                    onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/img/default-phone.png';">
                                                             </td>
                                                             <td>${p.productName}</td>
                                                             <td style="color: var(--primary-color); font-weight: bold;">
@@ -103,45 +106,53 @@
                                                     </c:forEach>
                                                 </tbody>
                                             </table>
-                                            
+
                                             <%-- Pagination Controls --%>
-                                            <c:if test="${totalPages > 1}">
-                                                <div class="pagination" style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;">
-                                                    <%-- Previous Button --%>
-                                                    <c:if test="${currentPage > 1}">
-                                                        <a href="admin-product-list?page=${currentPage - 1}&searchName=${searchName}&ramFilter=${selectedRam}&romFilter=${selectedRom}" class="btn">Trước</a>
-                                                    </c:if>
+                                                <c:if test="${totalPages > 1}">
+                                                    <div class="pagination"
+                                                        style="display: flex; justify-content: center; gap: 5px; margin-top: 20px;">
+                                                        <%-- Previous Button --%>
+                                                            <c:if test="${currentPage > 1}">
+                                                                <a href="admin-product-list?page=${currentPage - 1}&searchName=${searchName}&ramFilter=${selectedRam}&romFilter=${selectedRom}"
+                                                                    class="btn">Trước</a>
+                                                            </c:if>
 
-                                                    <%-- Page Numbers --%>
-                                                    <c:set var="showEllipsis" value="false" />
-                                                    <c:forEach begin="1" end="${totalPages}" var="i">
-                                                        <c:choose>
-                                                            <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+                                                            <%-- Page Numbers --%>
                                                                 <c:set var="showEllipsis" value="false" />
-                                                                <c:choose>
-                                                                    <c:when test="${currentPage == i}">
-                                                                        <a href="#" class="btn btn--primary">${i}</a>
-                                                                    </c:when>
-                                                                    <c:otherwise>
-                                                                        <a href="admin-product-list?page=${i}&searchName=${searchName}&ramFilter=${selectedRam}&romFilter=${selectedRom}" class="btn">${i}</a>
-                                                                    </c:otherwise>
-                                                                </c:choose>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <c:if test="${!showEllipsis}">
-                                                                    <span class="btn" style="pointer-events: none; border: none; background: transparent; padding: 0 5px; box-shadow: none;">...</span>
-                                                                    <c:set var="showEllipsis" value="true" />
-                                                                </c:if>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </c:forEach>
+                                                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                                                    <c:choose>
+                                                                        <c:when
+                                                                            test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+                                                                            <c:set var="showEllipsis" value="false" />
+                                                                            <c:choose>
+                                                                                <c:when test="${currentPage == i}">
+                                                                                    <a href="#"
+                                                                                        class="btn btn--primary">${i}</a>
+                                                                                </c:when>
+                                                                                <c:otherwise>
+                                                                                    <a href="admin-product-list?page=${i}&searchName=${searchName}&ramFilter=${selectedRam}&romFilter=${selectedRom}"
+                                                                                        class="btn">${i}</a>
+                                                                                </c:otherwise>
+                                                                            </c:choose>
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            <c:if test="${!showEllipsis}">
+                                                                                <span class="btn"
+                                                                                    style="pointer-events: none; border: none; background: transparent; padding: 0 5px; box-shadow: none;">...</span>
+                                                                                <c:set var="showEllipsis"
+                                                                                    value="true" />
+                                                                            </c:if>
+                                                                        </c:otherwise>
+                                                                    </c:choose>
+                                                                </c:forEach>
 
-                                                    <%-- Next Button --%>
-                                                    <c:if test="${currentPage < totalPages}">
-                                                        <a href="admin-product-list?page=${currentPage + 1}&searchName=${searchName}&ramFilter=${selectedRam}&romFilter=${selectedRom}" class="btn">Tiếp</a>
-                                                    </c:if>
-                                                </div>
-                                            </c:if>
+                                                                <%-- Next Button --%>
+                                                                    <c:if test="${currentPage < totalPages}">
+                                                                        <a href="admin-product-list?page=${currentPage + 1}&searchName=${searchName}&ramFilter=${selectedRam}&romFilter=${selectedRom}"
+                                                                            class="btn">Tiếp</a>
+                                                                    </c:if>
+                                                    </div>
+                                                </c:if>
                                         </div>
                                 </div>
                             </div>
