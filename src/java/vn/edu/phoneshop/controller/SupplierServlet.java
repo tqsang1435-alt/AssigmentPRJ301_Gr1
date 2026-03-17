@@ -127,7 +127,7 @@ public class SupplierServlet extends HttpServlet {
 
                 int id = Integer.parseInt(request.getParameter("id"));
                 Supplier s = new Supplier(id, name, contact, phone, email, address, logo, true);
-//                dao.update(s);
+//                dao.update(s);  
                 request.getSession().setAttribute("message", "Supplier updated successfully.");
             }
 

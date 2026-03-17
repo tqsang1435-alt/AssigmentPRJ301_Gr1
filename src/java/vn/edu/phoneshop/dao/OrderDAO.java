@@ -151,6 +151,30 @@ public class OrderDAO extends DBContext {
         return list;
     }
 
+    public Order getOrderById(int orderId) {
+        String sql = "SELECT * FROM Orders WHERE OrderID = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Order o = new Order();
+                    o.setOrderId(rs.getInt("OrderID"));
+                    o.setUserId(rs.getInt("UserID"));
+                    o.setOrderDate(rs.getTimestamp("OrderDate"));
+                    o.setTotalMoney(rs.getDouble("TotalMoney"));
+                    o.setShippingAddress(rs.getString("ShippingAddress"));
+                    o.setNote(rs.getString("Note"));
+                    o.setStatus(rs.getInt("Status"));
+                    return o;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public Map<Integer, String> getProductNamesMap(int orderId) {
         Map<Integer, String> productNames = new HashMap<>();
         String sql = "SELECT p.ProductID, p.ProductName " +
