@@ -9,8 +9,9 @@ import java.sql.SQLException;
  * @author tqsan
  */
 public class DBContext {
+
     private static final String USER = "sa";
-    private static final String PASS = "sa";
+    private static final String PASS = "123";
     private static final String SERVER = "localhost";
     private static final String PORT = "1433";
     private static final String DB_NAME = "PhoneShopDB";

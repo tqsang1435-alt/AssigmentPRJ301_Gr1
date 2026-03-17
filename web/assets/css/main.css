@@ -76,7 +76,7 @@
     border-radius: 4px;
     height: 40px;
     overflow: hidden;
-    margin: 0 30px; 
+    margin: 0 30px;
 }
 
 .header__search-input {
@@ -268,14 +268,89 @@
 
 /* FOOTER */
 .footer {
+    border-top: 4px solid var(--primary-color, #ee4d2d);
+    padding-top: 35px;
     background-color: var(--black-color);
-    padding: 20px 0;
+}
+
+.footer__heading {
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    color: var(--white-color, #fff);
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.footer-list {
+    padding-left: 0;
+    list-style: none;
+    margin-top: 0;
+}
+
+.footer-item {
+    margin-bottom: 12px;
+}
+
+.footer-item__link {
+    text-decoration: none;
+    font-size: 1.3rem;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.footer-item__link:hover {
+    color: var(--primary-color, #ee4d2d);
+}
+
+.footer-item__icon {
+    font-size: 1.6rem;
+    margin-right: 8px;
+    color: #aaa;
+}
+
+.footer-item__link:hover .footer-item__icon {
+    color: var(--primary-color, #ee4d2d);
+}
+
+.footer__download {
+    display: flex;
+}
+
+.footer__download-qr {
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--border-color, #dbdbdb);
+    margin-right: 15px;
+    background-color: var(--white-color, #fff);
+    padding: 4px;
+}
+
+.footer__download-apps {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.footer__download-app-img {
+    height: 20px;
+    margin-bottom: 5px;
+    background-color: var(--white-color, #fff);
+    padding: 2px 4px;
+    border-radius: 2px;
+}
+
+.footer__bottom {
+    background-color: #111;
+    padding: 12px 0;
+    margin-top: 30px;
     text-align: center;
 }
 
 .footer__text {
-    color: var(--white-color);
     font-size: 1.4rem;
+    color: #aaa;
     margin: 0;
 }
 
@@ -920,6 +995,7 @@
     background-color: #fff;
     padding: 15px;
     background-clip: content-box;
+    background-origin: content-box;
     transition: transform 0.3s ease-in-out;
 }
 

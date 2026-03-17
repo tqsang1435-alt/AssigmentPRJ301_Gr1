@@ -31,6 +31,7 @@ public class SearchController extends HttpServlet {
         String ramFilter = request.getParameter("ramFilter");
         String romFilter = request.getParameter("romFilter");
         String pageStr = request.getParameter("page");
+        String sortPrice = request.getParameter("sortPrice");
 
         ProductDAO dao = new ProductDAO();
 
@@ -42,6 +43,15 @@ public class SearchController extends HttpServlet {
         List<Product> fullList = dao.searchAndFilterProducts(search, ramFilter, romFilter);
         if (fullList == null)
             fullList = new ArrayList<>();
+
+        // Sắp xếp theo giá
+        if (sortPrice != null && !sortPrice.isEmpty()) {
+            if (sortPrice.equals("asc")) {
+                fullList.sort((p1, p2) -> Double.compare(p1.getPrice(), p2.getPrice()));
+            } else if (sortPrice.equals("desc")) {
+                fullList.sort((p1, p2) -> Double.compare(p2.getPrice(), p1.getPrice()));
+            }
+        }
 
         // Xử lý phân trang thủ công trên danh sách kết quả
         int page = 1;

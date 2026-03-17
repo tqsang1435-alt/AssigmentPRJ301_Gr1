@@ -27,7 +27,14 @@ public class ChatBotServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/plain;charset=UTF-8");
         String message = request.getParameter("message");
-        String reply = callGeminiAPI(message);
+        String mode = request.getParameter("mode");
+
+        String reply;
+        if ("admin".equals(mode)) {
+            reply = callGeminiAPIForAdmin(message);
+        } else {
+            reply = callGeminiAPI(message);
+        }
 
         try (PrintWriter out = response.getWriter()) {
             out.write(reply);
@@ -99,6 +106,62 @@ public class ChatBotServlet extends HttpServlet {
                     System.err.println("Gemini API Error: " + errorResponse.toString());
                     return "Lỗi kết nối AI (" + responseCode + "): " + errorResponse.toString();
                 }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Có lỗi xảy ra khi kết nối với AI: " + e.getMessage();
+        }
+    }
+
+    private String callGeminiAPIForAdmin(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return "Không có dữ liệu để phân tích.";
+        }
+
+        String apiKey = System.getenv("GEMINI_API_KEY");
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            System.err.println("LỖI: Chưa cấu hình biến môi trường GEMINI_API_KEY!");
+            return "Hệ thống đang bảo trì (Lỗi thiếu API Key).";
+        }
+
+        apiKey = apiKey.trim();
+        String modelName = "gemini-2.5-flash";
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key="
+                + apiKey;
+
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(30000);
+            conn.setDoOutput(true);
+
+            String escapedMessage = message.replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "");
+            String jsonInputString = "{\"contents\": [{\"parts\": [{\"text\": \"" + escapedMessage + "\"}]}]}";
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 200) {
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder responseBuilder = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        responseBuilder.append(responseLine.trim());
+                    }
+                    return extractTextFromGeminiResponse(responseBuilder.toString());
+                }
+            } else {
+                return "Lỗi kết nối AI (" + responseCode + ")";
             }
         } catch (Exception e) {
             e.printStackTrace();
