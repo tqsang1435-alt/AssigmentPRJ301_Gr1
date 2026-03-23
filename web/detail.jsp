@@ -87,10 +87,16 @@
 
                                                     <div class="product-meta">
                                                         <i class="ti-check-box"></i> Tình trạng:
-                                                        <span
-                                                            style="color: ${product.stockQuantity > 0 ? '#28a745' : '#dc3545'};">
-                                                            ${product.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}
-                                                        </span>
+                                                        <c:if test="${product.stockQuantity > 0}">
+                                                            <span style="color: #28a745;">
+                                                                Còn ${product.stockQuantity} sản phẩm
+                                                            </span>
+                                                        </c:if>
+                                                        <c:if test="${product.stockQuantity <= 0}">
+                                                            <span style="color: #dc3545;">
+                                                                Hết hàng
+                                                            </span>
+                                                        </c:if>
                                                     </div>
                                                     <div class="product-meta">
                                                         <i class="ti-tag"></i> Mã sản phẩm:

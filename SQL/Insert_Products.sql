@@ -180,3 +180,11 @@ GO
 -- 3. Bật lại kiểm tra khóa
 ALTER TABLE [dbo].[Products] CHECK CONSTRAINT ALL;
 GO
+
+-- 4. Cập nhật số lượng tồn kho ngẫu nhiên cho mỗi sản phẩm (từ 1 đến 100)
+UPDATE Products SET StockQuantity = ABS(CHECKSUM(NEWID())) % 100 + 1;
+GO
+
+-- 5. Kiểm tra kết quả
+SELECT ProductID, ProductName, StockQuantity FROM Products;
+GO

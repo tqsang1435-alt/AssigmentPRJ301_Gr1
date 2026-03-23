@@ -14,6 +14,7 @@ import java.util.Map;
 import vn.edu.phoneshop.dao.OrderDAO;
 import vn.edu.phoneshop.dao.ProductDAO;
 import vn.edu.phoneshop.model.Cart;
+import vn.edu.phoneshop.model.CartItem;
 import vn.edu.phoneshop.model.Product;
 import vn.edu.phoneshop.model.User;
 
@@ -24,7 +25,8 @@ import vn.edu.phoneshop.model.User;
     "/add-cart",
     "/remove-from-cart",
     "/update-cart",
-    "/clear-cart"
+    "/clear-cart",
+    "/toggle-select"
 })
 public class CartController extends HttpServlet {
 
@@ -55,6 +57,9 @@ public class CartController extends HttpServlet {
                 break;
             case "/clear-cart":
                 clearCart(request, response);
+                break;
+            case "/toggle-select":
+                toggleSelect(request, response);
                 break;
             default:
                 response.sendRedirect(request.getContextPath() + "/view-cart");
@@ -129,6 +134,16 @@ public class CartController extends HttpServlet {
                 } else {
                     cart = new Cart();
                 }
+                
+                // Kiểm tra tồn kho
+                CartItem existing = cart.getItemByProductID(productID);
+                int currentQty = (existing != null) ? existing.getQuantity() : 0;
+                if (currentQty + quantity > product.getStockQuantity()) {
+                    session.setAttribute("errorMessage", "Sản phẩm " + product.getProductName() + " không đủ hàng. Chỉ còn " + product.getStockQuantity() + " sản phẩm.");
+                    response.sendRedirect(request.getContextPath() + "/view-cart");
+                    return;
+                }
+                
                 cart.addProduct(product, quantity);
                 session.setAttribute("cart", cart);
                 session.setAttribute("cartCount", cart.getTotalQuantity());
@@ -188,7 +203,7 @@ public class CartController extends HttpServlet {
                 request.setAttribute("quickProduct", p);
                 request.setAttribute("payMode", "single");
             } else {
-                Map<Integer, Integer> cartItems = (Map<Integer, Integer>) session.getAttribute("cart"); // Fallback for add-cart style, but this is conflicting with Cart model above
+                Map<Integer, Integer> cartItems = (Map<Integer, Integer>) session.getAttribute("cart_map"); // Fallback for add-cart style, but this is conflicting with Cart model above
                 if (cartItems != null) { // Note: original AddCartController used Map cart, while AddToCart used model.Cart!
                     for (Integer pId : cartItems.keySet()) {
                         Product p = productDAO.getProductByID(pId);
@@ -321,7 +336,9 @@ public class CartController extends HttpServlet {
                 Product p = productDAO.getProductByID(productID);
                 if (p != null) {
                     if (quantity > p.getStockQuantity()) {
-                        quantity = p.getStockQuantity();
+                        session.setAttribute("errorMessage", "Sản phẩm " + p.getProductName() + " không đủ hàng. Chỉ còn " + p.getStockQuantity() + " sản phẩm.");
+                        response.sendRedirect(request.getContextPath() + "/view-cart");
+                        return;
                     }
                 }
 
@@ -342,5 +359,33 @@ public class CartController extends HttpServlet {
         Cart cart = new Cart();
         session.setAttribute("cart", cart);
         response.sendRedirect(request.getContextPath() + "/view-cart");
+    }
+
+    private void toggleSelect(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String productIDStr = request.getParameter("productID");
+
+            if (productIDStr == null || productIDStr.isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/view-cart");
+                return;
+            }
+
+            int productID = Integer.parseInt(productIDStr);
+
+            HttpSession session = request.getSession();
+            Cart cart = (Cart) session.getAttribute("cart");
+
+            if (cart != null) {
+                CartItem item = cart.getItemByProductID(productID);
+                if (item != null) {
+                    item.setSelected(!item.isSelected()); // toggle
+                }
+            }
+
+            response.sendRedirect(request.getContextPath() + "/view-cart");
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/view-cart");
+        }
     }
 }
