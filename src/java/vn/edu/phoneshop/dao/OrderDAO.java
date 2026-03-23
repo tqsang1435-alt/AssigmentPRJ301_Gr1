@@ -28,6 +28,7 @@ public class OrderDAO extends DBContext {
                 o.setNote(rs.getString("Note"));
                 o.setStatus(rs.getInt("Status"));
                 o.setCustomerName(rs.getString("FullName"));
+                o.setVoucherID(rs.getInt("VoucherID"));
                 list.add(o);
             }
         } catch (Exception e) {
@@ -50,13 +51,18 @@ public class OrderDAO extends DBContext {
     }
 
     // Tạo đơn hàng mới và trả về ID (Dùng cho Checkout)
-    public int createOrder(int userId, double totalMoney, int status) {
-        String sql = "INSERT INTO Orders (UserID, OrderDate, TotalMoney, Status) VALUES (?, GETDATE(), ?, ?)";
+    public int createOrder(int userId, double totalMoney, int status, int voucherID) {
+        String sql = "INSERT INTO Orders (UserID, OrderDate, TotalMoney, Status, VoucherID) VALUES (?, GETDATE(), ?, ?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, userId);
             ps.setDouble(2, totalMoney);
             ps.setInt(3, status);
+            if (voucherID > 0) {
+                ps.setInt(4, voucherID);
+            } else {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            }
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -115,6 +121,7 @@ public class OrderDAO extends DBContext {
                     o.setShippingAddress(rs.getString("ShippingAddress"));
                     o.setNote(rs.getString("Note"));
                     o.setStatus(rs.getInt("Status"));
+                    o.setVoucherID(rs.getInt("VoucherID"));
                     list.add(o);
                 }
             }

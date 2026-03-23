@@ -230,6 +230,17 @@
 
                                                     <h4 class="home-product-item__name">${p.productName}</h4>
 
+                                                    <c:if test="${p.stockQuantity > 0}">
+                                                        <div class="home-product-item__stock" style="font-size: 1.2rem; color: #28a745; margin-bottom: 8px;">
+                                                            Còn ${p.stockQuantity} sản phẩm
+                                                        </div>
+                                                    </c:if>
+                                                    <c:if test="${p.stockQuantity <= 0}">
+                                                        <div class="home-product-item__stock" style="font-size: 1.2rem; color: #dc3545; margin-bottom: 8px;">
+                                                            Hết hàng
+                                                        </div>
+                                                    </c:if>
+
                                                     <div class="home-product-item__price"
                                                         style="display: flex; flex-wrap: wrap; align-items: baseline;">
                                                         <c:if test="${discountPercent > 0}">

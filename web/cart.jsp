@@ -29,6 +29,21 @@
                                     <h1>Giỏ hàng của bạn</h1>
                                     <p>Kiểm tra và hoàn tất đơn hàng để nhận ngàn ưu đãi.</p>
                                 </div>
+                                
+                                <c:if test="${not empty error}">
+                                    <div class="error-message" style="color: red; background: #ffe6e6; padding: 10px; border: 1px solid #ffcccc; border-radius: 4px; margin-bottom: 20px;">
+                                        <i class="ti-alert" style="margin-right: 8px;"></i>
+                                        ${error}
+                                    </div>
+                                </c:if>
+                                
+                                <c:if test="${not empty sessionScope.errorMessage}">
+                                    <div class="error-message" style="color: red; background: #ffe6e6; padding: 10px; border: 1px solid #ffcccc; border-radius: 4px; margin-bottom: 20px;">
+                                        <i class="ti-alert" style="margin-right: 8px;"></i>
+                                        ${sessionScope.errorMessage}
+                                    </div>
+                                    <c:remove var="errorMessage" scope="session" />
+                                </c:if>
                             </div>
                         </div>
 
@@ -66,6 +81,13 @@
                                                 <div class="row no-gutters">
                                                     <div class="col l-5 m-5 c-12">
                                                         <div class="cart-item__product">
+                                                            <div class="cart-item__checkbox" style="margin-bottom: 10px;">
+                                                                <input type="checkbox" 
+                                                                       id="select-${item.product.productID}" 
+                                                                       ${item.selected ? 'checked' : ''} 
+                                                                       onchange="toggleSelect(${item.product.productID})">
+                                                                <label for="select-${item.product.productID}" style="margin-left: 8px; cursor: pointer;">Chọn để mua</label>
+                                                            </div>
                                                             <img src="${item.product.imageURL}" alt="Ảnh"
                                                                 class="cart-item__img">
                                                             <div class="cart-item__info">
@@ -188,6 +210,12 @@
                 </div>
 
                 <jsp:include page="footer.jsp" />
+
+                <script>
+                    function toggleSelect(productID) {
+                        window.location.href = '${pageContext.request.contextPath}/toggle-select?productID=' + productID;
+                    }
+                </script>
             </body>
 
             </html>

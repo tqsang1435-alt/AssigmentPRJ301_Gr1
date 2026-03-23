@@ -46,6 +46,31 @@
                                         <input id="address" name="address" type="text" class="form-control"
                                             placeholder="Nhập địa chỉ" value="${sessionScope.ACC.address}">
                                     </div>
+                                    <div class="form-group">
+                                        <label for="voucher" class="form-label">Mã giảm giá (tùy chọn)</label>
+                                        <input id="voucher" name="voucher" type="text" class="form-control"
+                                            placeholder="Nhập mã voucher hoặc chọn từ danh sách" value="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Chọn voucher có sẵn:</label>
+                                        <div class="voucher-list" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                            <c:forEach items="${validVouchers}" var="voucher">
+                                                <div class="voucher-item" style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; cursor: pointer; background: #f9f9f9;" onclick="selectVoucher('${voucher.code}')">
+                                                    <strong>${voucher.code}</strong><br>
+                                                    <c:choose>
+                                                        <c:when test="${voucher.discountType == 'percent'}">
+                                                            Giảm ${voucher.discountValue}% 
+                                                            <c:if test="${voucher.maxDiscount > 0}"> (tối đa <fmt:formatNumber value="${voucher.maxDiscount}" pattern="#,##0" /> đ)</c:if>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            Giảm <fmt:formatNumber value="${voucher.discountValue}" pattern="#,##0" /> đ
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <c:if test="${voucher.minOrderValue > 0}"><br>Đơn tối thiểu: <fmt:formatNumber value="${voucher.minOrderValue}" pattern="#,##0" /> đ</c:if>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </div>
                                     <button type="submit" class="btn btn--primary"
                                         style="min-width: 200px; height: 40px;">Hoàn tất đơn hàng</button>
                                 </form>
@@ -56,7 +81,7 @@
 
                                 <div class="checkout-cart-list"
                                     style="background: #fff; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                    <c:forEach items="${sessionScope.cart.cartItems}" var="item">
+                                    <c:forEach items="${sessionScope.cart.selectedItems}" var="item">
                                         <div class="checkout-item"
                                             style="display: flex; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                                             <img src="${item.product.imageURL}" alt="${item.product.productName}"
@@ -85,11 +110,11 @@
                                             style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.4rem;">
                                             <span>Tạm tính:</span>
                                             <span>
-                                                <fmt:formatNumber value="${sessionScope.cart.totalPrice}"
+                                                <fmt:formatNumber value="${sessionScope.cart.selectedTotalPrice}"
                                                     pattern="#,##0" /> đ
                                             </span>
                                         </div>
-                                        <c:if test="${sessionScope.cart.discountAmount > 0}">
+                                        <c:if test="${sessionScope.cart.rankDiscountAmount > 0}">
                                             <div
                                                 style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.4rem; color: #28a745;">
                                                 <span>Giảm giá hạng thành viên (
@@ -97,7 +122,17 @@
                                                         pattern="#,##0.#" />%):
                                                 </span>
                                                 <span>-
-                                                    <fmt:formatNumber value="${sessionScope.cart.discountAmount}"
+                                                    <fmt:formatNumber value="${sessionScope.cart.selectedTotalPrice * sessionScope.cart.discountPercent / 100}"
+                                                        pattern="#,##0" /> đ
+                                                </span>
+                                            </div>
+                                        </c:if>
+                                        <c:if test="${sessionScope.cart.voucherDiscount > 0}">
+                                            <div
+                                                style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 1.4rem; color: #28a745;">
+                                                <span>Giảm giá voucher (${appliedVoucher.code}):</span>
+                                                <span>-
+                                                    <fmt:formatNumber value="${sessionScope.cart.voucherDiscount}"
                                                         pattern="#,##0" /> đ
                                                 </span>
                                             </div>
@@ -106,7 +141,7 @@
                                             style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 2px solid #eee; font-size: 1.8rem; font-weight: bold;">
                                             <span>Tổng thanh toán:</span>
                                             <span style="color: var(--primary-color);">
-                                                <fmt:formatNumber value="${sessionScope.cart.finalTotalPrice}"
+                                                <fmt:formatNumber value="${sessionScope.cart.selectedFinalTotalPrice}"
                                                     pattern="#,##0" /> đ
                                             </span>
                                         </div>
@@ -119,5 +154,9 @@
 
                 <jsp:include page="footer.jsp" />
             </body>
-
+            <script>
+                function selectVoucher(code) {
+                    document.getElementById('voucher').value = code;
+                }
+            </script>
             </html>

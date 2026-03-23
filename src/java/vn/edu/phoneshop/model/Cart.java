@@ -8,7 +8,8 @@ import java.util.List;
  */
 public class Cart {
     private List<CartItem> cartItems;
-    private double discountPercent;
+    private double discountPercent; // Rank discount
+    private double voucherDiscount; // Voucher discount amount
 
     public Cart() {
         this.cartItems = new ArrayList<>();
@@ -101,10 +102,52 @@ public class Cart {
     }
 
     public double getDiscountAmount() {
+        return (getTotalPrice() * (discountPercent / 100.0)) + voucherDiscount;
+    }
+
+    public double getRankDiscountAmount() {
         return getTotalPrice() * (discountPercent / 100.0);
     }
 
     public double getFinalTotalPrice() {
         return getTotalPrice() - getDiscountAmount();
     }
+
+    // Lấy danh sách các items được chọn
+    public List<CartItem> getSelectedItems() {
+        List<CartItem> selected = new ArrayList<>();
+        for (CartItem item : cartItems) {
+            if (item.isSelected()) {
+                selected.add(item);
+            }
+        }
+        return selected;
+    }
+
+    // Tính tổng tiền chỉ của items được chọn
+    public double getSelectedTotalPrice() {
+        return getSelectedItems().stream().mapToDouble(CartItem::getSubtotal).sum();
+    }
+
+    // Tính số tiền giảm giá cho selected items
+    public double getSelectedDiscountAmount() {
+        return (getSelectedTotalPrice() * (discountPercent / 100.0)) + voucherDiscount;
+    }
+
+    // Tính tổng tiền sau giảm giá cho selected items
+    public double getSelectedFinalTotalPrice() {
+        return getSelectedTotalPrice() - getSelectedDiscountAmount();
+    }
+
+    // Tính tổng số lượng items được chọn
+    public int getSelectedTotalQuantity() {
+        return getSelectedItems().stream().mapToInt(CartItem::getQuantity).sum();
+    }
+    public double getVoucherDiscount() {
+        return voucherDiscount;
+    }
+
+    public void setVoucherDiscount(double voucherDiscount) {
+        this.voucherDiscount = voucherDiscount;
+    }}
 }

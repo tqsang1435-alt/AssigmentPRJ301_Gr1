@@ -1,6 +1,7 @@
 package vn.edu.phoneshop.controller;
 
 import java.io.IOException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,9 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.edu.phoneshop.dao.OrderDAO;
 import vn.edu.phoneshop.dao.UserDAO;
+import vn.edu.phoneshop.dao.VoucherDAO;
 import vn.edu.phoneshop.model.Cart;
 import vn.edu.phoneshop.model.CartItem;
 import vn.edu.phoneshop.model.User;
+import vn.edu.phoneshop.model.Voucher;
 
 @WebServlet(name = "CheckoutControl", urlPatterns = { "/checkout" })
 public class CheckoutControl extends HttpServlet {
@@ -29,16 +32,27 @@ public class CheckoutControl extends HttpServlet {
 
         // Check if cart is empty
         Cart cart = (Cart) session.getAttribute("cart");
-        if (cart == null || cart.getTotalQuantity() == 0) {
+        if (cart == null || cart.getSelectedTotalQuantity() == 0) {
             // Redirect to cart page with an error message
-            request.setAttribute("mess", "Giỏ hàng của bạn đang trống, không thể thanh toán!");
-            request.getRequestDispatcher("/view-cart").forward(request, response);
+            request.setAttribute("mess", "Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+            request.getRequestDispatcher("/cart.jsp").forward(request, response);
             return;
         }
 
         // Tính toán giảm giá theo hạng thành viên
         double discountPercent = getDiscountPercent(account.getCustomerType());
-        cart.setDiscountPercent(discountPercent); // Lưu % giảm giá vào giỏ hàng
+        cart.setDiscountPercent(discountPercent);
+        cart.setVoucherDiscount(0); // Reset voucher discount
+
+        // Lấy danh sách voucher hợp lệ
+        VoucherDAO voucherDAO = new VoucherDAO();
+        List<Voucher> validVouchers = voucherDAO.getAllValidVouchers();
+        if (validVouchers.isEmpty()) {
+            voucherDAO.seedVouchers();
+            validVouchers = voucherDAO.getAllValidVouchers();
+        }
+        request.setAttribute("validVouchers", validVouchers);
+        request.setAttribute("appliedVoucher", null); // Reset applied voucher
 
         // Forward to the checkout page to display it
         request.getRequestDispatcher("checkout.jsp").forward(request, response);
@@ -63,9 +77,16 @@ public class CheckoutControl extends HttpServlet {
             return;
         }
 
+        if (cart.getSelectedTotalQuantity() == 0) {
+            request.setAttribute("mess", "Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+            request.getRequestDispatcher("checkout.jsp").forward(request, response);
+            return;
+        }
+
         String name = request.getParameter("name");
         String phone = request.getParameter("phone");
         String address = request.getParameter("address");
+        String voucherCode = request.getParameter("voucher");
 
         // 1. Kiểm tra dữ liệu nhập vào có bị trống không
         if (name == null || name.trim().isEmpty() || phone == null || phone.trim().isEmpty() || address == null
@@ -82,20 +103,65 @@ public class CheckoutControl extends HttpServlet {
             return;
         }
 
-        // Tính toán tổng tiền sau khi giảm giá theo rank
+        // 3. Xử lý voucher
+        VoucherDAO voucherDAO = new VoucherDAO();
+        int voucherID = 0;
+        double voucherDiscount = 0;
+        if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+            Voucher voucher = voucherDAO.getVoucherByCode(voucherCode.trim());
+            if (voucher == null) {
+                request.setAttribute("mess", "Mã voucher không tồn tại!");
+                request.getRequestDispatcher("checkout.jsp").forward(request, response);
+                return;
+            }
+            if (!voucherDAO.isVoucherValid(voucher)) {
+                request.setAttribute("mess", "Mã voucher không hợp lệ hoặc đã hết hạn!");
+                request.getRequestDispatcher("checkout.jsp").forward(request, response);
+                return;
+            }
+            // Tính discount tạm thời để check min order
+            double tempTotal = cart.getTotalPrice();
+            double rankDiscount = tempTotal * (getDiscountPercent(user.getCustomerType()) / 100.0);
+            double subtotalAfterRank = tempTotal - rankDiscount;
+            if (subtotalAfterRank < voucher.getMinOrderValue()) {
+                request.setAttribute("mess", "Đơn hàng chưa đạt giá trị tối thiểu để sử dụng voucher này!");
+                request.getRequestDispatcher("checkout.jsp").forward(request, response);
+                return;
+            }
+            // Tính voucher discount
+            if ("percent".equals(voucher.getDiscountType())) {
+                voucherDiscount = subtotalAfterRank * (voucher.getDiscountValue() / 100.0);
+                if (voucher.getMaxDiscount() > 0 && voucherDiscount > voucher.getMaxDiscount()) {
+                    voucherDiscount = voucher.getMaxDiscount();
+                }
+            } else if ("fixed".equals(voucher.getDiscountType())) {
+                voucherDiscount = voucher.getDiscountValue();
+            }
+            voucherID = voucher.getVoucherID();
+            request.setAttribute("appliedVoucher", voucher);
+        }
+
+        // Tính toán tổng tiền sau khi giảm giá
         double discountPercent = getDiscountPercent(user.getCustomerType());
         cart.setDiscountPercent(discountPercent);
-        double totalMoney = cart.getFinalTotalPrice();
+        cart.setVoucherDiscount(voucherDiscount);
+        double selectedTotal = cart.getSelectedTotalPrice();
+        double discountAmount = selectedTotal * (discountPercent / 100.0) + voucherDiscount;
+        double totalMoney = selectedTotal - discountAmount; // đã tính dựa trên selected items
 
         OrderDAO dao = new OrderDAO();
         // Tạo đơn hàng mới với trạng thái 1 (Chờ xác nhận)
-        int orderId = dao.createOrder(user.getUserID(), totalMoney, 1);
+        int orderId = dao.createOrder(user.getUserID(), totalMoney, 1, voucherID);
 
         if (orderId > 0) {
             dao.updateOrderStatusAndAddress(orderId, 1, address);
-            for (CartItem item : cart.getCartItems()) {
+            for (CartItem item : cart.getSelectedItems()) {
                 dao.insertOrderDetail(orderId, item.getProduct().getProductID(), item.getQuantity(),
                         item.getProduct().getPrice());
+            }
+            // Tăng used count cho voucher
+            if (voucherID > 0) {
+                voucherDAO.incrementUsedCount(voucherID);
             }
             session.removeAttribute("cart");
             session.setAttribute("cartCount", 0);

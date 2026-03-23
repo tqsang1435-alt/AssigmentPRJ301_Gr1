@@ -11,6 +11,7 @@ public class Order {
     private String note;
     private int status;
     private String customerName;
+    private int voucherID;
 
     public int getOrderId() {
         return orderId;
@@ -74,5 +75,13 @@ public class Order {
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
+    }
+
+    public int getVoucherID() {
+        return voucherID;
+    }
+
+    public void setVoucherID(int voucherID) {
+        this.voucherID = voucherID;
     }
 }
