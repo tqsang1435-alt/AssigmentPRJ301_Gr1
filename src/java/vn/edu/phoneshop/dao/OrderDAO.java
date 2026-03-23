@@ -196,4 +196,47 @@ public class OrderDAO extends DBContext {
         }
         return productNames;
     }
+
+    public int getTotalOrders() {
+        String sql = "SELECT COUNT(*) FROM Orders";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Order> getOrdersWithCustomerNamePaginated(int offset, int limit) {
+        List<Order> list = new ArrayList<>();
+        String sql = "SELECT o.*, u.FullName FROM Orders o JOIN Users u ON o.UserID = u.UserID " +
+                     "ORDER BY o.OrderDate DESC " +
+                     "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, offset);
+            ps.setInt(2, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order o = new Order();
+                    o.setOrderId(rs.getInt("OrderID"));
+                    o.setUserId(rs.getInt("UserID"));
+                    o.setOrderDate(rs.getTimestamp("OrderDate"));
+                    o.setTotalMoney(rs.getDouble("TotalMoney"));
+                    o.setShippingAddress(rs.getString("ShippingAddress"));
+                    o.setNote(rs.getString("Note"));
+                    o.setStatus(rs.getInt("Status"));
+                    o.setCustomerName(rs.getString("FullName"));
+                    list.add(o);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

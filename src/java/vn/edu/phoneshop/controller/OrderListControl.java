@@ -26,8 +26,35 @@ public class OrderListControl extends HttpServlet {
         }
 
         OrderDAO orderDAO = new OrderDAO();
-        List<Order> orderList = orderDAO.getAllOrdersWithCustomerName();
+
+        // --- Pagination Logic ---
+        int page = 1;
+        int pageSize = 10; // So don hang moi trang
+
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        int totalOrders = orderDAO.getTotalOrders();
+        int totalPages = (int) Math.ceil((double) totalOrders / pageSize);
+
+        if (page < 1) {
+            page = 1;
+        } else if (page > totalPages && totalPages > 0) {
+            page = totalPages;
+        }
+
+        int offset = (page - 1) * pageSize;
+        List<Order> orderList = orderDAO.getOrdersWithCustomerNamePaginated(offset, pageSize);
+
         request.setAttribute("listOrders", orderList);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
 
         // Đánh dấu trang đang active cho sidebar
         request.setAttribute("activePage", "order-management");

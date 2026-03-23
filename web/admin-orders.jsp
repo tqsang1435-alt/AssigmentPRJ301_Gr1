@@ -153,6 +153,46 @@
                                                 </c:forEach>
                                             </tbody>
                                         </table>
+
+                                        <!-- Pagination -->
+                                        <c:if test="${totalPages > 1}">
+                                            <ul class="pagination" style="margin-top: 20px;">
+                                                <li class="pagination-item ${currentPage == 1 ? 'pagination-item--disabled' : ''}">
+                                                    <a href="order-list?page=${currentPage - 1}" class="pagination-item__link">
+                                                        <i class="ti-angle-left"></i>
+                                                    </a>
+                                                </li>
+
+                                                <c:set var="showEllipsis" value="false" />
+                                                <c:forEach begin="1" end="${totalPages}" var="i">
+                                                    <c:choose>
+                                                        <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
+                                                            <c:set var="showEllipsis" value="false" />
+                                                            <li class="pagination-item">
+                                                                <a href="order-list?page=${i}"
+                                                                    class="pagination-item__link ${currentPage == i ? 'pagination-item__link--active' : ''}">${i}</a>
+                                                            </li>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:if test="${!showEllipsis}">
+                                                                <li class="pagination-item">
+                                                                    <span class="pagination-item__link"
+                                                                        style="cursor: default; background: transparent; color: #939393;">...</span>
+                                                                </li>
+                                                                <c:set var="showEllipsis" value="true" />
+                                                            </c:if>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </c:forEach>
+
+                                                <li class="pagination-item ${currentPage == totalPages ? 'pagination-item--disabled' : ''}">
+                                                    <a href="order-list?page=${currentPage + 1}" class="pagination-item__link">
+                                                        <i class="ti-angle-right"></i>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </c:if>
+
                                     </div>
                                 </div>
                             </div>
