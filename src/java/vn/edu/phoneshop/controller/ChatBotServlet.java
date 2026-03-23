@@ -152,17 +152,19 @@ public class ChatBotServlet extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
         HttpSession session = request.getSession();
 
-        // Anti-spam Rate Limit User
-        Long lastReq = (Long) session.getAttribute("lastChatReqTs");
-        long now = System.currentTimeMillis();
-        if (lastReq != null && now - lastReq < 1500) {
-            response.getWriter().write("Hệ thống phát hiện spam. Vui lòng nhắn tin chậm lại vài giây nhé!");
-            return;
-        }
-        session.setAttribute("lastChatReqTs", now);
-
         String message = request.getParameter("message");
         String mode = request.getParameter("mode");
+
+        // Anti-spam Rate Limit: chỉ áp dụng cho user chat, KHÔNG áp dụng cho admin
+        if (!"admin".equals(mode)) {
+            Long lastReq = (Long) session.getAttribute("lastChatReqTs");
+            long now = System.currentTimeMillis();
+            if (lastReq != null && now - lastReq < 1500) {
+                response.getWriter().write("Hệ thống phát hiện spam. Vui lòng nhắn tin chậm lại vài giây nhé!");
+                return;
+            }
+            session.setAttribute("lastChatReqTs", now);
+        }
 
         System.out.println("\n========== CHATBOT NEW REQUEST ==========");
         System.out.println("MODE: " + mode + " | MESSAGE: " + message);
@@ -172,8 +174,14 @@ public class ChatBotServlet extends HttpServlet {
             return;
         }
 
-        if (message.length() > 500)
-            message = message.substring(0, 500) + "...";
+        // Admin mode cần prompt dài hơn (chứa dữ liệu ngày/tháng), nâng limit lên 3000
+        if ("admin".equals(mode)) {
+            if (message.length() > 3000)
+                message = message.substring(0, 3000) + "...";
+        } else {
+            if (message.length() > 500)
+                message = message.substring(0, 500) + "...";
+        }
 
         try {
             String reply = processChat(request, message, mode);
