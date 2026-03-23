@@ -63,9 +63,16 @@ public class ChatBotServlet extends HttpServlet {
         public boolean isBuying = false;
         public String exactPhrase = "";
         public List<String> keywords = new ArrayList<>();
+        /**
+         * Tên brand cụ thể user yêu cầu (vd: "iphone", "samsung", "oppo") - null nếu
+         * không xác định
+         */
+        public String requestedBrand = null;
 
         public boolean hasFullIntent() {
-            return maxPrice > 0 && (!ram.isEmpty() || !rom.isEmpty() || isGaming || !keywords.isEmpty());
+            // Updated: Coi là có đủ Intent nếu có bất kỳ tiêu chí lọc cứng nào (Giá, RAM,
+            // ROM, Gaming, Keywords)
+            return minPrice > 0 || maxPrice > 0 || !ram.isEmpty() || !rom.isEmpty() || isGaming || !keywords.isEmpty();
         }
     }
 
@@ -320,6 +327,58 @@ public class ChatBotServlet extends HttpServlet {
 
         boolean isFinalFallback = false;
         if (topProducts.isEmpty()) {
+            // --- Nếu user yêu cầu brand cụ thể mà không tìm thấy → Thông báo lịch sự,
+            // KHÔNG gợi ý brand khác ---
+            if (intent.requestedBrand != null && !intent.requestedBrand.isEmpty()) {
+                String brandDisplay = intent.requestedBrand.substring(0, 1).toUpperCase()
+                        + intent.requestedBrand.substring(1);
+                // Thử tìm xem có mẫu nào của brand đó trong kho không (để gợi ý thay thế)
+                String reqBrand = intent.requestedBrand.toLowerCase();
+                List<Product> sameBrandProducts = allProducts.stream()
+                        .filter(p -> p.getProductName().toLowerCase().contains(reqBrand))
+                        .sorted((p1, p2) -> Double.compare(p2.getPrice(), p1.getPrice()))
+                        .limit(5)
+                        .collect(Collectors.toList());
+
+                StringBuilder notFoundMsg = new StringBuilder();
+                if (intent.exactPhrase != null && !intent.exactPhrase.isEmpty()) {
+                    notFoundMsg.append("Dạ, hiện tại PhoneShop chưa có **").append(intent.exactPhrase.toUpperCase())
+                            .append("** trong kho ạ. Mẫu máy này có thể chưa ra mắt hoặc chưa được phân phối tại VN.\n\n");
+                } else {
+                    notFoundMsg.append("Dạ, hiện tại PhoneShop chưa có dòng **").append(brandDisplay)
+                            .append("** phù hợp với yêu cầu của anh/chị trong kho ạ.\n\n");
+                }
+
+                if (!sameBrandProducts.isEmpty()) {
+                    notFoundMsg.append("Tuy nhiên, PhoneShop hiện đang có các mẫu **").append(brandDisplay)
+                            .append("** sau, anh/chị tham khảo nhé:\n\n");
+                    for (Product p : sameBrandProducts) {
+                        String encodedName = "";
+                        try {
+                            encodedName = java.net.URLEncoder.encode(p.getProductName(), "UTF-8");
+                        } catch (Exception ignored) {
+                        }
+                        notFoundMsg.append("- **[").append(p.getProductName()).append("](search?searchName=")
+                                .append(encodedName).append(")** | Giá: ")
+                                .append(String.format("%,.0f VNĐ", p.getPrice()));
+                        if (p.getRam() != null)
+                            notFoundMsg.append(" | RAM: ").append(p.getRam());
+                        if (p.getRom() != null)
+                            notFoundMsg.append(" | ROM: ").append(p.getRom());
+                        notFoundMsg.append("\n");
+                    }
+                    notFoundMsg.append("\nAnh/chị muốn tư vấn thêm về mẫu nào không ạ?");
+                } else {
+                    notFoundMsg.append(
+                            "Anh/chị có muốn em gợi ý các dòng điện thoại khác có cấu hình tương đương không ạ?");
+                }
+
+                String notFoundStr = notFoundMsg.toString();
+                saveHistory(session, history, message, notFoundStr, sessionKey);
+                return notFoundStr;
+            }
+
+            // Không có brand cụ thể → fallback thông thường (top sản phẩm bất kỳ)
             isFinalFallback = true;
             System.out.println("--- FINAL FALLBACK (NO STRICT FILTER) ---");
             topProducts = allProducts.stream()
@@ -332,28 +391,34 @@ public class ChatBotServlet extends HttpServlet {
                 || message.toLowerCase().contains("tư vấn kỹ");
         String targetModel = isComplex ? "gemini-2.5-pro" : "gemini-2.5-flash";
 
-        // 3. Bypass AI hoàn toàn nếu đủ Intent (Đơn giản + Nhu cầu cao) - Giảm tải AI
-        if (!isFinalFallback && !isComplex && intent.hasFullIntent() && !topProducts.isEmpty()) {
+        // 3. Bypass AI hoàn toàn nếu đủ Intent (Đơn giản + Nhu cầu rõ ràng) - Giảm tải AI & Tăng tốc
+        // Bắt buộc đẩy cho AI xử lý nếu không có từ khoá (tên máy/hãng) nào để AI tự tư vấn cho mềm mại.
+        if (!isFinalFallback && !isComplex && intent.hasFullIntent() && !intent.keywords.isEmpty() && !topProducts.isEmpty()) {
             System.out.println("--- BYPASSING AI (FULL INTENT) ---");
-            StringBuilder directHtml = new StringBuilder();
-            // Nếu user xin thêm model khác thì vẫn nhảy AI. Nếu ko, bypass luôn.
-            if (!message.toLowerCase().contains("còn mẫu nào")) {
-                directHtml.append(
-                        "Dạ, dựa vào yêu cầu ngân sách và cấu hình anh/chị chọn, em thấy các mẫu máy cực chuẩn sau đây ạ:\n\n");
+            // Nếu user xin thêm mẫu khác thì vẫn nhảy AI. Nếu ko, bypass luôn.
+            if (!message.toLowerCase().contains("còn mẫu nào") && !message.toLowerCase().contains("khác")) {
+                StringBuilder directHtml = new StringBuilder();
+                directHtml.append("### Gợi ý từ PhoneShop AI\n\n");
+                directHtml
+                        .append("Dựa trên yêu cầu của anh/chị, em đã tìm thấy các mẫu máy **tốt nhất** hiện có ạ:\n\n");
+
                 for (Product p : topProducts) {
                     String pRam = p.getRam() != null ? p.getRam() : "N/A";
                     String pRom = p.getRom() != null ? p.getRom() : "N/A";
                     String encodedName = "";
                     try {
                         encodedName = java.net.URLEncoder.encode(p.getProductName(), "UTF-8");
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                     }
+
                     directHtml.append("- **[").append(p.getProductName()).append("](search?searchName=")
-                            .append(encodedName).append(")** | Giá: ").append(String.format("%,.0f VNĐ", p.getPrice()))
-                            .append(" | RAM: ").append(pRam).append(" | ROM: ").append(pRom).append("\n");
+                            .append(encodedName).append(")**\n")
+                            .append("   - Giá: **").append(String.format("%,.0f VNĐ", p.getPrice())).append("**\n")
+                            .append("   - Cấu hình: ").append(pRam).append(" RAM / ").append(pRom)
+                            .append(" ROM\n\n");
                 }
-                directHtml.append(
-                        "\nAnh/chị ưng mẫu nào ở trên để em lên đơn hoặc cần em tư vấn sâu thêm về dòng nào ạ?");
+
+                directHtml.append("--- \n*Anh/chị có muốn tham khảo kỹ hơn về mẫu nào ở trên không ạ?*");
                 saveHistory(session, history, message, directHtml.toString(), sessionKey);
                 return directHtml.toString();
             }
@@ -464,7 +529,7 @@ public class ChatBotServlet extends HttpServlet {
         // Khi tất cả model bị 429, tự build danh sách sản phẩm kèm thông báo
         if (SENTINEL_ALL_429.equals(reply)) {
             StringBuilder sb = new StringBuilder();
-            sb.append("⚠️ **Máy chủ AI đang quá tải, em tạm thời không thể tư vấn chi tiết.** ");
+            sb.append("**Máy chủ AI đang quá tải, em tạm thời không thể tư vấn chi tiết.** ");
             sb.append("Dưới đây là các sản phẩm phù hợp nhất với yêu cầu của anh/chị, anh/chị tham khảo nhé:\n\n");
             for (Product p : topProducts) {
                 String pRam = p.getRam() != null ? p.getRam() : "";
@@ -490,6 +555,9 @@ public class ChatBotServlet extends HttpServlet {
         // Post-process: gắn link trực tiếp vào tên sản phẩm nếu AI không tự làm
         reply = injectProductLinks(reply, topProducts);
 
+        // Post-process: Wrap "naked list" (Nếu AI trả danh sách mà không có lời dẫn)
+        reply = wrapAiResponse(reply);
+
         saveHistory(session, history, message, reply, sessionKey);
         return reply;
     }
@@ -503,7 +571,7 @@ public class ChatBotServlet extends HttpServlet {
             history = new ArrayList<>();
         }
 
-        String contextData = getAdminContext(message);
+        String contextData = getAdminContext(message, history);
         String systemRole = "Bạn là trợ lý AI (Read-Only) cho Admin PhoneShop.\n" +
                 "QUY TẮC:\n" +
                 "1. Phân tích Dữ liệu Context bên dưới.\n" +
@@ -715,7 +783,8 @@ public class ChatBotServlet extends HttpServlet {
 
         // --- Bước 2: Lọc token bằng Set stopwords Unicode ---
         // (cần thiết vì \b không hoạt động với ký tự Unicode có dấu
-        // như "rẻ", "đẹp", "và", "hay" — \b chỉ nhận ASCII [a-zA-Z0-9_] là word boundary)
+        // như "rẻ", "đẹp", "và", "hay" — \b chỉ nhận ASCII [a-zA-Z0-9_] là word
+        // boundary)
         Set<String> viStopwords = new HashSet<>(Arrays.asList(
                 // Tính từ chất lượng / cảm tính — KHÔNG phải tên sản phẩm
                 "ngon", "rẻ", "đẹp", "mạnh", "mượt", "tốt", "nhất", "trâu", "xịn", "ngầu",
@@ -731,9 +800,10 @@ public class ChatBotServlet extends HttpServlet {
                 "cho", "hỏi", "nào", "có", "không", "ko", "nhỉ", "ạ",
                 // Động từ chức năng
                 "mua", "tìm", "lấy", "gợi", "đề", "xuất", "giới", "thiệu",
-                // Danh từ chung
-                "điện", "thoại", "máy", "sản", "phẩm", "loại", "cái", "chiếc",
-                "dòng", "mẫu", "con", "hàng", "giá",
+                // Danh từ chung và Nhu cầu (đã parse riêng)
+                "điện", "thoại", "đt", "smartphone", "máy", "sản", "phẩm", "loại", "cái", "chiếc",
+                "dòng", "mẫu", "con", "hàng", "giá", "tiền", "game", "pubg", "liên", "quân",
+                "chụp", "ảnh", "camera", "quay", "video", "selfie", "pin", "sạc", "nhanh", "zoom",
                 // Giới từ / liên từ phụ
                 "từ", "đến", "tầm", "dưới", "trên", "khoảng", "về", "của", "trong",
                 "ngoài", "trước", "sau", "bên", "phía",
@@ -758,13 +828,56 @@ public class ChatBotServlet extends HttpServlet {
             }
         }
 
-        // --- Bước 3: Log wantsValue để debug (không cần lưu vào IntentData) ---
-        System.out.println("[NLP] wantsValue=" + wantsValue + " | isComparison=" + data.isComparison);
+        // --- Bước 3: Nhận diện brand cụ thể mà user yêu cầu ---
+        // Nếu user hỏi "iphone 18 pro max" → requestedBrand = "iphone"
+        // Giúp matchStrict lọc cứng chỉ sản phẩm đúng brand
+        String[] brandKeywords = {
+                "iphone", "apple", "samsung", "galaxy", "oppo", "vivo", "xiaomi", "redmi", "poco",
+                "realme", "nokia", "sony", "honor", "motorola", "tcl", "asus", "itel", "tecno"
+        };
+        String lowerNoAccent = java.text.Normalizer.normalize(lower, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "").replace('đ', 'd').replace('Đ', 'D');
+
+        for (String bk : brandKeywords) {
+            // Tìm brand keyword trong tin nhắn gốc (lower) - không chỉ trong exactPhrase
+            // để bắt "tôi muốn mua iphone 18 pro max" → "iphone"
+            if (lowerNoAccent.contains(bk) || lower.contains(bk)) {
+                data.requestedBrand = bk;
+                System.out.println("[NLP] Detected requestedBrand: " + bk);
+                break;
+            }
+        }
+
+        // --- Bước 4: Log wantsValue để debug (không cần lưu vào IntentData) ---
+        System.out.println("[NLP] wantsValue=" + wantsValue + " | isComparison=" + data.isComparison
+                + " | requestedBrand=" + data.requestedBrand);
 
         return data;
     }
 
+    // Danh sách brand được nhận diện từ tên sản phẩm (prefix đầu tiên)
+    private static final List<String> KNOWN_BRANDS = Arrays.asList(
+            "iphone", "apple", "samsung", "galaxy", "oppo", "vivo", "xiaomi", "redmi", "poco",
+            "realme", "nokia", "sony", "honor", "motorola", "tcl", "asus", "itel", "tecno");
+
     private boolean matchStrict(Product p, IntentData intent) {
+        // FIX: Hard-filter theo brand nếu user yêu cầu brand cụ thể
+        // Ví dụ: user hỏi "iphone 18 pro max" → chỉ cho qua các sản phẩm có tên chứa
+        // "iphone"
+        if (intent.requestedBrand != null && !intent.requestedBrand.isEmpty()) {
+            String pname = p.getProductName().toLowerCase();
+            String reqBrand = intent.requestedBrand.toLowerCase();
+            // Alias: "iphone" → cũng match "apple"
+            boolean brandMatch = pname.contains(reqBrand);
+            if (reqBrand.equals("iphone") || reqBrand.equals("apple")) {
+                brandMatch = pname.contains("iphone") || pname.startsWith("apple");
+            } else if (reqBrand.equals("samsung") || reqBrand.equals("galaxy")) {
+                brandMatch = pname.contains("samsung") || pname.contains("galaxy");
+            }
+            if (!brandMatch)
+                return false;
+        }
+
         if (intent.maxPrice > 0) {
             if (intent.minPrice > 0) {
                 // Trong tầm giá, filter nhẹ (tới 1.5x) để scoring quyết định
@@ -879,10 +992,12 @@ public class ChatBotServlet extends HttpServlet {
                 if (pname.startsWith(intent.exactPhrase.toLowerCase()))
                     score += 20;
             } else {
-                // Penalty only if exactPhrase looks like a specific brand/model
-                if (intent.exactPhrase.toLowerCase().matches(
+                // Penalty nếu exactPhrase chứa brand/model cụ thể nhưng sản phẩm không match
+                String phraseNoAccent = java.text.Normalizer.normalize(intent.exactPhrase.toLowerCase(), java.text.Normalizer.Form.NFD)
+                        .replaceAll("\\p{M}", "").replace('đ', 'd').replace('Đ', 'D');
+                if (phraseNoAccent.matches(
                         ".*(iphone|samsung|oppo|vivo|xiaomi|realme|nokia|poco|sony|ipad|macbook|laptop|watch).*")) {
-                    score -= 40;
+                    score -= 100; // Tăng penalty mạnh để không lọt qua ngưỡng -50
                 }
             }
 
@@ -1189,15 +1304,14 @@ public class ChatBotServlet extends HttpServlet {
         // hoàn toàn Session Memory
 
         String memUser = userMsg;
-        if (memUser != null && memUser.length() > 200) {
-            memUser = memUser.substring(0, 200) + "...";
+        if (memUser != null && memUser.length() > 1000) {
+            memUser = memUser.substring(0, 1000) + "...";
         }
 
         String memAi = aiReply;
-        // AI có thể trả lời rất dài, cắt ngắn để tối ưu bộ nhớ. 500 ký tự là đủ để AI
-        // giữ context.
-        if (memAi != null && memAi.length() > 500) {
-            memAi = memAi.substring(0, 500) + "...";
+        // Tăng giới hạn cắt ngắn để AI nhớ được trọn vẹn context các table dài
+        if (memAi != null && memAi.length() > 4000) {
+            memAi = memAi.substring(0, 4000) + "...";
         }
 
         history.add(new ChatMessage("user", memUser));
@@ -1349,56 +1463,72 @@ public class ChatBotServlet extends HttpServlet {
         return SENTINEL_ALL_429;
     }
 
-    private String getAdminContext(String message) {
+    private String getAdminContext(String message, List<ChatMessage> history) {
         StringBuilder sb = new StringBuilder();
-        String lowerCaseMessage = (message != null) ? message.toLowerCase() : "";
-
-        boolean hasKeywords = lowerCaseMessage.contains("khách") || lowerCaseMessage.contains("user")
-                || lowerCaseMessage.contains("người dùng")
-                || lowerCaseMessage.contains("đơn") || lowerCaseMessage.contains("order")
-                || lowerCaseMessage.contains("sản phẩm") || lowerCaseMessage.contains("product")
-                || lowerCaseMessage.contains("kho") || lowerCaseMessage.contains("hết hàng");
 
         try {
             class AdminDB extends vn.edu.phoneshop.utils.DBContext {
-                public java.sql.Connection getDbConnection() throws Exception {
+                public Connection getDbConnection() throws Exception {
                     return getConnection();
                 }
             }
             AdminDB db = new AdminDB();
-            try (java.sql.Connection conn = db.getDbConnection()) {
-                if (!hasKeywords || lowerCaseMessage.contains("khách")) {
-                    sb.append("DANH SÁCH 5 KHÁCH HÀNG:\n");
-                    try (java.sql.Statement stmt = conn.createStatement();
-                            java.sql.ResultSet rs = stmt.executeQuery(
-                                    "SELECT TOP 5 UserID, FullName, Email, PhoneNumber FROM Users ORDER BY UserID DESC")) {
-                        while (rs.next())
-                            sb.append(String.format(" + ID: %s | Tên: %s | SĐT: %s\n", rs.getString("UserID"),
-                                    rs.getString("FullName"), rs.getString("PhoneNumber")));
-                    } catch (Exception e) {
-                    }
+            try (Connection conn = db.getDbConnection()) {
+                sb.append("DANH SÁCH 5 KHÁCH HÀNG MỚI ĐĂNG KÝ:\n");
+                try (java.sql.Statement stmt = conn.createStatement();
+                        java.sql.ResultSet rs = stmt.executeQuery(
+                                "SELECT TOP 5 UserID, FullName, Email, PhoneNumber FROM Users ORDER BY UserID DESC")) {
+                    while (rs.next())
+                        sb.append(String.format(" + ID: %s | Tên: %s | SĐT: %s\n", rs.getString("UserID"),
+                                rs.getString("FullName"), rs.getString("PhoneNumber")));
+                } catch (Exception e) {
                 }
-                if (!hasKeywords || lowerCaseMessage.contains("đơn")) {
-                    sb.append("\nDANH SÁCH 5 ĐƠN HÀNG:\n");
-                    try (java.sql.Statement stmt = conn.createStatement();
-                            java.sql.ResultSet rs = stmt.executeQuery(
-                                    "SELECT TOP 5 o.OrderID, u.FullName, o.TotalMoney FROM Orders o JOIN Users u ON o.UserID = u.UserID ORDER BY o.OrderDate DESC")) {
-                        while (rs.next())
-                            sb.append(String.format(" + Đơn ID: %d | KH: %s | Trị giá: %,.0f\n", rs.getInt("OrderID"),
-                                    rs.getString("FullName"), rs.getDouble("TotalMoney")));
-                    } catch (Exception e) {
-                    }
+
+                sb.append("\nTOP 5 KHÁCH HÀNG CHI TIÊU NHIỀU NHẤT (VIP):\n");
+                try (java.sql.Statement stmt = conn.createStatement();
+                        java.sql.ResultSet rs = stmt.executeQuery(
+                                "SELECT TOP 5 u.FullName, u.PhoneNumber, COUNT(o.OrderID) as TotalOrders, SUM(o.TotalMoney) as TotalSpent " +
+                                "FROM Users u JOIN Orders o ON u.UserID = o.UserID " +
+                                "GROUP BY u.UserID, u.FullName, u.PhoneNumber " +
+                                "ORDER BY TotalSpent DESC")) {
+                    while (rs.next())
+                        sb.append(String.format(" + KH: %s | SĐT: %s | Số đơn: %d | Tổng chi tiêu: %,.0f VNĐ\n", 
+                                rs.getString("FullName"), rs.getString("PhoneNumber"), 
+                                rs.getInt("TotalOrders"), rs.getDouble("TotalSpent")));
+                } catch (Exception e) {
                 }
-                if (!hasKeywords || lowerCaseMessage.contains("kho") || lowerCaseMessage.contains("sản phẩm")) {
-                    sb.append("\nDANH SÁCH 5 SẢN PHẨM KHAN HÀNG:\n");
-                    try (java.sql.Statement stmt = conn.createStatement();
-                            java.sql.ResultSet rs = stmt.executeQuery(
-                                    "SELECT TOP 5 ProductID, ProductName, StockQuantity FROM Products WHERE Status = 1 ORDER BY StockQuantity ASC")) {
-                        while (rs.next())
-                            sb.append(String.format(" + SP ID: %d | %s | Tồn: %d\n", rs.getInt("ProductID"),
-                                    rs.getString("ProductName"), rs.getInt("StockQuantity")));
-                    } catch (Exception e) {
-                    }
+
+                sb.append("\nDANH SÁCH 5 ĐƠN HÀNG MỚI NHẤT:\n");
+                try (java.sql.Statement stmt = conn.createStatement();
+                        java.sql.ResultSet rs = stmt.executeQuery(
+                                "SELECT TOP 5 o.OrderID, u.FullName, o.TotalMoney FROM Orders o JOIN Users u ON o.UserID = u.UserID ORDER BY o.OrderDate DESC")) {
+                    while (rs.next())
+                        sb.append(String.format(" + Đơn ID: %d | KH: %s | Trị giá: %,.0f\n", rs.getInt("OrderID"),
+                                rs.getString("FullName"), rs.getDouble("TotalMoney")));
+                } catch (Exception e) {
+                }
+
+                sb.append("\nTOP 5 SẢN PHẨM BÁN CHẠY NHẤT:\n");
+                try (java.sql.Statement stmt = conn.createStatement();
+                        java.sql.ResultSet rs = stmt.executeQuery(
+                                "SELECT TOP 5 p.ProductName, SUM(od.Quantity) as TotalSold " +
+                                "FROM Products p JOIN OrderDetails od ON p.ProductID = od.ProductID " +
+                                "GROUP BY p.ProductID, p.ProductName " +
+                                "ORDER BY TotalSold DESC")) {
+                    while (rs.next())
+                        sb.append(String.format(" + SP: %s | Đã bán: %d chiếc\n", 
+                                rs.getString("ProductName"), rs.getInt("TotalSold")));
+                } catch (Exception e) {
+                }
+
+                sb.append("\nDANH SÁCH 5 SẢN PHẨM KHAN HÀNG (TỒN KHO THẤP):\n");
+                try (java.sql.Statement stmt = conn.createStatement();
+                        java.sql.ResultSet rs = stmt.executeQuery(
+                                "SELECT TOP 5 ProductID, ProductName, StockQuantity FROM Products WHERE Status = 1 ORDER BY StockQuantity ASC")) {
+                    while (rs.next())
+                        sb.append(String.format(" + SP ID: %d | %s | Tồn: %d\n", rs.getInt("ProductID"),
+                                rs.getString("ProductName"), rs.getInt("StockQuantity")));
+                } catch (Exception e) {
                 }
             }
         } catch (Exception e) {
@@ -1444,6 +1574,32 @@ public class ChatBotServlet extends HttpServlet {
 
             reply = reply.replaceAll(regex, Matcher.quoteReplacement(linkMarkdown));
         }
+        return reply;
+    }
+
+    /**
+     * Post-process: Nếu AI trả về một danh sách "trơ trụi" (chỉ có các dấu gạch đầu
+     * dòng),
+     * tự động bọc thêm lời dẫn và kết thúc để UI đẹp hơn.
+     */
+    private String wrapAiResponse(String reply) {
+        if (reply == null || reply.trim().isEmpty())
+            return reply;
+
+        String trimmed = reply.trim();
+        // Kiểm tra xem có phải "naked list" không (bắt đầu bằng -, *, hoặc số)
+        boolean isListStart = trimmed.startsWith("-") || trimmed.startsWith("*") || trimmed.startsWith("1.");
+
+        // Nếu là danh sách mà ngắn (không có nhiều text giải thích phía trước)
+        if (isListStart && !trimmed.contains("\n\n") && trimmed.split("\n").length >= 1) {
+            System.out.println("[POST-PROCESS] Wrapping naked AI list");
+            return "### Gợi ý chi tiết từ AI\n\n" +
+                    "Dạ, PhoneShop xin gửi đến anh/chị một số lựa chọn nổi bật nhất:\n\n" +
+                    reply +
+                    "\n\n---\n" +
+                    "*Anh/chị cần em so sánh kỹ hơn mẫu nào trong danh sách trên không ạ?*";
+        }
+
         return reply;
     }
 }

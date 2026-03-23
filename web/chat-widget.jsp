@@ -125,7 +125,7 @@
 
             // Phân tích markdown cơ bản: **bold**, [text](link) và \n -> <br>
             var formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+            formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
             formattedText = formattedText.replace(/\n/g, '<br>');
             
             div.innerHTML = formattedText;
