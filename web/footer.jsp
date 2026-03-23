@@ -72,7 +72,8 @@
                             alt="Download QR" class="footer__download-qr">
                         <div class="footer__download-apps">
                             <a href="#" class="footer__download-app-link">
-                                <img src="assets/img/app_store.png" alt="App Store" class="footer__download-app-img">
+                                <img src="assets/img/app_store.png" alt="App Store" class="footer__download-app-img"
+                                    style="height: 2.25rem;">
                             </a>
                             <a href="#" class="footer__download-app-link">
                                 <img src="assets/img/google_play.png" alt="Google Play"

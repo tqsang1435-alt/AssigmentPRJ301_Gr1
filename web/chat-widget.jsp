@@ -1,5 +1,21 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 
+    <style>
+        .chat-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #90949c;
+            border-radius: 50%;
+            animation: chat-typing 1.4s infinite both;
+        }
+        .chat-dot:nth-child(1) { animation-delay: -0.32s; }
+        .chat-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes chat-typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+
     <div class="chat-widget-btn" onclick="toggleChatWidget()" title="Chat với chúng tôi">
         <i class="ti-comments"></i>
     </div>
@@ -46,6 +62,24 @@
             appendMessage(message, "user");
             input.value = ""; // Xóa ô nhập
 
+            // Hiện hiệu ứng loading
+            var chatBody = document.getElementById("chatBody");
+            var loadingDiv = document.createElement("div");
+            loadingDiv.id = "botLoadingIndicator";
+            loadingDiv.style.padding = "10px 14px";
+            loadingDiv.style.borderRadius = "10px";
+            loadingDiv.style.maxWidth = "80%";
+            loadingDiv.style.marginBottom = "5px";
+            loadingDiv.style.background = "#e4e6eb";
+            loadingDiv.style.alignSelf = "flex-start";
+            loadingDiv.style.display = "flex";
+            loadingDiv.style.alignItems = "center";
+            loadingDiv.style.gap = "4px";
+            loadingDiv.style.width = "fit-content";
+            loadingDiv.innerHTML = "<span class='chat-dot'></span><span class='chat-dot'></span><span class='chat-dot'></span>";
+            chatBody.appendChild(loadingDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
             var mode = "${sessionScope.ACC.role == 'Admin' ? 'admin' : 'user'}";
             // 2. Gửi tin nhắn đến Servlet qua API fetch
             fetch("chat-bot", {
@@ -57,10 +91,18 @@
             })
                 .then(response => response.text())
                 .then(data => {
+                    // Xóa loading
+                    var loadingEl = document.getElementById("botLoadingIndicator");
+                    if (loadingEl) loadingEl.remove();
+
                     // 3. Hiển thị phản hồi từ Bot
                     appendMessage(data, "bot");
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    var loadingEl = document.getElementById("botLoadingIndicator");
+                    if (loadingEl) loadingEl.remove();
+                    console.error('Error:', error);
+                });
         }
 
         function appendMessage(text, sender) {
@@ -81,7 +123,12 @@
                 div.style.alignSelf = "flex-start";
             }
 
-            div.innerText = text;
+            // Phân tích markdown cơ bản: **bold**, [text](link) và \n -> <br>
+            var formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+            formattedText = formattedText.replace(/\n/g, '<br>');
+            
+            div.innerHTML = formattedText;
             chatBody.appendChild(div);
 
             // Tự động cuộn xuống dưới cùng

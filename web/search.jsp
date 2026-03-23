@@ -209,7 +209,7 @@
                                             <c:set var="finalPrice"
                                                 value="${p.price - (p.price * discountPercent / 100)}" />
                                             <div class="col l-2-4 m-4 c-6" style="margin-bottom: 20px;">
-                                                <a href="detail?id=${p.productID}" class="home-product-item">
+                                                <a href="detail?id=${p.productID}" class="home-product-item" onclick="trackProductClick('${p.productName}')">
 
                                                     <div class="home-product-item__img-wrap"
                                                         style="position: relative;">
@@ -331,6 +331,13 @@
                     <jsp:include page="chat-widget.jsp"></jsp:include>
 
                     <script>
+                        // ======= PERSONALIZATION: Track Product Click =======
+                        function trackProductClick(productName) {
+                            try {
+                                fetch('chat-bot?action=track&productName=' + encodeURIComponent(productName), { method: 'GET', keepalive: true }).catch(() => {});
+                            } catch(e) {}
+                        }
+
                         function confirmAddCart(id, name) {
                             Swal.fire({
                                 title: 'Thêm vào giỏ hàng?',

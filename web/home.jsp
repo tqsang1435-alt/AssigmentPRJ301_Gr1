@@ -312,7 +312,7 @@
                                 <c:forEach items="${listP}" var="p">
                                     <c:set var="finalPrice" value="${p.price - (p.price * discountPercent / 100)}" />
                                     <div class="col l-2-4 m-4 c-6" style="margin-bottom: 20px;">
-                                        <a href="detail?id=${p.productID}" class="home-product-item">
+                                        <a href="detail?id=${p.productID}" class="home-product-item" onclick="trackProductClick('${p.productName}')">
 
                                             <div class="home-product-item__img-wrap" style="position: relative;">
                                                 <div class="home-product-item__img"
@@ -498,6 +498,14 @@
                         // Bắt đầu chạy slider
                         resetSlideTimer();
 
+
+                        // ======= PERSONALIZATION: Track Product Click =======
+                        function trackProductClick(productName) {
+                            try {
+                                // Fire & forget - không chặn navigation
+                                fetch('chat-bot?action=track&productName=' + encodeURIComponent(productName), { method: 'GET', keepalive: true }).catch(() => {});
+                            } catch(e) {}
+                        }
 
                         // ======= LOGIC GIỎ HÀNG =======
                         function confirmAddCart(id, name) {
