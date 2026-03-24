@@ -100,13 +100,13 @@ public class CustomerDAO extends DBContext {
         try {
             int points = user.getRewardPoints();
             String newType = "New Member";
-            if (points >= 2000) {
+            if (points >= 20000) {
                 newType = "Diamond";
-            } else if (points >= 1000) {
+            } else if (points >= 10000) {
                 newType = "Gold";
-            } else if (points >= 500) {
+            } else if (points >= 5000) {
                 newType = "Silver";
-            } else if (points >= 100) {
+            } else if (points >= 1000) {
                 newType = "Bronze";
             }
             user.setCustomerType(newType);
