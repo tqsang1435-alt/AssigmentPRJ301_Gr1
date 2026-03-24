@@ -63,6 +63,7 @@
                                             <table class="table">
                                                 <thead>
                                                     <tr>
+                                                        <th>STT</th>
                                                         <th>ID</th>
                                                         <th>Hình ảnh</th>
                                                         <th>Tên sản phẩm</th>
@@ -75,8 +76,9 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <c:forEach items="${listP}" var="p">
+                                                    <c:forEach items="${listP}" var="p" varStatus="loop">
                                                         <tr>
+                                                            <td>${loop.index + 1}</td>
                                                             <td>#${p.productID}</td>
                                                             <td>
                                                                 <img src="${not empty p.imageURL ? p.imageURL : pageContext.request.contextPath += '/assets/img/default-phone.png'}"

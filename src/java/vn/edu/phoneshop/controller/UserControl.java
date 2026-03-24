@@ -184,8 +184,29 @@ public class UserControl extends HttpServlet {
                     if (session != null && session.getAttribute("ACC") != null) {
                         User u = (User) session.getAttribute("ACC");
                         if ("Admin".equalsIgnoreCase(u.getRole())) {
-                            List<User> list = dao.getAllCustomers();
-                            request.setAttribute("listC", list);
+                            int pageSize = 10;
+                            int currentPage = 1;
+                            String pageParam = request.getParameter("page");
+                            if (pageParam != null) {
+                                try {
+                                    currentPage = Integer.parseInt(pageParam);
+                                    if (currentPage < 1) currentPage = 1;
+                                } catch (NumberFormatException ex) {
+                                    currentPage = 1;
+                                }
+                            }
+                            List<User> allList = dao.getAllCustomers();
+                            int totalRecords = allList.size();
+                            int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+                            if (totalPages < 1) totalPages = 1;
+                            if (currentPage > totalPages) currentPage = totalPages;
+                            int fromIndex = (currentPage - 1) * pageSize;
+                            int toIndex = Math.min(fromIndex + pageSize, totalRecords);
+                            List<User> pagedList = (totalRecords > 0) ? allList.subList(fromIndex, toIndex) : allList;
+                            request.setAttribute("listC", pagedList);
+                            request.setAttribute("currentPage", currentPage);
+                            request.setAttribute("totalPages", totalPages);
+                            request.setAttribute("pageOffset", fromIndex);
                             request.getRequestDispatcher("CustomerList.jsp").forward(request, response);
                         } else {
                             response.sendRedirect("home");
@@ -194,6 +215,7 @@ public class UserControl extends HttpServlet {
                         response.sendRedirect("user-login");
                     }
                     break;
+
                 default:
                     response.sendRedirect("home");
                     break;

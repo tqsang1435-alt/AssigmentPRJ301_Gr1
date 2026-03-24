@@ -170,13 +170,13 @@ public class CheckoutControl extends HttpServlet {
             userDAO.updateRewardPoints(user.getUserID(), totalMoney);
             user.setRewardPoints(user.getRewardPoints() + pointsEarned);
             int newPoints = user.getRewardPoints();
-            if (newPoints >= 2000)
+            if (newPoints >= 20000)
                 user.setCustomerType("Diamond");
-            else if (newPoints >= 1000)
+            else if (newPoints >= 10000)
                 user.setCustomerType("Gold");
-            else if (newPoints >= 500)
+            else if (newPoints >= 5000)
                 user.setCustomerType("Silver");
-            else if (newPoints >= 100)
+            else if (newPoints >= 1000)
                 user.setCustomerType("Bronze");
             else
                 user.setCustomerType("New Member");

@@ -72,6 +72,7 @@
                                         <table class="table">
                                             <thead>
                                                 <tr>
+                                                    <th>STT</th>
                                                     <th>Mã ĐH</th>
                                                     <th>Khách hàng</th>
                                                     <th>Ngày đặt</th>
@@ -83,12 +84,13 @@
                                             <tbody>
                                                 <c:if test="${empty listOrders}">
                                                     <tr>
-                                                        <td colspan="6" style="text-align: center; padding: 40px;">
+                                                        <td colspan="7" style="text-align: center; padding: 40px;">
                                                             Chưa có đơn hàng nào.</td>
                                                     </tr>
                                                 </c:if>
-                                                <c:forEach items="${listOrders}" var="o">
+                                                <c:forEach items="${listOrders}" var="o" varStatus="loop">
                                                     <tr>
+                                                        <td>${loop.index + 1}</td>
                                                         <td>#${o.orderId}</td>
                                                         <td>${o.customerName}</td>
                                                         <td>

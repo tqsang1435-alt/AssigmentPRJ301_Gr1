@@ -122,7 +122,7 @@ public class CartController extends HttpServlet {
             if (quantity < 1) {
                 quantity = 1;
             }
-            
+
             Product product = productDAO.getProductByID(productID);
             if (product != null) {
                 System.out.println("Product Found: " + product.getProductName());
@@ -134,7 +134,7 @@ public class CartController extends HttpServlet {
                 } else {
                     cart = new Cart();
                 }
-                
+
                 // Kiểm tra tồn kho
                 CartItem existing = cart.getItemByProductID(productID);
                 int currentQty = (existing != null) ? existing.getQuantity() : 0;
@@ -143,7 +143,7 @@ public class CartController extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/view-cart");
                     return;
                 }
-                
+
                 cart.addProduct(product, quantity);
                 session.setAttribute("cart", cart);
                 session.setAttribute("cartCount", cart.getTotalQuantity());
@@ -166,12 +166,10 @@ public class CartController extends HttpServlet {
         }
     }
 
-    private void addCart(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    private void addCart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String productIdStr = request.getParameter("id");
         String action = request.getParameter("action");
         HttpSession session = request.getSession();
-
         User user = (User) session.getAttribute("ACC");
         if (user == null) {
             response.sendRedirect("login.jsp");
@@ -179,7 +177,6 @@ public class CartController extends HttpServlet {
         }
         if ("buynow".equals(action)) {
             double totalAmount = 0;
-
             if (productIdStr != null) {
                 int id = Integer.parseInt(productIdStr);
                 Product p = productDAO.getProductByID(id);
@@ -192,19 +189,18 @@ public class CartController extends HttpServlet {
                     totalAmount = (Double) totalMoneyObj;
                 }
             }
-            int orderId = orderDAO.createOrder(user.getUserID(), totalAmount, 1);
+            // Added missing fourth argument (e.g., default status = 0)
+            int orderId = orderDAO.createOrder(user.getUserID(), totalAmount, 1, 0);
             session.setAttribute("currentOrderId", orderId);
-
             if (productIdStr != null) {
                 int id = Integer.parseInt(productIdStr);
                 Product p = productDAO.getProductByID(id);
                 orderDAO.insertOrderDetail(orderId, id, 1, p.getPrice());
-
                 request.setAttribute("quickProduct", p);
                 request.setAttribute("payMode", "single");
             } else {
-                Map<Integer, Integer> cartItems = (Map<Integer, Integer>) session.getAttribute("cart_map"); // Fallback for add-cart style, but this is conflicting with Cart model above
-                if (cartItems != null) { // Note: original AddCartController used Map cart, while AddToCart used model.Cart!
+                Map<Integer, Integer> cartItems = (Map<Integer, Integer>) session.getAttribute("cart_map");
+                if (cartItems != null) {
                     for (Integer pId : cartItems.keySet()) {
                         Product p = productDAO.getProductByID(pId);
                         orderDAO.insertOrderDetail(orderId, pId, cartItems.get(pId), p.getPrice());
@@ -218,11 +214,10 @@ public class CartController extends HttpServlet {
         try {
             if (productIdStr != null) {
                 int id = Integer.parseInt(productIdStr);
-                Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart_map"); // Separating map session
+                Map<Integer, Integer> cart = (Map<Integer, Integer>) session.getAttribute("cart_map");
                 if (cart == null) {
                     cart = new HashMap<>();
                 }
-
                 if ("sub".equals(action)) {
                     if (cart.containsKey(id)) {
                         int newQty = cart.get(id) - 1;
@@ -242,8 +237,6 @@ public class CartController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Điều hướng quay lại
         String referer = request.getHeader("referer");
         if (referer != null && referer.contains("cart")) {
             response.sendRedirect("cart.jsp");

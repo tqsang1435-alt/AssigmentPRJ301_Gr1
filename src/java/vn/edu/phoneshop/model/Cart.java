@@ -7,6 +7,7 @@ import java.util.List;
  * Cart - Quản lý các sản phẩm trong giỏ hàng
  */
 public class Cart {
+
     private List<CartItem> cartItems;
     private double discountPercent; // Rank discount
     private double voucherDiscount; // Voucher discount amount
@@ -143,11 +144,12 @@ public class Cart {
     public int getSelectedTotalQuantity() {
         return getSelectedItems().stream().mapToInt(CartItem::getQuantity).sum();
     }
+
     public double getVoucherDiscount() {
         return voucherDiscount;
     }
 
     public void setVoucherDiscount(double voucherDiscount) {
         this.voucherDiscount = voucherDiscount;
-    }}
+    }
 }

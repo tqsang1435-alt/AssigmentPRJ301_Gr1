@@ -14,6 +14,13 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+        /* Expanded (full-screen) state */
+        #chatWidgetWindow.chat-expanded {
+            width: 520px !important;
+            height: 620px !important;
+            bottom: 20px !important;
+            right: 20px !important;
+        }
     </style>
 
     <div class="chat-widget-btn" onclick="toggleChatWidget()" title="Chat với chúng tôi">
@@ -23,7 +30,10 @@
     <div class="chat-window" id="chatWidgetWindow">
         <div class="chat-header">
             <span><i class="ti-headphone-alt"></i> Hỗ trợ trực tuyến</span>
-            <i class="ti-close" style="cursor: pointer;" onclick="toggleChatWidget()"></i>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <i class="ti-zoom-in" id="expandIcon" title="Phóng to" style="cursor: pointer;" onclick="toggleExpandChat()"></i>
+                <i class="ti-close" title="Đóng" style="cursor: pointer;" onclick="toggleChatWidget()"></i>
+            </div>
         </div>
         <div class="chat-body" id="chatBody">
             <div
@@ -105,6 +115,19 @@
                 });
         }
 
+        function toggleExpandChat() {
+            var chatWindow = document.getElementById("chatWidgetWindow");
+            var icon = document.getElementById("expandIcon");
+            chatWindow.classList.toggle("chat-expanded");
+            if (chatWindow.classList.contains("chat-expanded")) {
+                icon.classList.replace("ti-zoom-in", "ti-zoom-out");
+                icon.title = "Thu nhỏ";
+            } else {
+                icon.classList.replace("ti-zoom-out", "ti-zoom-in");
+                icon.title = "Phóng to";
+            }
+        }
+
         function appendMessage(text, sender) {
             var chatBody = document.getElementById("chatBody");
             var div = document.createElement("div");
@@ -112,6 +135,8 @@
             div.style.borderRadius = "10px";
             div.style.maxWidth = "80%";
             div.style.marginBottom = "5px";
+            div.style.lineHeight = "1.7";
+            div.style.letterSpacing = "0.01em";
 
             if (sender === "user") {
                 div.style.background = "#007bff";

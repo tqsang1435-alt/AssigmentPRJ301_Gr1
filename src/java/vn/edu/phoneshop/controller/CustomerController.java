@@ -74,8 +74,31 @@ public class CustomerController extends HttpServlet {
             return;
         }
 
-        List<User> list = customerDAO.getCustomers();
-        request.setAttribute("listC", list);
+        int pageSize = 10;
+        int currentPage = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+                if (currentPage < 1) currentPage = 1;
+            } catch (NumberFormatException e) {
+                currentPage = 1;
+            }
+        }
+
+        List<User> allList = customerDAO.getCustomers();
+        int totalRecords = allList.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+        int fromIndex = (currentPage - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalRecords);
+        List<User> pagedList = (totalRecords > 0) ? allList.subList(fromIndex, toIndex) : allList;
+
+        request.setAttribute("listC", pagedList);
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageOffset", fromIndex);
         request.getRequestDispatcher("CustomerList.jsp").forward(request, response);
     }
 
