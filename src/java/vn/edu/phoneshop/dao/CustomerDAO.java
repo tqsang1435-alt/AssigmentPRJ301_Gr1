@@ -96,6 +96,17 @@ public class CustomerDAO extends DBContext {
         return null;
     }
 
+    public void resetPointsNewYear() {
+        String sql = "UPDATE Users SET RewardPoints = 0, CustomerType = 'New Member' WHERE Role = 'Customer'";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void updateCustomer(User user) {
         try {
             int points = user.getRewardPoints();

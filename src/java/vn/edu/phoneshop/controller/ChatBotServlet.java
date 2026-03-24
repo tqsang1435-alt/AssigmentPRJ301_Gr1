@@ -153,9 +153,9 @@ public class ChatBotServlet extends HttpServlet {
             return rejectReply;
         }
 
-        // --- KIỂM TRA HỎI VỀ GIẢM GIÁ / ƯU ĐÃI ---
-        if (message.toLowerCase().matches(".*(giảm giá|ưu đãi|khuyến mãi|sale).*")) {
-            String discountReply = "Dạ, cửa hàng đang có giảm giá theo bậc thành viên có thể giảm tới 15% (mức giảm giá cụ thể đã được ghi trong hồ sơ người dùng của anh/chị) ạ. Anh/chị cần em hỗ trợ tư vấn mẫu máy nào không ạ?";
+        // --- KIỂM TRA HỎI VỀ GIẢM GIÁ / ƯU ĐÃI / ĐIỂM ---
+        if (message.toLowerCase().matches(".*(giảm giá|ưu đãi|khuyến mãi|sale|điểm).*")) {
+            String discountReply = "Dạ, cửa hàng đang có giảm giá theo bậc thành viên có thể giảm tới 15% (mức giảm giá cụ thể đã được ghi trong hồ sơ người dùng của anh/chị) ạ. Lưu ý điểm tích lũy sẽ reset sau khi sang năm mới. Anh/chị cần em hỗ trợ tư vấn mẫu máy nào không ạ?";
             saveHistory(session, history, message, discountReply, sessionKey);
             return discountReply;
         }
