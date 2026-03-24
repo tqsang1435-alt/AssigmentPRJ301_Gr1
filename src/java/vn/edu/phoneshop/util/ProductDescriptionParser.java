@@ -13,12 +13,6 @@ import vn.edu.phoneshop.model.Product;
  */
 public class ProductDescriptionParser {
 
-    // Các từ khóa thường xuất hiện trong phần "Đặc điểm nổi bật"
-    private static final List<String> HIGHLIGHT_STARTERS = Arrays.asList(
-        "Đặc điểm nổi bật", "Điểm nổi bật", "Nổi bật", "Ưu điểm", 
-        "Thiết kế", "Màn hình", "Hiệu năng", "Camera", "Pin", "Sạc"
-    );
-
     // Regex để trích xuất thông số kỹ thuật phổ biến
     private static final Map<String, Pattern> SPEC_PATTERNS = new LinkedHashMap<>();
 
@@ -27,23 +21,23 @@ public class ProductDescriptionParser {
         SPEC_PATTERNS.put("ram", Pattern.compile("(?i)(?:ram| bộ nhớ ram)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:gb|g| )", Pattern.CASE_INSENSITIVE));
         
         // ROM / bộ nhớ trong
-        SPEC_PATTERNS.put("rom", Pattern.compile("(?i)(?:rom|bộ nhớ trong|bộ nhớ)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:gb|g|tb| )", Pattern.CASE_INSENSITIVE));
+        SPEC_PATTERNS.put("rom", Pattern.compile("(?i)(?:rom|bộ nhớ trong|bộ nhớ|dung lượng)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:gb|g|tb| )|(\\d+)\\s*(TB|GB)", Pattern.CASE_INSENSITIVE));
         
         // Pin
-        SPEC_PATTERNS.put("battery", Pattern.compile("(?i)(?:pin|dung lượng pin)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:mah|mAh| )", Pattern.CASE_INSENSITIVE));
+        SPEC_PATTERNS.put("battery", Pattern.compile("(?i)(?:pin|dung lượng pin|battery)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:mah|mAh| )", Pattern.CASE_INSENSITIVE));
         
         // Sạc nhanh
         SPEC_PATTERNS.put("charging", Pattern.compile("(?i)(?:sạc|sạc nhanh|sạc siêu nhanh)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:w|W| )", Pattern.CASE_INSENSITIVE));
         
         // Màn hình
-        SPEC_PATTERNS.put("screen_size", Pattern.compile("(?i)(?:màn hình|screen)\\s*[:\\-–]?\\s*(\\d+\\.?\\d*)\\s*(?:inch|\")", Pattern.CASE_INSENSITIVE));
-        SPEC_PATTERNS.put("refresh_rate", Pattern.compile("(?i)(?:tần số quét|refresh rate)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:hz|Hz)", Pattern.CASE_INSENSITIVE));
+        SPEC_PATTERNS.put("screen_size", Pattern.compile("(?i)(?:màn hình|screen)\\s*[:\\-–]?\\s*(\\d+\\.?\\d*)\\s*(?:inch|\")|(\\d+\\.?\\d*)\\s*inch", Pattern.CASE_INSENSITIVE));
+        SPEC_PATTERNS.put("refresh_rate", Pattern.compile("(?i)(?:tần số quét|refresh rate)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:hz|Hz)|(\\d+)\\s*Hz", Pattern.CASE_INSENSITIVE));
         
         // Camera chính
         SPEC_PATTERNS.put("camera_main", Pattern.compile("(?i)(?:camera chính|camera sau|camera)\\s*[:\\-–]?\\s*(\\d+)\\s*(?:mp|MP)", Pattern.CASE_INSENSITIVE));
         
         // Chip
-        SPEC_PATTERNS.put("chipset", Pattern.compile("(?i)(?:chip|vi xử lý|processor|snapdragon|dimensity|exynos|helio|unisoc).*?([A-Za-z0-9\\s\\(\\)\\-]+)", Pattern.CASE_INSENSITIVE));
+        SPEC_PATTERNS.put("chipset", Pattern.compile("(?i)(?:chip|vi xử lý|processor|snapdragon|dimensity|exynos|helio|unisoc).*?([A-Za-z0-9\\s\\(\\)\\-]+)|(A\\d{2}\\s?Pro)", Pattern.CASE_INSENSITIVE));
     }
 
     /**
@@ -60,8 +54,8 @@ public class ProductDescriptionParser {
             return result;
         }
 
-        // Lọc bảng so sánh ra trước khi parse để tránh nhiễu
-        desc = desc.replaceAll("(?is)Bảng so sánh.*", "");
+        // Lọc sạch dữ liệu trước khi parse để tránh nhiễu
+        desc = cleanDescription(desc);
 
         // 1. Trích xuất phần đặc điểm nổi bật (thường nằm ở đầu)
         List<String> highlights = extractHighlights(desc);
@@ -69,6 +63,17 @@ public class ProductDescriptionParser {
 
         // 2. Trích xuất các thông số kỹ thuật bằng regex
         Map<String, String> specs = extractSpecifications(desc);
+        
+        // Bổ sung RAM/ROM từ DB vào specs nếu regex không quét được
+        if (!specs.containsKey("ram") && product.getRam() != null && !product.getRam().trim().isEmpty()) {
+            String r = product.getRam().trim();
+            specs.put("ram", r + (r.matches("\\d+") ? " GB" : ""));
+        }
+        if (!specs.containsKey("rom") && product.getRom() != null && !product.getRom().trim().isEmpty()) {
+            String r = product.getRom().trim();
+            specs.put("rom", r + (r.matches("\\d+") ? " GB" : ""));
+        }
+        
         result.put("specs", specs);
 
         // 3. Tạo mô tả ngắn gọn (lấy 1-3 câu đầu hoặc phần tóm tắt)
@@ -86,69 +91,51 @@ public class ProductDescriptionParser {
     }
 
     /**
-     * Trích xuất danh sách các điểm mạnh nổi bật (bullet points)
+     * Lọc sạch dữ liệu trước khi parse
+     */
+    private static String cleanDescription(String text) {
+        return text
+            // remove bảng
+            .replaceAll("(?is)Bảng so sánh.*", "")
+            // remove giá
+            .replaceAll("(?is)Giá bán.*", "")
+            // remove FAQ
+            .replaceAll("(?is)Những thông tin cần biết.*", "")
+            // remove marketing dài
+            .replaceAll("(?is)Vì sao .*?\\?", "")
+            // remove nhiều space
+            .replaceAll("\\s{2,}", " ")
+            .trim();
+    }
+
+    /**
+     * Trích xuất danh sách các điểm mạnh nổi bật bằng NLP theo câu
      */
     private static List<String> extractHighlights(String text) {
-        List<String> highlights = new ArrayList<>();
-        
-        // Tìm đoạn bắt đầu bằng "Đặc điểm nổi bật" hoặc tương tự
-        String lower = text.toLowerCase();
-        int startIdx = -1;
-        
-        for (String starter : HIGHLIGHT_STARTERS) {
-            int idx = lower.indexOf(starter.toLowerCase());
-            if (idx >= 0) {
-                startIdx = idx;
-                break;
+        List<String> result = new ArrayList<>();
+
+        String[] sentences = text.split("(?<=[.!?])\\s+");
+
+        for (String s : sentences) {
+            String lower = s.toLowerCase();
+
+            if (
+                lower.contains("chip") ||
+                lower.contains("camera") ||
+                lower.contains("màn hình") ||
+                lower.contains("pin") ||
+                lower.contains("hiệu năng") ||
+                lower.contains("titan")
+            ) {
+                result.add(s.trim());
             }
+
+            if (result.size() >= 5) break;
         }
-        
-        if (startIdx < 0) {
-            // Không tìm thấy → lấy 4-8 dòng đầu có dấu đầu dòng hoặc số
-            String[] lines = text.split("\n");
-            for (String line : lines) {
-                String trimmed = line.trim();
-                String tLower = trimmed.toLowerCase();
-                boolean hasKeywords = tLower.contains("mang đến") || tLower.contains("đột phá") || tLower.contains("siêu việt");
-                
-                if (trimmed.startsWith("-") || trimmed.startsWith("•") || trimmed.matches("^\\d+\\.\\s.*") || hasKeywords) {
-                    String clean = trimmed.replaceAll("^[\\-\\•\\d\\.\\s]+", "").trim();
-                    if (!clean.isEmpty() && (clean.length() > 15 || hasKeywords)) {
-                        highlights.add(clean);
-                    }
-                }
-                if (highlights.size() >= 8) break;
-            }
-        } else {
-            // Có phần đặc điểm nổi bật → lấy các dòng sau đó
-            String sub = text.substring(startIdx);
-            String[] lines = sub.split("\n");
-            boolean inHighlight = true;
-            
-            for (String line : lines) {
-                String trimmed = line.trim();
-                if (trimmed.isEmpty()) continue;
-                
-                // Dừng khi gặp tiêu đề khác hoặc đoạn văn dài
-                if (trimmed.length() > 100 || trimmed.matches("(?i)(xem thêm|thông số kỹ thuật|tóm lại)")) {
-                    inHighlight = false;
-                }
-                
-                String tLower = trimmed.toLowerCase();
-                boolean hasKeywords = tLower.contains("mang đến") || tLower.contains("đột phá") || tLower.contains("siêu việt");
-                
-                if (inHighlight && (trimmed.startsWith("-") || trimmed.startsWith("•") || trimmed.matches("^\\d+\\.\\s.*") || hasKeywords)) {
-                    String clean = trimmed.replaceAll("^[\\-\\•\\d\\.\\s]+", "").trim();
-                    if (!clean.isEmpty()) {
-                        highlights.add(clean);
-                    }
-                }
-                
-                if (highlights.size() >= 8) break;
-            }
-        }
-        
-        return highlights.size() > 0 ? highlights : Collections.singletonList("Không trích xuất được điểm nổi bật");
+
+        return result.isEmpty()
+            ? Collections.singletonList("Không trích xuất được")
+            : result;
     }
 
     /**
@@ -160,19 +147,42 @@ public class ProductDescriptionParser {
         for (Map.Entry<String, Pattern> entry : SPEC_PATTERNS.entrySet()) {
             Matcher matcher = entry.getValue().matcher(text);
             if (matcher.find()) {
-                String value = matcher.group(1).trim();
                 String k = entry.getKey();
+                String value = "";
+                
+                // Lấy group đầu tiên có giá trị
+                for (int i = 1; i <= matcher.groupCount(); i++) {
+                    if (matcher.group(i) != null) {
+                        value = matcher.group(i).trim();
+                        // Gộp group kế tiếp (nếu là đơn vị TB/GB/inch/Hz được define trong regex riêng)
+                        if (i + 1 <= matcher.groupCount() && matcher.group(i + 1) != null && (k.equals("rom") || k.equals("screen_size") || k.equals("refresh_rate"))) {
+                            value += " " + matcher.group(i + 1).trim();
+                        }
+                        break;
+                    }
+                }
+                
+                if (value.isEmpty()) {
+                    value = matcher.group().trim();
+                }
                 
                 // Chuẩn hóa một chút
                 if (k.equals("chipset") && value.length() > 40) {
                     value = value.substring(0, 40) + "...";
                 }
                 
+                // Xử lý riêng biệt cho các format đặc thù (TB của Apple)
+                if (value.toLowerCase().contains("tb")) {
+                    value = value.replace(" ", "");
+                }
+                
                 // Chuẩn hóa đơn vị
-                if (k.equals("ram") || k.equals("rom") || k.equals("rom_db") || k.equals("ram_db")) value = value + " GB";
-                if (k.equals("battery")) value = value + " mAh";
-                if (k.equals("charging")) value = value + " W";
-                if (k.equals("camera_main")) value = value + " MP";
+                if ((k.equals("ram") || k.equals("rom") || k.equals("rom_db") || k.equals("ram_db")) && value.matches("\\d+")) value = value + " GB";
+                if (k.equals("battery") && value.matches("\\d+")) value = value + " mAh";
+                if (k.equals("charging") && value.matches("\\d+")) value = value + " W";
+                if (k.equals("camera_main") && value.matches("\\d+")) value = value + " MP";
+                if (k.equals("screen_size") && value.matches("\\d+\\.?\\d*")) value = value + " inch";
+                if (k.equals("refresh_rate") && value.matches("\\d+")) value = value + " Hz";
                 
                 specs.put(k, value);
             }
@@ -182,28 +192,23 @@ public class ProductDescriptionParser {
     }
 
     /**
-     * Tạo mô tả ngắn gọn (1-2 câu đầu hoặc phần tóm tắt)
+     * Tạo mô tả ngắn gọn (dùng NLP đơn giản)
      */
     private static String extractShortDescription(String text) {
-        String[] paragraphs = text.split("\n\\n+");
-        if (paragraphs.length == 0) return "";
-        
-        String firstPara = paragraphs[0].trim();
-        if (firstPara.length() > 300) {
-            firstPara = firstPara.substring(0, 280) + "...";
-        }
-        
-        // Ưu tiên đoạn có từ "là lựa chọn", "mang đến", "đáp ứng"
-        for (String p : paragraphs) {
-            if (p.contains("là lựa chọn") || p.contains("mang đến") || p.contains("phù hợp")) {
-                String candidate = p.trim();
-                if (candidate.length() < 350) {
-                    return candidate;
-                }
+        String[] sentences = text.split("(?<=[.!?])\\s+");
+
+        for (String s : sentences) {
+            String lower = s.toLowerCase();
+            if (
+                lower.contains("chip") ||
+                lower.contains("hiệu năng") ||
+                lower.contains("camera")
+            ) {
+                return s.trim();
             }
         }
-        
-        return firstPara;
+
+        return sentences.length > 0 ? sentences[0].trim() : "";
     }
 
     // -------------------------------------------------------------------------

@@ -131,17 +131,19 @@
                                             <div class="card-header"
                                                 style="display: flex; justify-content: space-between; align-items: center;">
                                                 <h3 class="card-title"><i class="ti-wand"
-                                                        style="color: var(--primary-color);"></i> AI Phân Tích & Dự Đoán
+                                                        style="color: var(--primary-color);"></i> AI Dự Đoán
                                                 </h3>
-                                                <button id="btn-ai-analyze" class="btn btn--primary"
-                                                    style="height: 36px; padding: 0 15px; border-radius: 4px; border: none; cursor: pointer; color: #fff; background-color: var(--primary-color);">Phân
-                                                    tích ngay</button>
+                                                <div style="display: flex; gap: 10px;">
+                                                    <button id="btn-ai-analyze-force" class="btn btn--outline"
+                                                        style="height: 36px; padding: 0 15px; border-radius: 4px; cursor: pointer; color: var(--primary-color); border: 1px solid var(--primary-color); background-color: transparent;">Dự đoán lại</button>
+                                                    <button id="btn-ai-analyze" class="btn btn--primary"
+                                                        style="height: 36px; padding: 0 15px; border-radius: 4px; border: none; cursor: pointer; color: #fff; background-color: var(--primary-color);">Dự đoán ngay</button>
+                                                </div>
                                             </div>
                                             <div class="card-body">
                                                 <div id="ai-result"
                                                     style="padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 100px; font-size: 1.5rem; line-height: 1.6; white-space: pre-wrap; color: var(--text-color);">
-                                                    Nhấn nút "Phân tích ngay" để AI đưa ra nhận xét về tình hình kinh
-                                                    doanh và dự đoán xu hướng sắp tới dựa trên dữ liệu hiện tại...</div>
+                                                    Nhấn nút "Dự đoán ngay" để AI dự đoán xu hướng và nhu cầu tồn kho sắp tới dựa trên dữ liệu hiện tại...</div>
                                             </div>
                                         </div>
                                     </div>
@@ -154,12 +156,12 @@
                 <script>
                     // Khai báo data arrays ở scope ngoài để Chart.js và AI listener dùng chung
                     // Tránh lỗi "Cannot redeclare block-scoped variable"
-                    var dailyLabels   = ${dailyLabels};
-                    var dailyValues   = ${dailyData};
-                    var monthlyLabels = ${monthlyLabels};
-                    var monthlyValues = ${monthlyData};
-                    var productLabels = ${productLabels};
-                    var productValues = ${productData};
+                    var dailyLabels = ${ dailyLabels };
+                    var dailyValues = ${ dailyData };
+                    var monthlyLabels = ${ monthlyLabels };
+                    var monthlyValues = ${ monthlyData };
+                    var productLabels = ${ productLabels };
+                    var productValues = ${ productData };
 
                     // 1. Biểu đồ ngày (Line Chart)
                     new Chart(document.getElementById('dailyChart'), {
@@ -204,30 +206,34 @@
                         options: { responsive: true, maintainAspectRatio: false }
                     });
 
-                    // AI Phân tích
-                    document.getElementById('btn-ai-analyze').addEventListener('click', function () {
-                        var btn = this;
+                    // AI Dự đoán
+                    function analyzeAI(force) {
+                        var btnAnalyze = document.getElementById('btn-ai-analyze');
+                        var btnForce = document.getElementById('btn-ai-analyze-force');
+                        var activeBtn = force ? btnForce : btnAnalyze;
                         var resultDiv = document.getElementById('ai-result');
 
-                        btn.disabled = true;
-                        btn.innerText = 'Đang phân tích...';
+                        btnAnalyze.disabled = true;
+                        if (btnForce) btnForce.disabled = true;
+                        var originalText = activeBtn.innerText;
+                        activeBtn.innerText = 'Đang dự đoán...';
                         resultDiv.innerHTML = '<div style="text-align: center; color: #666;"><i class="ti-reload" style="animation: spin 1s linear infinite; display: inline-block;"></i> AI đang xử lý dữ liệu...</div>';
 
                         // Fix Lỗi 2: Tạo chuỗi dữ liệu có label ngày/tháng để AI phân tích được chính xác
-                        var dailyDetail = dailyLabels.map(function(d, i) {
+                        var dailyDetail = dailyLabels.map(function (d, i) {
                             return '  ' + d + ': ' + (dailyValues[i] || 0).toLocaleString('vi-VN') + ' VNĐ';
                         }).join('\n');
 
-                        var monthlyDetail = monthlyLabels.map(function(m, i) {
+                        var monthlyDetail = monthlyLabels.map(function (m, i) {
                             return '  Tháng ' + m + ': ' + (monthlyValues[i] || 0).toLocaleString('vi-VN') + ' VNĐ';
                         }).join('\n');
 
-                        var productDetail = productLabels.map(function(p, i) {
+                        var productDetail = productLabels.map(function (p, i) {
                             return '  ' + p + ': ' + (productValues[i] || 0).toLocaleString('vi-VN') + ' VNĐ doanh thu';
                         }).join('\n');
 
                         var prompt =
-                            "Bạn là chuyên gia phân tích dữ liệu kinh doanh. Dưới đây là số liệu thực tế của cửa hàng PhoneShop:\n" +
+                            "Bạn là chuyên gia dự đoán dữ liệu kinh doanh. Dưới đây là số liệu thực tế của cửa hàng PhoneShop:\n" +
                             "- Tổng khách hàng: ${totalCustomers} người\n" +
                             "- Tổng sản phẩm: ${totalProducts} sản phẩm\n" +
                             "- Đơn hàng mới (chờ xử lý): ${newOrders} đơn\n" +
@@ -235,51 +241,56 @@
                             "Doanh thu theo từng ngày gần đây:\n" + dailyDetail + "\n\n" +
                             "Doanh thu theo từng tháng:\n" + monthlyDetail + "\n\n" +
                             "Top sản phẩm bán chạy:\n" + productDetail + "\n\n" +
-                            "Dựa vào các số liệu trên, hãy:\n" +
-                            "1. Đánh giá tổng quan tình hình kinh doanh hiện tại (điểm mạnh, điểm yếu)\n" +
-                            "2. Phân tích xu hướng doanh thu (ngày/tháng nào tốt, ngày/tháng nào kém)\n" +
-                            "3. Dự đoán xu hướng tháng tới\n" +
-                            "4. Đề xuất 3 hành động cụ thể để tăng doanh thu\n" +
+                            "Dựa vào các số liệu trên, hãy CHỈ tập trung vào dự đoán (không phân tích tình hình hiện tại hay đánh giá tổng quan):\n" +
+                            "1. Dự đoán nhu cầu tồn kho để biết Model nào sẽ hết hàng hoặc dư hàng trong 7-30 ngày tới\n" +
+                            "2. Dự đoán xu hướng doanh thu trong tháng tới\n" +
                             "Trình bày rõ ràng bằng Markdown (dùng heading, bảng, bullet list).";
 
                         var formData = new URLSearchParams();
                         formData.append('message', prompt);
                         formData.append('mode', 'admin');
+                        if (force) formData.append('force', 'true');
 
                         fetch('chat-bot', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                             body: formData.toString()
                         })
-                        .then(function(response) { return response.text(); })
-                        .then(function(data) {
-                            // Fix Lỗi 3: Dùng marked.js để render Markdown đầy đủ
-                            // (headers, bảng, bold, italic, bullets, code blocks, hr...)
-                            if (typeof marked !== 'undefined') {
-                                marked.setOptions({ breaks: true, gfm: true });
-                                resultDiv.innerHTML = marked.parse(data);
-                            } else {
-                                // Fallback nếu marked.js không load được
-                                var html = data
-                                    .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
-                                    .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
-                                    .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
-                                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                                    .replace(/^[-*] (.*?)$/gm, '<li>$1</li>')
-                                    .replace(/^---$/gm, '<hr>')
-                                    .replace(/\n/g, '<br>');
-                                resultDiv.innerHTML = html;
-                            }
-                        })
-                        .catch(function(error) {
-                            resultDiv.innerHTML = '<span style="color: red;">Lỗi kết nối đến AI. Vui lòng thử lại sau.</span>';
-                        })
-                        .finally(function() {
-                            btn.disabled = false;
-                            btn.innerText = 'Phân tích ngay';
-                        });
-                    });
+                            .then(function (response) { return response.text(); })
+                            .then(function (data) {
+                                // Fix Lỗi 3: Dùng marked.js để render Markdown đầy đủ
+                                // (headers, bảng, bold, italic, bullets, code blocks, hr...)
+                                if (typeof marked !== 'undefined') {
+                                    marked.setOptions({ breaks: true, gfm: true });
+                                    resultDiv.innerHTML = marked.parse(data);
+                                } else {
+                                    // Fallback nếu marked.js không load được
+                                    var html = data
+                                        .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+                                        .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+                                        .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+                                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                        .replace(/^[-*] (.*?)$/gm, '<li>$1</li>')
+                                        .replace(/^---$/gm, '<hr>')
+                                        .replace(/\n/g, '<br>');
+                                    resultDiv.innerHTML = html;
+                                }
+                            })
+                            .catch(function (error) {
+                                resultDiv.innerHTML = '<span style="color: red;">Lỗi kết nối đến AI. Vui lòng thử lại sau.</span>';
+                            })
+                            .finally(function () {
+                                btnAnalyze.disabled = false;
+                                if (btnForce) btnForce.disabled = false;
+                                activeBtn.innerText = originalText;
+                            });
+                    }
+
+                    document.getElementById('btn-ai-analyze').addEventListener('click', function () { analyzeAI(false); });
+                    if (document.getElementById('btn-ai-analyze-force')) {
+                        document.getElementById('btn-ai-analyze-force').addEventListener('click', function () { analyzeAI(true); });
+                    }
                 </script>
 
                 <style>

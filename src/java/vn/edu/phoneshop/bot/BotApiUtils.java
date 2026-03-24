@@ -23,6 +23,23 @@ import vn.edu.phoneshop.model.bot.ChatMessage;
 
 public class BotApiUtils {
 
+    // Cache để tối ưu token: lưu lại các câu trả lời cho cùng một payload (cùng câu hỏi/context/dữ liệu)
+    private static final int MAX_CACHE_SIZE = 200;
+    private static final Map<String, String> responseCache = Collections.synchronizedMap(new java.util.LinkedHashMap<String, String>(MAX_CACHE_SIZE, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
+            return size() > MAX_CACHE_SIZE;
+        }
+    });
+
+    // Tùy chọn xóa cache chủ động (trường hợp muốn force AI chạy lại)
+    public static void clearCache() {
+        if (responseCache != null) {
+            responseCache.clear();
+            System.out.println("[GEMINI CACHE] Đã xoá toàn bộ cache theo yêu cầu.");
+        }
+    }
+
     private static final long COOLDOWN_TIME = 60 * 1000;
     /**
      * Cooldown map dùng composite key "apiKey::modelName" để tránh "oan" model khác
@@ -159,6 +176,12 @@ public class BotApiUtils {
      * lite → standard-flash → preferred → (pro nếu cần)
      */
     public static String callGeminiJSON(String jsonPayload, String preferredModel, boolean allowFallback) {
+        // --- Kiểm tra Cache (Tối ưu token nếu không có dữ liệu/câu hỏi mới) ---
+        if (responseCache.containsKey(jsonPayload)) {
+            System.out.println("[GEMINI CACHE HIT] Trả về kết quả từ cache (Tối ưu token)");
+            return responseCache.get(jsonPayload);
+        }
+
         // --- Xây dựng danh sách model theo thứ tự ưu tiên ---
         // Nguyên tắc: model nhỏ (lite) trước để tiết kiệm quota,
         // leo dần lên model preferred/pro khi các model nhỏ hết quota.
@@ -236,7 +259,12 @@ public class BotApiUtils {
                             String line;
                             while ((line = br.readLine()) != null)
                                 sb.append(line);
-                            return extractRobustJsonText(sb.toString());
+                            String result = extractRobustJsonText(sb.toString());
+                            // Lưu vào cache nếu kết quả hợp lệ (không phải lỗi)
+                            if (!result.startsWith("[Lỗi") && !result.startsWith("Xin lỗi")) {
+                                responseCache.put(jsonPayload, result);
+                            }
+                            return result;
                         }
                     } else if (code == 429) {
                         // Chỉ cooldown TỔ HỢP (key + model) này, không ảnh hưởng key ở model khác

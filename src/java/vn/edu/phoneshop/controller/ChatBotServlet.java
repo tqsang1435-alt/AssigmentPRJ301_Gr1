@@ -67,6 +67,12 @@ public class ChatBotServlet extends HttpServlet {
 
         String message = request.getParameter("message");
         String mode = request.getParameter("mode");
+        String force = request.getParameter("force");
+
+        // Xóa cache nếu request có cờ force
+        if ("true".equals(force)) {
+            BotApiUtils.clearCache();
+        }
 
         // Anti-spam Rate Limit: chỉ áp dụng cho user chat, KHÔNG áp dụng cho admin
         if (!"admin".equals(mode)) {
@@ -433,8 +439,8 @@ public class ChatBotServlet extends HttpServlet {
                     .collect(Collectors.toList());
         }
 
-        boolean isComplex = intent.isComparison || message.length() > 100 || message.toLowerCase().contains("tại sao")
-                || message.toLowerCase().contains("tư vấn kỹ");
+        boolean isComplex = intent.isComparison || message.length() > 100 
+                || message.toLowerCase().matches(".*(tại sao|tư vấn kỹ|thông số|cấu hình|chi tiết).*");
         String targetModel = isComplex ? "gemini-2.5-pro" : "gemini-2.5-flash";
 
         // 3. Bypass AI hoàn toàn nếu đủ Intent (Đơn giản + Nhu cầu rõ ràng)
@@ -466,7 +472,7 @@ public class ChatBotServlet extends HttpServlet {
                         if (specs.containsKey("chipset") && msgLower.matches(".*(chip|snapdragon|dimensity|exynos|helio|unisoc|bionic|vi xử lý|processor).*")) chipInfo = " / Chip " + specs.get("chipset");
                         if (specs.containsKey("screen_size") && msgLower.matches(".*(màn|inch|to|nhỏ).*")) screenInfo = " / Màn hình " + specs.get("screen_size");
                         if (specs.containsKey("refresh_rate") && msgLower.matches(".*(hz|tần số quét|mượt).*")) hzInfo = " / Tần số quét " + specs.get("refresh_rate");
-                        if (specs.containsKey("charging") && msgLower.matches(".*(sạc|w).*")) chargingInfo = " / Sạc " + specs.get("charging");
+                        if (specs.containsKey("charging") && msgLower.matches(".*(sạc|\\d+\\s*w\\b).*")) chargingInfo = " / Sạc " + specs.get("charging");
                     }
 
                     directHtml.append("- **[").append(p.getProductName()).append("](detail?id=")
@@ -514,7 +520,7 @@ public class ChatBotServlet extends HttpServlet {
                     if (specs.containsKey("chipset") && msgLower.matches(".*(chip|snapdragon|dimensity|exynos|helio|unisoc|bionic|vi xử lý|processor).*")) chipInfo = ", Chip " + specs.get("chipset");
                     if (specs.containsKey("screen_size") && msgLower.matches(".*(màn|inch|to|nhỏ).*")) screenInfo = ", Màn hình " + specs.get("screen_size");
                     if (specs.containsKey("refresh_rate") && msgLower.matches(".*(hz|tần số quét|mượt).*")) hzInfo = ", Tần số quét " + specs.get("refresh_rate");
-                    if (specs.containsKey("charging") && msgLower.matches(".*(sạc|w).*")) chargingInfo = ", Sạc " + specs.get("charging");
+                    if (specs.containsKey("charging") && msgLower.matches(".*(sạc|\\d+\\s*w\\b).*")) chargingInfo = ", Sạc " + specs.get("charging");
                 }
 
                 String directReply = "Dạ, mẫu **[" + best.getProductName() + "](detail?id=" + best.getProductID()
@@ -555,6 +561,8 @@ public class ChatBotServlet extends HttpServlet {
         String intentData = BotPromptUtils.buildIntentContext(intent);
         String personalCtx = BotPromptUtils.buildPersonalizationContext(userMemory);
 
+        boolean isInfoOrSpecs = message.toLowerCase().matches(".*(tại sao|tư vấn kỹ|thông số|cấu hình|chi tiết|review|đánh giá|khác biệt|như thế nào|thông tin|có gì mới).*");
+
         String systemRole;
         if (intent.isComparison) {
             systemRole = "Bạn là chuyên gia tư vấn Smartphone cao cấp của PhoneShop.\n" +
@@ -567,6 +575,18 @@ public class ChatBotServlet extends HttpServlet {
                     (personalCtx.isEmpty() ? "" : "--- HÀNH VI KHÁCH HÀNG (Personalization) ---\n" + personalCtx + "\n") +
                     "--- YÊU CẦU ĐÃ PHÂN TÍCH TỪ KHÁCH HÀNG ---\n" + intentData + "\n" +
                     "--- CONTEXT (Kho SP Tốt Nhất Khớp Thuật Toán) ---\n" + contextData
+                    + "\n--------------------------------\n";
+        } else if (isInfoOrSpecs) {
+            systemRole = "Bạn là chuyên gia tư vấn Smartphone cao cấp của PhoneShop.\n" +
+                    "QUY TẮC NGHIÊM NGẶT (TUYỆT ĐỐI TUÂN THỦ):\n" +
+                    "1. DÙNG TIẾNG VIỆT tự nhiên, thân thiện, trả lời tập trung vào câu hỏi.\n" +
+                    "2. YÊU CẦU NÀY LÀ HỎI THÔNG TIN / THÔNG SỐ: Hãy cung cấp đầy đủ thông số cấu hình, tính năng, đánh giá từ dữ liệu CONTEXT một cách rành mạch.\n" +
+                    "3. KHÔNG ÉP BUỘC CHỐT SALE. Chỉ tập trung cung cấp giải đáp đúng trọng tâm thắc mắc của khách hàng.\n" +
+                    "4. NO HALLUCINATION: Tuyệt đối không bịa thông tin sản phẩm ngoài Context. Chỉ sử dụng thông tin và giá từ CONTEXT cung cấp, nếu không có dữ liệu hãy nói chưa có.\n" +
+                    "5. OUTPUT FORMAT: LUÔN LUÔN trả lời bằng Markdown chuẩn. Nhắc đến sản phẩm thì bắt buộc gắn link sản phẩm bằng dạng Markdown link như trong CONTEXT, ví dụ: **[Tên SP](detail?id=123)**.\n\n" +
+                    (personalCtx.isEmpty() ? "" : "--- HÀNH VI KHÁCH HÀNG (Personalization) ---\n" + personalCtx + "\n") +
+                    "--- YÊU CẦU ĐÃ PHÂN TÍCH TỪ KHÁCH HÀNG ---\n" + intentData + "\n" +
+                    "--- CONTEXT (Thông Tin SP Khớp Lọc) ---\n" + contextData
                     + "\n--------------------------------\n";
         } else {
             systemRole = "Bạn là chuyên gia tư vấn Smartphone cao cấp của PhoneShop.\n" +
@@ -616,7 +636,7 @@ public class ChatBotServlet extends HttpServlet {
                     if (specs.containsKey("chipset") && msgLower.matches(".*(chip|snapdragon|dimensity|exynos|helio|unisoc|bionic|vi xử lý|processor).*")) chipInfo = specs.get("chipset");
                     if (specs.containsKey("screen_size") && msgLower.matches(".*(màn|inch|to|nhỏ).*")) screenInfo = specs.get("screen_size");
                     if (specs.containsKey("refresh_rate") && msgLower.matches(".*(hz|tần số quét|mượt).*")) hzInfo = specs.get("refresh_rate");
-                    if (specs.containsKey("charging") && msgLower.matches(".*(sạc|w).*")) chargingInfo = specs.get("charging");
+                    if (specs.containsKey("charging") && msgLower.matches(".*(sạc|\\d+\\s*w\\b).*")) chargingInfo = specs.get("charging");
                 }
 
                 sb.append("- **[").append(p.getProductName()).append("](detail?id=").append(p.getProductID())
