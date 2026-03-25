@@ -26,25 +26,21 @@ public class CheckoutControl extends HttpServlet {
 
         User account = (User) session.getAttribute("ACC");
         if (account == null) {
-            response.sendRedirect("user-login"); // Redirect to login page
+            response.sendRedirect("user-login");
             return;
         }
 
-        // Check if cart is empty
         Cart cart = (Cart) session.getAttribute("cart");
         if (cart == null || cart.getSelectedTotalQuantity() == 0) {
-            // Redirect to cart page with an error message
             request.setAttribute("mess", "Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
             request.getRequestDispatcher("/cart.jsp").forward(request, response);
             return;
         }
 
-        // Tính toán giảm giá theo hạng thành viên
         double discountPercent = getDiscountPercent(account.getCustomerType());
         cart.setDiscountPercent(discountPercent);
-        cart.setVoucherDiscount(0); // Reset voucher discount
+        cart.setVoucherDiscount(0);
 
-        // Lấy danh sách voucher hợp lệ
         VoucherDAO voucherDAO = new VoucherDAO();
         List<Voucher> validVouchers = voucherDAO.getAllValidVouchers();
         if (validVouchers.isEmpty()) {
@@ -52,9 +48,8 @@ public class CheckoutControl extends HttpServlet {
             validVouchers = voucherDAO.getAllValidVouchers();
         }
         request.setAttribute("validVouchers", validVouchers);
-        request.setAttribute("appliedVoucher", null); // Reset applied voucher
+        request.setAttribute("appliedVoucher", null);
 
-        // Forward to the checkout page to display it
         request.getRequestDispatcher("checkout.jsp").forward(request, response);
     }
 
@@ -89,16 +84,17 @@ public class CheckoutControl extends HttpServlet {
         String address = request.getParameter("address");
         String voucherCode = request.getParameter("voucher");
 
-        // 1. Kiểm tra dữ liệu nhập vào có bị trống không
-        if (name == null || name.trim().isEmpty() || phone == null || phone.trim().isEmpty() || address == null
-                || address.trim().isEmpty()) {
+        // 1. Kiểm tra dữ liệu nhập vào
+        if (name == null || name.trim().isEmpty()
+                || phone == null || phone.trim().isEmpty()
+                || address == null || address.trim().isEmpty()) {
             request.setAttribute("mess", "Vui lòng điền đầy đủ thông tin nhận hàng (Họ tên, SĐT, Địa chỉ)!");
             attachVouchersToRequest(request);
             request.getRequestDispatcher("checkout.jsp").forward(request, response);
             return;
         }
 
-        // 2. Kiểm tra định dạng số điện thoại (10-11 chữ số)
+        // 2. Kiểm tra số điện thoại
         if (!phone.matches("\\d{10,11}")) {
             request.setAttribute("mess", "Số điện thoại không hợp lệ (phải là 10-11 số)!");
             attachVouchersToRequest(request);
@@ -124,7 +120,6 @@ public class CheckoutControl extends HttpServlet {
                 request.getRequestDispatcher("checkout.jsp").forward(request, response);
                 return;
             }
-            // Tính discount tạm thời để check min order (dùng selectedTotalPrice thay vì getTotalPrice)
             double tempTotal = cart.getSelectedTotalPrice();
             double rankDiscount = tempTotal * (getDiscountPercent(user.getCustomerType()) / 100.0);
             double subtotalAfterRank = tempTotal - rankDiscount;
@@ -134,7 +129,6 @@ public class CheckoutControl extends HttpServlet {
                 request.getRequestDispatcher("checkout.jsp").forward(request, response);
                 return;
             }
-            // Tính voucher discount
             if ("percent".equals(voucher.getDiscountType())) {
                 voucherDiscount = subtotalAfterRank * (voucher.getDiscountValue() / 100.0);
                 if (voucher.getMaxDiscount() > 0 && voucherDiscount > voucher.getMaxDiscount()) {
@@ -147,28 +141,29 @@ public class CheckoutControl extends HttpServlet {
             request.setAttribute("appliedVoucher", voucher);
         }
 
-        // Tính toán tổng tiền sau khi giảm giá
+        // 4. Tính tổng tiền
         double discountPercent = getDiscountPercent(user.getCustomerType());
         cart.setDiscountPercent(discountPercent);
         cart.setVoucherDiscount(voucherDiscount);
         double selectedTotal = cart.getSelectedTotalPrice();
         double discountAmount = selectedTotal * (discountPercent / 100.0) + voucherDiscount;
-        double totalMoney = selectedTotal - discountAmount; // đã tính dựa trên selected items
+        double totalMoney = selectedTotal - discountAmount;
 
+        // 5. Tạo đơn hàng (truyền address thẳng vào INSERT để tránh lỗi NOT NULL)
         OrderDAO dao = new OrderDAO();
-        // Tạo đơn hàng mới với trạng thái 1 (Chờ xác nhận)
-        int orderId = dao.createOrder(user.getUserID(), totalMoney, 1, voucherID);
+        int orderId = dao.createOrder(user.getUserID(), totalMoney, 1, voucherID, address);
 
         if (orderId > 0) {
-            dao.updateOrderStatusAndAddress(orderId, 1, address);
+            // Thêm chi tiết đơn hàng
             for (CartItem item : cart.getSelectedItems()) {
-                dao.insertOrderDetail(orderId, item.getProduct().getProductID(), item.getQuantity(),
-                        item.getProduct().getPrice());
+                dao.insertOrderDetail(orderId, item.getProduct().getProductID(),
+                        item.getQuantity(), item.getProduct().getPrice());
             }
             // Tăng used count cho voucher
             if (voucherID > 0) {
                 voucherDAO.incrementUsedCount(voucherID);
             }
+            // Xóa giỏ hàng
             session.removeAttribute("cart");
             session.setAttribute("cartCount", 0);
 
@@ -179,21 +174,14 @@ public class CheckoutControl extends HttpServlet {
             user.setRewardPoints(user.getRewardPoints() + pointsEarned);
             int newPoints = user.getRewardPoints();
             String newType;
-            if (newPoints >= 20000)
-                newType = "Diamond";
-            else if (newPoints >= 10000)
-                newType = "Gold";
-            else if (newPoints >= 5000)
-                newType = "Silver";
-            else if (newPoints >= 1000)
-                newType = "Bronze";
-            else
-                newType = "New Member";
+            if (newPoints >= 20000) newType = "Diamond";
+            else if (newPoints >= 10000) newType = "Gold";
+            else if (newPoints >= 5000) newType = "Silver";
+            else if (newPoints >= 1000) newType = "Bronze";
+            else newType = "New Member";
 
             user.setCustomerType(newType);
-            // Lưu CustomerType mới vào database
             userDAO.updateCustomerType(user.getUserID(), newType);
-
             session.setAttribute("ACC", user);
 
             request.setAttribute("message", "Đơn hàng của bạn đã được gửi đến địa chỉ: " + address
@@ -206,33 +194,24 @@ public class CheckoutControl extends HttpServlet {
         }
     }
 
-    // Đính kèm danh sách voucher vào request khi forward về checkout.jsp
     private void attachVouchersToRequest(HttpServletRequest request) {
         try {
             VoucherDAO voucherDAO = new VoucherDAO();
             List<Voucher> validVouchers = voucherDAO.getAllValidVouchers();
             request.setAttribute("validVouchers", validVouchers);
         } catch (Exception e) {
-            // ignore, page can still render without vouchers
+            // ignore
         }
     }
 
-    // Lấy phần trăm giảm giá dựa trên hạng thành viên.
     public static double getDiscountPercent(String customerType) {
-        if (customerType == null) {
-            return 0.0;
-        }
+        if (customerType == null) return 0.0;
         switch (customerType) {
-            case "Diamond":
-                return 15.0;
-            case "Gold":
-                return 10.0;
-            case "Silver":
-                return 5.0;
-            case "Bronze":
-                return 2.0;
-            default:
-                return 0.0;
+            case "Diamond": return 15.0;
+            case "Gold":    return 10.0;
+            case "Silver":  return 5.0;
+            case "Bronze":  return 2.0;
+            default:        return 0.0;
         }
     }
 }
