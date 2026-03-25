@@ -79,6 +79,7 @@ public class CheckoutControl extends HttpServlet {
 
         if (cart.getSelectedTotalQuantity() == 0) {
             request.setAttribute("mess", "Vui lòng chọn ít nhất một sản phẩm để thanh toán!");
+            attachVouchersToRequest(request);
             request.getRequestDispatcher("checkout.jsp").forward(request, response);
             return;
         }
@@ -92,6 +93,7 @@ public class CheckoutControl extends HttpServlet {
         if (name == null || name.trim().isEmpty() || phone == null || phone.trim().isEmpty() || address == null
                 || address.trim().isEmpty()) {
             request.setAttribute("mess", "Vui lòng điền đầy đủ thông tin nhận hàng (Họ tên, SĐT, Địa chỉ)!");
+            attachVouchersToRequest(request);
             request.getRequestDispatcher("checkout.jsp").forward(request, response);
             return;
         }
@@ -99,6 +101,7 @@ public class CheckoutControl extends HttpServlet {
         // 2. Kiểm tra định dạng số điện thoại (10-11 chữ số)
         if (!phone.matches("\\d{10,11}")) {
             request.setAttribute("mess", "Số điện thoại không hợp lệ (phải là 10-11 số)!");
+            attachVouchersToRequest(request);
             request.getRequestDispatcher("checkout.jsp").forward(request, response);
             return;
         }
@@ -111,20 +114,23 @@ public class CheckoutControl extends HttpServlet {
             Voucher voucher = voucherDAO.getVoucherByCode(voucherCode.trim());
             if (voucher == null) {
                 request.setAttribute("mess", "Mã voucher không tồn tại!");
+                attachVouchersToRequest(request);
                 request.getRequestDispatcher("checkout.jsp").forward(request, response);
                 return;
             }
             if (!voucherDAO.isVoucherValid(voucher)) {
                 request.setAttribute("mess", "Mã voucher không hợp lệ hoặc đã hết hạn!");
+                attachVouchersToRequest(request);
                 request.getRequestDispatcher("checkout.jsp").forward(request, response);
                 return;
             }
-            // Tính discount tạm thời để check min order
-            double tempTotal = cart.getTotalPrice();
+            // Tính discount tạm thời để check min order (dùng selectedTotalPrice thay vì getTotalPrice)
+            double tempTotal = cart.getSelectedTotalPrice();
             double rankDiscount = tempTotal * (getDiscountPercent(user.getCustomerType()) / 100.0);
             double subtotalAfterRank = tempTotal - rankDiscount;
             if (subtotalAfterRank < voucher.getMinOrderValue()) {
                 request.setAttribute("mess", "Đơn hàng chưa đạt giá trị tối thiểu để sử dụng voucher này!");
+                attachVouchersToRequest(request);
                 request.getRequestDispatcher("checkout.jsp").forward(request, response);
                 return;
             }
@@ -165,21 +171,28 @@ public class CheckoutControl extends HttpServlet {
             }
             session.removeAttribute("cart");
             session.setAttribute("cartCount", 0);
+
+            // Cộng điểm thưởng và cập nhật hạng thành viên
             int pointsEarned = (int) (totalMoney / 100000);
             UserDAO userDAO = new UserDAO();
             userDAO.updateRewardPoints(user.getUserID(), totalMoney);
             user.setRewardPoints(user.getRewardPoints() + pointsEarned);
             int newPoints = user.getRewardPoints();
+            String newType;
             if (newPoints >= 20000)
-                user.setCustomerType("Diamond");
+                newType = "Diamond";
             else if (newPoints >= 10000)
-                user.setCustomerType("Gold");
+                newType = "Gold";
             else if (newPoints >= 5000)
-                user.setCustomerType("Silver");
+                newType = "Silver";
             else if (newPoints >= 1000)
-                user.setCustomerType("Bronze");
+                newType = "Bronze";
             else
-                user.setCustomerType("New Member");
+                newType = "New Member";
+
+            user.setCustomerType(newType);
+            // Lưu CustomerType mới vào database
+            userDAO.updateCustomerType(user.getUserID(), newType);
 
             session.setAttribute("ACC", user);
 
@@ -187,7 +200,20 @@ public class CheckoutControl extends HttpServlet {
                     + ". Bạn đã tích lũy được " + pointsEarned + " điểm.");
             request.getRequestDispatcher("thanks.jsp").forward(request, response);
         } else {
-            response.sendRedirect("home");
+            request.setAttribute("mess", "Có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại!");
+            attachVouchersToRequest(request);
+            request.getRequestDispatcher("checkout.jsp").forward(request, response);
+        }
+    }
+
+    // Đính kèm danh sách voucher vào request khi forward về checkout.jsp
+    private void attachVouchersToRequest(HttpServletRequest request) {
+        try {
+            VoucherDAO voucherDAO = new VoucherDAO();
+            List<Voucher> validVouchers = voucherDAO.getAllValidVouchers();
+            request.setAttribute("validVouchers", validVouchers);
+        } catch (Exception e) {
+            // ignore, page can still render without vouchers
         }
     }
 

@@ -149,6 +149,18 @@ public class UserDAO extends DBContext {
         }
     }
 
+    public void updateCustomerType(int userId, String customerType) {
+        String sql = "UPDATE Users SET CustomerType = ? WHERE UserID = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, customerType);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void deleteUser(int id) {
         String sql = "DELETE FROM Users WHERE UserID = ?";
         try (Connection conn = getConnection();
