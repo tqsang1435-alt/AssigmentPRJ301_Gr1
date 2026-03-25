@@ -16,7 +16,8 @@ import vn.edu.phoneshop.model.User;
     "/add-customer", 
     "/edit-customer", 
     "/update-customer", 
-    "/delete-customer" 
+    "/delete-customer",
+    "/restore-customer"
 })
 public class CustomerController extends HttpServlet {
 
@@ -39,6 +40,9 @@ public class CustomerController extends HttpServlet {
                 break;
             case "/delete-customer":
                 deleteCustomer(request, response);
+                break;
+            case "/restore-customer":
+                restoreCustomer(request, response);
                 break;
             default:
                 response.sendRedirect("customer-list");
@@ -86,7 +90,7 @@ public class CustomerController extends HttpServlet {
             }
         }
 
-        List<User> allList = customerDAO.getCustomers();
+        List<User> allList = customerDAO.getCustomers(true); // hiển thị cả tài khoản bị vô hiệu hóa
         int totalRecords = allList.size();
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
@@ -162,6 +166,13 @@ public class CustomerController extends HttpServlet {
             throws ServletException, IOException {
         String id = request.getParameter("id");
         customerDAO.deleteCustomer(id);
+        response.sendRedirect("customer-list");
+    }
+
+    private void restoreCustomer(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String id = request.getParameter("id");
+        customerDAO.restoreCustomer(id);
         response.sendRedirect("customer-list");
     }
 }

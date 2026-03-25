@@ -2,3 +2,7 @@
 ALTER TABLE [dbo].[Products] ADD [RAM] [nvarchar](50) NULL;
 ALTER TABLE [dbo].[Products] ADD [ROM] [nvarchar](50) NULL;
 ALTER TABLE [dbo].[Products] ADD [Color] [nvarchar](50) NULL;
+
+
+ALTER TABLE Orders
+ADD VoucherID INT NULL FOREIGN KEY REFERENCES Vouchers(VoucherID);

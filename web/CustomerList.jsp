@@ -57,6 +57,35 @@
             color: #adb5bd;
             pointer-events: none;
         }
+        tr.inactive-row {
+            opacity: 0.55;
+            background-color: #f8f9fa;
+        }
+        tr.inactive-row td {
+            color: #6c757d;
+        }
+        .badge--active {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge--inactive {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .action-btn--restore {
+            color: #059669;
+        }
+        .action-btn--restore:hover {
+            color: #065f46;
+        }
     </style>
 </head>
 
@@ -93,12 +122,13 @@
                                     <th>Điểm</th>
                                     <th>Hạng</th>
                                     <th>Ngày tạo</th>
+                                    <th>Trạng thái</th>
                                     <th>Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <c:forEach items="${requestScope.listC}" var="c" varStatus="loop">
-                                    <tr>
+                                    <tr class="${!c.active ? 'inactive-row' : ''}">
                                         <td>${pageOffset + loop.index + 1}</td>
                                         <td>#${c.userID}</td>
                                         <td>${c.fullName}</td>
@@ -115,12 +145,32 @@
                                                 pattern="dd/MM/yyyy" />
                                         </td>
                                         <td>
+                                            <c:choose>
+                                                <c:when test="${c.active}">
+                                                    <span class="badge--active">Hoạt động</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge--inactive">Đã vô hiệu hóa</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
                                             <a href="edit-customer?id=${c.userID}" class="action-btn"
                                                 title="Chỉnh sửa"><i class="ti-pencil"></i></a>
-                                            <a href="admin-delete-user?userID=${c.userID}"
-                                                onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');"
-                                                class="action-btn action-btn--delete" title="Xóa"><i
-                                                    class="ti-trash"></i></a>
+                                            <c:choose>
+                                                <c:when test="${c.active}">
+                                                    <a href="delete-customer?id=${c.userID}"
+                                                        onclick="return confirm('Bạn chắc chắn muốn vô hiệu hóa khách hàng này? Tài khoản sẽ không bị xóa và có thể khôi phục sau.');"
+                                                        class="action-btn action-btn--delete" title="Vô hiệu hóa">
+                                                        <i class="ti-na"></i></a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <a href="restore-customer?id=${c.userID}"
+                                                        onclick="return confirm('Bạn có muốn khôi phục tài khoản này không?');"
+                                                        class="action-btn action-btn--restore" title="Khôi phục">
+                                                        <i class="ti-reload"></i></a>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </td>
                                     </tr>
                                 </c:forEach>

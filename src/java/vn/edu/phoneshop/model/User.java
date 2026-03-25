@@ -13,6 +13,7 @@ public class User {
     private Date createDate;
     private int rewardPoints;
     private String customerType;
+    private boolean isActive = true;
 
     public User() {
     }
@@ -109,5 +110,13 @@ public class User {
 
     public void setCustomerType(String customerType) {
         this.customerType = customerType;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 }

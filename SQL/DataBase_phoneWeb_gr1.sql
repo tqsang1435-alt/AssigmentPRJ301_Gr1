@@ -146,6 +146,9 @@ ADD RewardPoints INT NOT NULL DEFAULT 0;
 ALTER TABLE Users
 ADD CustomerType VARCHAR(50) NOT NULL DEFAULT 'New';
 
+ALTER TABLE Users
+ADD IsActive BIT NOT NULL DEFAULT 1; -- 1: Đang hoạt động, 0: Đã vô hiệu hóa (soft delete)
+
 ALTER TABLE Orders
 ADD VoucherID INT FOREIGN KEY REFERENCES Vouchers(VoucherID);
 

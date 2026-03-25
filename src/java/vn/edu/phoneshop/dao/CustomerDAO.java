@@ -11,8 +11,14 @@ import java.sql.Connection;
 public class CustomerDAO extends DBContext {
 
     public List<User> getCustomers() {
+        return getCustomers(false);
+    }
+
+    public List<User> getCustomers(boolean includeInactive) {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT * FROM Users WHERE Role = 'Customer'";
+        String sql = includeInactive
+            ? "SELECT * FROM Users WHERE Role = 'Customer'"
+            : "SELECT * FROM Users WHERE Role = 'Customer' AND IsActive = 1";
         try {
             Connection connection = getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -28,6 +34,7 @@ public class CustomerDAO extends DBContext {
                 u.setRole(rs.getString("Role"));
                 u.setRewardPoints(rs.getInt("RewardPoints"));
                 u.setCustomerType(rs.getString("CustomerType"));
+                u.setActive(rs.getBoolean("IsActive"));
                 list.add(u);
             }
         } catch (Exception e) {
@@ -37,16 +44,24 @@ public class CustomerDAO extends DBContext {
     }
 
     public void deleteCustomer(String id) {
-        String sqlUpdateOrder = "UPDATE Orders SET UserID = NULL WHERE UserID = ?";
-        String sqlDeleteUser = "DELETE FROM Users WHERE UserID = ? AND Role = 'Customer'";
+        // Soft delete: vô hiệu hóa tạm thời, không xóa dữ liệu khỏi DB
+        String sql = "UPDATE Users SET IsActive = 0 WHERE UserID = ? AND Role = 'Customer'";
         try {
             Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-            PreparedStatement psUpdate = connection.prepareStatement(sqlUpdateOrder);
-            psUpdate.setString(1, id);
-            psUpdate.executeUpdate();
-
-            PreparedStatement ps = connection.prepareStatement(sqlDeleteUser);
+    public void restoreCustomer(String id) {
+        // Khôi phục tài khoản đã bị vô hiệu hóa
+        String sql = "UPDATE Users SET IsActive = 1 WHERE UserID = ? AND Role = 'Customer'";
+        try {
+            Connection connection = getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, id);
             ps.executeUpdate();
         } catch (Exception e) {
