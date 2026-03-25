@@ -52,7 +52,12 @@ public class OrderDAO extends DBContext {
 
     // Tạo đơn hàng mới và trả về ID (Dùng cho Checkout)
     public int createOrder(int userId, double totalMoney, int status, int voucherID) {
-        String sql = "INSERT INTO Orders (UserID, OrderDate, TotalMoney, Status, VoucherID) VALUES (?, GETDATE(), ?, ?, ?)";
+        return createOrder(userId, totalMoney, status, voucherID, null);
+    }
+
+    // Tạo đơn hàng mới kèm địa chỉ giao hàng và trả về ID (Dùng cho Checkout)
+    public int createOrder(int userId, double totalMoney, int status, int voucherID, String shippingAddress) {
+        String sql = "INSERT INTO Orders (UserID, OrderDate, TotalMoney, Status, VoucherID, ShippingAddress) VALUES (?, GETDATE(), ?, ?, ?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, userId);
@@ -62,6 +67,11 @@ public class OrderDAO extends DBContext {
                 ps.setInt(4, voucherID);
             } else {
                 ps.setNull(4, java.sql.Types.INTEGER);
+            }
+            if (shippingAddress != null && !shippingAddress.trim().isEmpty()) {
+                ps.setString(5, shippingAddress);
+            } else {
+                ps.setNull(5, java.sql.Types.NVARCHAR);
             }
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
